@@ -1,65 +1,122 @@
 import React from 'react';
 import {
+  Button,
   Image,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { WebBrowser } from 'expo';
 
 import { MonoText } from '../components/StyledText';
+import firebase from 'firebase';
+import db from '../db.js';
 
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
     header: null,
   };
 
+  state = {
+    name: "",
+    email: "",
+    password: "",
+    avatar: null,
+    caption: ""
+  }
+
+
+
+  finishLoginOrRegister = async () => {
+
+  }
+
+  loginOrRegister = async () => {
+    let avatar = "default.png"
+    try {
+
+      await firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
+      // upload this.state.avatar called this.state.email to firebase storage
+      if (this.state.avatar) {
+        avatar = this.state.email
+        await uploadImageAsync("avatars", this.state.avatar, this.state.email)
+      }
+
+      console.log("avatar upload: ", avatar)
+      const name = this.state.name || this.state.email
+      await db.collection('users').doc(this.state.email).set({ name, avatar, online: true })
+    } catch (error) {
+      // Handle Errors here.
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      // ...
+      console.log(errorCode)
+      console.log(errorMessage)
+      if (errorCode == "auth/email-already-in-use") {
+        try {
+          await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
+
+          if (this.state.avatar) {
+            avatar = this.state.email
+            await db.collection('users').doc(this.state.email).update({ avatar })
+          }
+
+          await db.collection('users').doc(this.state.email).update({ online: true })
+          
+          if(this.state.name) {
+            await db.collection('users').doc(this.state.email).update({ name: this.state.name })
+          }
+        } catch (error) {
+
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          // ...
+          console.log(errorMessage)
+        }
+      }
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        <View style={styles.contentContainer}>
           <View style={styles.welcomeContainer}>
-            <Image
-              source={
-                __DEV__
-                  ? require('../assets/images/robot-dev.png')
-                  : require('../assets/images/robot-prod.png')
-              }
-              style={styles.welcomeImage}
+          <Image
+          style={{width: 50, height: 50}}
+          source={{uri: 'https://www.fonepaw.com/images/android-data-recovery/recycle-bin-icon.png'}}
+        />
+            <TextInput
+              autoCapitalize="none"
+              placeholder="Name"
+              onChangeText={name => this.setState({ name })}
+              value={this.state.name}
             />
-          </View>
 
-          <View style={styles.getStartedContainer}>
-            {this._maybeRenderDevelopmentModeWarning()}
+            <TextInput
+              autoCapitalize="none"
+              placeholder="Email"
+              onChangeText={email => this.setState({ email })}
+              value={this.state.email}
+            />
 
-            <Text style={styles.getStartedText}>Get started by opening</Text>
+            <TextInput
+              autoCapitalize="none"
+              placeholder="Password"
+              onChangeText={password => this.setState({ password })}
+              value={this.state.password}
+            />
 
-            <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
-              <MonoText style={styles.codeHighlightText}>screens/HomeScreen.js</MonoText>
-            </View>
+            <Button onPress={this.loginOrRegister} title="Login / Register" style={{ width: 100, paddingTop: 20 }} />
 
-            <Text style={styles.getStartedText}>
-              Change this text and your app will automatically reload.
-            </Text>
-          </View>
-
-          <View style={styles.helpContainer}>
-            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-
-        <View style={styles.tabBarInfoContainer}>
-          <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text>
-
-          <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-            <MonoText style={styles.codeHighlightText}>navigation/MainTabNavigator.js</MonoText>
           </View>
         </View>
+
       </View>
     );
   }
