@@ -9,6 +9,7 @@ import TabBarIcon from "../components/TabBarIcon";
 import HomeScreen from "../screens/HomeScreen";
 import LinksScreen from "../screens/LinksScreen";
 import MapScreen from "../screens/MapScreen";
+import DashboardScreen from "../screens/DashboardScreen";
 
 const HomeStack = createStackNavigator({
   Home: HomeScreen
@@ -56,8 +57,22 @@ MapStack.navigationOptions = {
   )
 };
 
+const DashboardStack = createStackNavigator({
+  Dashboard: DashboardScreen
+});
+
+DashboardStack.navigationOptions = {
+  tabBarLabel: "Dashboard",
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon
+      focused={focused}
+      name={Platform.OS === "ios" ? "ios-options" : "md-options"}
+    />
+  )
+};
 export default createBottomTabNavigator({
   HomeStack,
   LinksStack,
-  MapStack
+  MapStack,
+  DashboardStack
 });
