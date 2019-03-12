@@ -9,8 +9,7 @@ import {
   /*, StyleSheet*/
 } from "react-native";
 import { ExpoConfigView } from "@expo/samples";
-import MapView from "react-native-maps";
-import Geolocation from "react-native-geolocation-service";
+import MapView, { Callout } from "react-native-maps";
 
 export default class MapScreen extends React.Component {
   static navigationOptions = {
@@ -35,11 +34,12 @@ export default class MapScreen extends React.Component {
       longitude: -122.4324,
       latitudeDelta: 0.0922,
       longitudeDelta: 0.0421
-    }
+    },
+    selectedBin: null
   };
 
   async componentDidMount() {
-    await navigator.geolocation.getCurrentPosition(
+    await navigator.geolocation.watchPosition(
       position => {
         console.log(position.coords.latitude);
         console.log(position.coords.longitude);
@@ -64,7 +64,7 @@ export default class MapScreen extends React.Component {
   }
 
   render() {
-    console.log("render print:", this.state.region);
+    console.log(this.state);
     return (
       <View
         style={{
@@ -81,7 +81,8 @@ export default class MapScreen extends React.Component {
           <MapView
             showsUserLocation
             style={{
-              flex: 1
+              flex: 1,
+              zIndex: -1
               // position: "absolute",
               // top: 0,
               // left: 0,
@@ -104,6 +105,14 @@ export default class MapScreen extends React.Component {
             ]}
             region={this.state.region}
           >
+            <TouchableOpacity
+              onPress={() => {
+                console.log("Reserved!");
+              }}
+              style={{ backgroundColor: "lightgreen" }}
+            >
+              <Text>Reserve</Text>
+            </TouchableOpacity>
             <MapView.Polygon
               coordinates={this.state.coordsArr}
               strokeColor="green"
@@ -111,14 +120,75 @@ export default class MapScreen extends React.Component {
               showsCompass={true}
               showsMyLocationButton={true}
             />
+
             {this.state.markers.map((marker, i) => (
               <TouchableOpacity key={i} onPress={alert}>
-                <MapView.Marker onPress={alert} coordinate={marker}>
+                <MapView.Marker.Animated
+                  ref={marker => (this.marker = marker)}
+                  title={"Id goes here"}
+                  description={"Capacity percentage goes here"}
+                  onPress={() => {
+                    this.setState({ selectedBin: marker });
+                  }}
+                  coordinate={marker}
+                >
                   <Image
                     source={require("../assets/images/bin.png")}
                     style={{ width: 20, height: 20, tintColor: "orange" }}
                   />
-                </MapView.Marker>
+                  <Callout>
+                    <View
+                      style={{
+                        width: 150,
+                        height: 100,
+                        justifyContent: "center"
+                      }}
+                    >
+                      <Text style={{ fontWeight: "bold" }}>
+                        Trash Level: 50%
+                      </Text>
+                      <Text style={{ fontWeight: "bold" }}>
+                        Battery Level: 87%
+                      </Text>
+                      <Text style={{ fontWeight: "bold" }}>Status: Active</Text>
+                      {/* <View
+                        style={{
+                          marginTop: "1%",
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          alignItems: "center"
+                        }}
+                      >
+                        <Callout>
+                          <TouchableOpacity
+                            onPress={() => {
+                              console.log("Reserved!");
+                            }}
+                            style={{ backgroundColor: "lightgreen" }}
+                          >
+                            <Text>Reserve</Text>
+                          </TouchableOpacity>
+                        </Callout>
+                        <TouchableOpacity
+                          onPress={() => {
+                            console.log("Emptied!");
+                          }}
+                          style={{ backgroundColor: "green" }}
+                        >
+                          <Text>Empty Bin</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => {
+                            console.log("Reported!");
+                          }}
+                          style={{ backgroundColor: "red" }}
+                        >
+                          <Text>Report</Text>
+                        </TouchableOpacity>
+                      </View> */}
+                    </View>
+                  </Callout>
+                </MapView.Marker.Animated>
               </TouchableOpacity>
             ))}
           </MapView>
