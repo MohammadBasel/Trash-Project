@@ -10,19 +10,28 @@ import {
 } from "react-native";
 import { ExpoConfigView } from "@expo/samples";
 import MapView, { Callout } from "react-native-maps";
+import db from "../db";
 
 export default class MapScreen extends React.Component {
   static navigationOptions = {
     title: "Map"
   };
+  // [
+  //   { latitude: 25.380331, longitude: 51.489722 },
+  //   { latitude: 25.375834, longitude: 51.48307 },
+  //   { latitude: 25.36199, longitude: 51.483364 },
+  //   { latitude: 25.359082, longitude: 51.48184 }
+  // ],
+  // coordsArr: [
+  //   { latitude: 25.381649, longitude: 51.479143 },
+  //   { latitude: 25.359159, longitude: 51.478886 },
+  //   { latitude: 25.359314, longitude: 51.494207 },
+  //   { latitude: 25.384426, longitude: 51.49592 }
+  // ]
 
   state = {
-    markers: [
-      { latitude: 25.380331, longitude: 51.489722 },
-      { latitude: 25.375834, longitude: 51.48307 },
-      { latitude: 25.36199, longitude: 51.483364 },
-      { latitude: 25.359082, longitude: 51.48184 }
-    ],
+    zone: "SsEKhFPP19pg0jJLcBBv",
+    bins: [],
     coordsArr: [
       { latitude: 25.381649, longitude: 51.479143 },
       { latitude: 25.359159, longitude: 51.478886 },
@@ -61,6 +70,14 @@ export default class MapScreen extends React.Component {
         maximumAge: 1000
       }
     );
+    db.collection(`Zone/${this.state.zone}/Trash`).onSnapshot(querySnapshot => {
+      let bins = [...this.state.bins];
+      querySnapshot.forEach(doc => {
+        bins.push({ id: doc.id, ...doc.data() });
+      });
+      this.setState({ bins });
+      //console.log("Current login users: ", this.users.length);
+    });
   }
 
   render() {
@@ -108,16 +125,17 @@ export default class MapScreen extends React.Component {
               showsMyLocationButton={true}
             />
 
-            {this.state.markers.map((marker, i) => (
+            {this.state.bins.map((marker, i) => (
               <TouchableOpacity key={i} onPress={alert}>
+                {console.log("marker is: ", marker.Loc)}
                 <MapView.Marker.Animated
                   ref={marker => (this.marker = marker)}
-                  title={"Id goes here"}
-                  description={"Capacity percentage goes here"}
+                  title={marker.Id}
+                  description={marker.Level}
                   onPress={() => {
                     this.setState({ selectedBin: marker });
                   }}
-                  coordinate={marker}
+                  coordinate={marker.Loc}
                 >
                   <Image
                     source={require("../assets/images/bin.png")}
