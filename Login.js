@@ -10,13 +10,15 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import HomeScreen from "./navigation/MainTabNavigator"
+import AppNavigator from './navigation/AppNavigator';
+import { MonoText } from './components/StyledText';
 import { WebBrowser } from 'expo';
 
-import { MonoText } from '../components/StyledText';
 import firebase from 'firebase';
-import db from '../db.js';
+import db from "./db";
 
-export default class HomeScreen extends React.Component {
+export default class Login extends React.Component {
   static navigationOptions = {
     header: null,
   };
@@ -26,7 +28,8 @@ export default class HomeScreen extends React.Component {
     email: "",
     password: "",
     avatar: null,
-    caption: ""
+    caption: "",
+    flag : false
   }
 
 
@@ -37,7 +40,26 @@ export default class HomeScreen extends React.Component {
 
   login = async () => {
     let avatar = "default.png"
-    
+    // try {
+
+    //   await firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
+    //   // upload this.state.avatar called this.state.email to firebase storage
+    //   if (this.state.avatar) {
+    //     avatar = this.state.email
+    //     await uploadImageAsync("avatars", this.state.avatar, this.state.email)
+    //   }
+  
+    //   console.log("avatar upload: ", avatar)
+    //   const name = this.state.name || this.state.email
+    //   await db.collection('users').doc(this.state.email).set({ name, avatar, online: true })
+    // } catch (error) {
+    //   // Handle Errors here.
+    //   var errorCode = error.code;
+    //   var errorMessage = error.message;
+    //   // ...
+    //   console.log(errorCode)
+    //   console.log(errorMessage)
+    // }
         try {
           await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
 
@@ -51,6 +73,8 @@ export default class HomeScreen extends React.Component {
           if(this.state.name) {
             await db.collection('users').doc(this.state.email).update({ name: this.state.name })
           }
+          this.push
+          this.setState({flag : true})
         } catch (error) {
 
           // Handle Errors here.
@@ -58,19 +82,24 @@ export default class HomeScreen extends React.Component {
           var errorMessage = error.message;
           // ...
           console.log(errorMessage)
+          this.setState({flag : false})
         }
       }
     
   
 
   render() {
+    {console.log("the flag", this.state.flag)}
     return (
+      
       <View style={styles.container}>
+      {this.state.flag == false?
         <View style={styles.contentContainer}>
           <View style={styles.welcomeContainer}>
+          
           <Image
-          style={{width: 50, height: 50}}
-          source={{uri: 'https://www.fonepaw.com/images/android-data-recovery/recycle-bin-icon.png'}}
+          style={{width: 150, height: 150}}
+          source={{uri: 'https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/logo.png?alt=media&token=3a5446d6-2998-46b5-8cef-7f1c1afda0d3'}}
         />
             {/* <TextInput
               autoCapitalize="none"
@@ -78,9 +107,9 @@ export default class HomeScreen extends React.Component {
               onChangeText={name => this.setState({ name })}
               value={this.state.name}
             /> */}
-            <Text style={{fontSize: 80}}>THE HOME PAGE !!!!! </Text>
 
             <TextInput
+            style={{ paddingTop: 20}}
               autoCapitalize="none"
               placeholder="Email"
               onChangeText={email => this.setState({ email })}
@@ -88,17 +117,18 @@ export default class HomeScreen extends React.Component {
             />
 
             <TextInput
+            style={{ paddingTop: 20}}
               autoCapitalize="none"
               placeholder="Password"
               onChangeText={password => this.setState({ password })}
               value={this.state.password}
             />
 
-            <Button onPress={this.login} title="Login" style={{ width: 100, paddingTop: 20 }} />
-
+            <Button onPress={this.login} title="Login" style={{ width: 100, paddingTop: 50 }} />
+            
           </View>
         </View>
-
+:  <AppNavigator /> }
       </View>
     );
   }
@@ -141,6 +171,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+
+    
   },
   developmentModeText: {
     marginBottom: 20,
