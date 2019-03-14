@@ -83,11 +83,6 @@ export default class MapScreen extends React.Component {
             style={{
               flex: 1,
               zIndex: -1
-              // position: "absolute",
-              // top: 0,
-              // left: 0,
-              // right: 0,
-              // bottom: 0
             }}
             customMapStyle={[
               {
@@ -105,14 +100,6 @@ export default class MapScreen extends React.Component {
             ]}
             region={this.state.region}
           >
-            <TouchableOpacity
-              onPress={() => {
-                console.log("Reserved!");
-              }}
-              style={{ backgroundColor: "lightgreen" }}
-            >
-              <Text>Reserve</Text>
-            </TouchableOpacity>
             <MapView.Polygon
               coordinates={this.state.coordsArr}
               strokeColor="green"
@@ -151,47 +138,29 @@ export default class MapScreen extends React.Component {
                         Battery Level: 87%
                       </Text>
                       <Text style={{ fontWeight: "bold" }}>Status: Active</Text>
-                      {/* <View
-                        style={{
-                          marginTop: "1%",
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          alignItems: "center"
-                        }}
-                      >
-                        <Callout>
-                          <TouchableOpacity
-                            onPress={() => {
-                              console.log("Reserved!");
-                            }}
-                            style={{ backgroundColor: "lightgreen" }}
-                          >
-                            <Text>Reserve</Text>
-                          </TouchableOpacity>
-                        </Callout>
-                        <TouchableOpacity
-                          onPress={() => {
-                            console.log("Emptied!");
-                          }}
-                          style={{ backgroundColor: "green" }}
-                        >
-                          <Text>Empty Bin</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          onPress={() => {
-                            console.log("Reported!");
-                          }}
-                          style={{ backgroundColor: "red" }}
-                        >
-                          <Text>Report</Text>
-                        </TouchableOpacity>
-                      </View> */}
                     </View>
                   </Callout>
                 </MapView.Marker.Animated>
               </TouchableOpacity>
             ))}
           </MapView>
+          <TouchableOpacity
+            onPress={() => {
+              console.log("Reserved!");
+            }}
+            style={{
+              backgroundColor: "lightgreen",
+              width: 75,
+              height: 50,
+              position: "absolute",
+              top: 600,
+              bottom: 20,
+              left: 20,
+              right: 50
+            }}
+          >
+            <Text style={{ textAlign: "center" }}>Reserve</Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
