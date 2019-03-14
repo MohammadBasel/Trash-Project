@@ -10,7 +10,10 @@ import HomeScreen from "../screens/HomeScreen";
 import LinksScreen from "../screens/LinksScreen";
 import MapScreen from "../screens/MapScreen";
 import DashboardScreen from "../screens/DashboardScreen";
+import TrashStatus from "../screens/TrashStatus";
+import Employee from "../screens/Employee";
 
+import LogScreen from "../screens/LogScreen";
 const HomeStack = createStackNavigator({
   Home: HomeScreen
 });
@@ -58,7 +61,10 @@ MapStack.navigationOptions = {
 };
 
 const DashboardStack = createStackNavigator({
-  Dashboard: DashboardScreen
+  Dashboard: DashboardScreen,
+  TrashStatus: TrashStatus,
+  Employee: Employee,
+  Log: LogScreen
 });
 
 DashboardStack.navigationOptions = {

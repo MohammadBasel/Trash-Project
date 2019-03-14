@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import { ExpoConfigView } from "@expo/samples";
 import MapView from "react-native-maps";
-import Geolocation from "react-native-geolocation-service";
 
 export default class MapScreen extends React.Component {
   static navigationOptions = {
