@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Button,
   Image,
@@ -8,19 +8,19 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
-} from 'react-native';
-import HomeScreen from "./navigation/MainTabNavigator"
-import AppNavigator from './navigation/AppNavigator';
-import { MonoText } from './components/StyledText';
-import { WebBrowser } from 'expo';
+  View
+} from "react-native";
+import HomeScreen from "./navigation/MainTabNavigator";
+import AppNavigator from "./navigation/AppNavigator";
+import { MonoText } from "./components/StyledText";
+import { WebBrowser } from "expo";
 
-import firebase from 'firebase';
+import firebase from "firebase";
 import db from "./db";
 
 export default class Login extends React.Component {
   static navigationOptions = {
-    header: null,
+    header: null
   };
 
   state = {
@@ -29,17 +29,13 @@ export default class Login extends React.Component {
     password: "",
     avatar: null,
     caption: "",
-    flag : false
-  }
+    flag: true
+  };
 
-
-
-  finishLoginOrRegister = async () => {
-
-  }
+  finishLoginOrRegister = async () => {};
 
   login = async () => {
-    let avatar = "default.png"
+    let avatar = "default.png";
     // try {
 
     //   await firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
@@ -48,7 +44,7 @@ export default class Login extends React.Component {
     //     avatar = this.state.email
     //     await uploadImageAsync("avatars", this.state.avatar, this.state.email)
     //   }
-  
+
     //   console.log("avatar upload: ", avatar)
     //   const name = this.state.name || this.state.email
     //   await db.collection('users').doc(this.state.email).set({ name, avatar, online: true })
@@ -60,75 +56,91 @@ export default class Login extends React.Component {
     //   console.log(errorCode)
     //   console.log(errorMessage)
     // }
-        try {
-          await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
+    try {
+      await firebase
+        .auth()
+        .signInWithEmailAndPassword(this.state.email, this.state.password);
 
-          if (this.state.avatar) {
-            avatar = this.state.email
-            await db.collection('users').doc(this.state.email).update({ avatar })
-          }
-
-          await db.collection('users').doc(this.state.email).update({ online: true })
-          
-          if(this.state.name) {
-            await db.collection('users').doc(this.state.email).update({ name: this.state.name })
-          }
-          this.push
-          this.setState({flag : true})
-        } catch (error) {
-
-          // Handle Errors here.
-          var errorCode = error.code;
-          var errorMessage = error.message;
-          // ...
-          console.log(errorMessage)
-          this.setState({flag : false})
-        }
+      if (this.state.avatar) {
+        avatar = this.state.email;
+        await db
+          .collection("users")
+          .doc(this.state.email)
+          .update({ avatar });
       }
-    
-  
+
+      await db
+        .collection("users")
+        .doc(this.state.email)
+        .update({ online: true });
+
+      if (this.state.name) {
+        await db
+          .collection("users")
+          .doc(this.state.email)
+          .update({ name: this.state.name });
+      }
+      this.push;
+      this.setState({ flag: true });
+    } catch (error) {
+      // Handle Errors here.
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      // ...
+      console.log(errorMessage);
+      this.setState({ flag: false });
+    }
+  };
 
   render() {
-    {console.log("the flag", this.state.flag)}
+    {
+      console.log("the flag", this.state.flag);
+    }
     return (
-      
       <View style={styles.container}>
-      {this.state.flag == false?
-        <View style={styles.contentContainer}>
-          <View style={styles.welcomeContainer}>
-          
-          <Image
-          style={{width: 150, height: 150}}
-          source={{uri: 'https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/logo.png?alt=media&token=3a5446d6-2998-46b5-8cef-7f1c1afda0d3'}}
-        />
-            {/* <TextInput
+        {this.state.flag == false ? (
+          <View style={styles.contentContainer}>
+            <View style={styles.welcomeContainer}>
+              <Image
+                style={{ width: 150, height: 150 }}
+                source={{
+                  uri:
+                    "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/logo.png?alt=media&token=3a5446d6-2998-46b5-8cef-7f1c1afda0d3"
+                }}
+              />
+              {/* <TextInput
               autoCapitalize="none"
               placeholder="Name"
               onChangeText={name => this.setState({ name })}
               value={this.state.name}
             /> */}
 
-            <TextInput
-            style={{ paddingTop: 20}}
-              autoCapitalize="none"
-              placeholder="Email"
-              onChangeText={email => this.setState({ email })}
-              value={this.state.email}
-            />
+              <TextInput
+                style={{ paddingTop: 20 }}
+                autoCapitalize="none"
+                placeholder="Email"
+                onChangeText={email => this.setState({ email })}
+                value={this.state.email}
+              />
 
-            <TextInput
-            style={{ paddingTop: 20}}
-              autoCapitalize="none"
-              placeholder="Password"
-              onChangeText={password => this.setState({ password })}
-              value={this.state.password}
-            />
+              <TextInput
+                style={{ paddingTop: 20 }}
+                autoCapitalize="none"
+                placeholder="Password"
+                onChangeText={password => this.setState({ password })}
+                value={this.state.password}
+              />
 
-            <Button onPress={this.login} title="Login" style={{ width: 100, paddingTop: 50 }} />
-            
+              <Button
+                onPress={this.login}
+                title="Login"
+                style={{ width: 100, paddingTop: 50 }}
+              />
+            </View>
           </View>
-        </View>
-:  <AppNavigator /> }
+        ) : (
+          <AppNavigator />
+        )}
       </View>
     );
   }
@@ -143,8 +155,8 @@ export default class Login extends React.Component {
 
       return (
         <Text style={styles.developmentModeText}>
-          Development mode is enabled, your app will be slower but you can use useful development
-          tools. {learnMoreButton}
+          Development mode is enabled, your app will be slower but you can use
+          useful development tools. {learnMoreButton}
         </Text>
       );
     } else {
@@ -157,12 +169,14 @@ export default class Login extends React.Component {
   }
 
   _handleLearnMorePress = () => {
-    WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/guides/development-mode');
+    WebBrowser.openBrowserAsync(
+      "https://docs.expo.io/versions/latest/guides/development-mode"
+    );
   };
 
   _handleHelpPress = () => {
     WebBrowser.openBrowserAsync(
-      'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
+      "https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes"
     );
   };
 }
@@ -170,90 +184,88 @@ export default class Login extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-
-    
+    backgroundColor: "#fff"
   },
   developmentModeText: {
     marginBottom: 20,
-    color: 'rgba(0,0,0,0.4)',
+    color: "rgba(0,0,0,0.4)",
     fontSize: 14,
     lineHeight: 19,
-    textAlign: 'center',
+    textAlign: "center"
   },
   contentContainer: {
-    paddingTop: 30,
+    paddingTop: 30
   },
   welcomeContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 10,
-    marginBottom: 20,
+    marginBottom: 20
   },
   welcomeImage: {
     width: 100,
     height: 80,
-    resizeMode: 'contain',
+    resizeMode: "contain",
     marginTop: 3,
-    marginLeft: -10,
+    marginLeft: -10
   },
   getStartedContainer: {
-    alignItems: 'center',
-    marginHorizontal: 50,
+    alignItems: "center",
+    marginHorizontal: 50
   },
   homeScreenFilename: {
-    marginVertical: 7,
+    marginVertical: 7
   },
   codeHighlightText: {
-    color: 'rgba(96,100,109, 0.8)',
+    color: "rgba(96,100,109, 0.8)"
   },
   codeHighlightContainer: {
-    backgroundColor: 'rgba(0,0,0,0.05)',
+    backgroundColor: "rgba(0,0,0,0.05)",
     borderRadius: 3,
-    paddingHorizontal: 4,
+    paddingHorizontal: 4
   },
   getStartedText: {
     fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
+    color: "rgba(96,100,109, 1)",
     lineHeight: 24,
-    textAlign: 'center',
+    textAlign: "center"
   },
   tabBarInfoContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
     ...Platform.select({
       ios: {
-        shadowColor: 'black',
+        shadowColor: "black",
         shadowOffset: { height: -3 },
         shadowOpacity: 0.1,
-        shadowRadius: 3,
+        shadowRadius: 3
       },
       android: {
-        elevation: 20,
-      },
+        elevation: 20
+      }
     }),
-    alignItems: 'center',
-    backgroundColor: '#fbfbfb',
-    paddingVertical: 20,
+    alignItems: "center",
+    backgroundColor: "#fbfbfb",
+    paddingVertical: 20
   },
   tabBarInfoText: {
     fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    textAlign: 'center',
+    color: "rgba(96,100,109, 1)",
+    textAlign: "center"
   },
   navigationFilename: {
-    marginTop: 5,
+    marginTop: 5
   },
   helpContainer: {
     marginTop: 15,
-    alignItems: 'center',
+    alignItems: "center"
   },
   helpLink: {
-    paddingVertical: 15,
+    paddingVertical: 15
   },
   helpLinkText: {
     fontSize: 14,
-    color: '#2e78b7',
-  },
+    color: "#2e78b7"
+  }
 });
