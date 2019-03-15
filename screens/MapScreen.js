@@ -30,14 +30,11 @@ export default class MapScreen extends React.Component {
   // ]
 
   state = {
-    zone: "SsEKhFPP19pg0jJLcBBv",
+    user: null,
+    zone: null,
     bins: [],
-    coordsArr: [
-      { latitude: 25.381649, longitude: 51.479143 },
-      { latitude: 25.359159, longitude: 51.478886 },
-      { latitude: 25.359314, longitude: 51.494207 },
-      { latitude: 25.384426, longitude: 51.49592 }
-    ],
+    trucks: [],
+    coordsArr: [{ latitude: 25.381649, longitude: 51.479143 }],
     region: {
       latitude: 37.78825,
       longitude: -122.4324,
@@ -46,20 +43,16 @@ export default class MapScreen extends React.Component {
     },
     selectedBin: null
   };
-
   async componentDidMount() {
     await navigator.geolocation.watchPosition(
       position => {
-        console.log(position.coords.latitude);
-        console.log(position.coords.longitude);
-
         region = {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421
         };
-        this.setState({ region }, console.log("new Region: ", region));
+        this.setState({ region });
       },
       error => {
         console.warn("Error Code: ", error);
@@ -70,18 +63,81 @@ export default class MapScreen extends React.Component {
         maximumAge: 1000
       }
     );
-    db.collection(`Zone/${this.state.zone}/Trash`).onSnapshot(querySnapshot => {
+    const result = await db
+      .collection("Users")
+      .doc("fida@fida.com")
+      .get();
+
+    const zoneId = result.data().Zone;
+    const user = { id: result.id, ...result.data() };
+    db.collection("Zone")
+      .doc(zoneId)
+      .onSnapshot(querySnapshot => {
+        const id = querySnapshot.id;
+        const coordsArr = this.convertToObjects(
+          querySnapshot.data().Coordinate
+        );
+        const zone = { id, ...querySnapshot.data() };
+        this.setState({ zone, coordsArr, user });
+      });
+
+    db.collection(`Zone/${zoneId}/Trash`).onSnapshot(querySnapshot => {
       let bins = [...this.state.bins];
       querySnapshot.forEach(doc => {
         bins.push({ id: doc.id, ...doc.data() });
       });
       this.setState({ bins });
-      //console.log("Current login users: ", this.users.length);
+    });
+
+    db.collection(`Zone/${zoneId}/Truck`).onSnapshot(querySnapshot => {
+      let trucks = [...this.state.trucks];
+      querySnapshot.forEach(doc => {
+        trucks.push({ id: doc.id, ...doc.data() });
+      });
+      this.setState({ trucks });
     });
   }
 
+  reserveBin = async () => {
+    let truckId = null;
+    for (let i = 0; i < this.state.trucks.length; i++) {
+      truckId = this.state.trucks[i].id;
+      let user = this.state.trucks[i].Crew.find(c => c === this.state.user.id);
+      if (user !== undefined) break;
+    }
+
+    db.collection(`Zone/${this.state.zone.id}/Trash`)
+      .doc(this.state.selectedBin.id)
+      .update({ Status: "Reserved" });
+
+    db.collection("Reserve_Bin")
+      .doc()
+      .set({
+        Status: "inprogress",
+        Time: new Date(),
+        Trash_Id: this.state.selectedBin.id,
+        Truck_Id: truckId
+      });
+  };
+
+  emptyBin = async () => {
+    await db
+      .collection(`Zone/${this.state.zone.id}/Trash`)
+      .doc(this.state.selectedBin.id)
+      .update({ Status: "Active", Level: 0 });
+    this.setState({ selectedBin: null });
+  };
+
+  convertToObjects = arr => {
+    let temp = [];
+    arr.forEach(cor => {
+      temp.push({ latitude: cor._lat, longitude: cor._long });
+    });
+    return temp;
+  };
+
   render() {
-    console.log(this.state);
+    // console.log(this.state);
     return (
       <View
         style={{
@@ -96,7 +152,15 @@ export default class MapScreen extends React.Component {
         >
           <Text>Welcome Map!</Text>
           <MapView
+            showsCompass={true}
+            showsMyLocationButton={true}
             showsUserLocation
+            onPress={() => {
+              this.setState(
+                { selectedBin: null },
+                console.log("Current Bin is: ", this.state.selectedBin)
+              );
+            }}
             style={{
               flex: 1,
               zIndex: -1
@@ -121,51 +185,71 @@ export default class MapScreen extends React.Component {
               coordinates={this.state.coordsArr}
               strokeColor="green"
               strokeWidth={2}
-              showsCompass={true}
-              showsMyLocationButton={true}
             />
 
-            {this.state.bins.map((marker, i) => (
-              <TouchableOpacity key={i} onPress={alert}>
-                {console.log("marker is: ", marker.Loc)}
-                <MapView.Marker.Animated
-                  ref={marker => (this.marker = marker)}
-                  title={marker.Id}
-                  description={marker.Level}
+            {this.state.bins.map((bin, i) => (
+              <TouchableOpacity key={i}>
+                <MapView.Marker
+                  redraw
+                  tracksViewChanges
                   onPress={() => {
-                    this.setState({ selectedBin: marker });
+                    this.setState({ selectedBin: bin });
                   }}
-                  coordinate={marker.Loc}
+                  coordinate={{
+                    latitude: bin.Loc._lat,
+                    longitude: bin.Loc._long
+                  }}
                 >
                   <Image
                     source={require("../assets/images/bin.png")}
-                    style={{ width: 20, height: 20, tintColor: "orange" }}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      tintColor: [
+                        bin.Status === "Damaged"
+                          ? "black"
+                          : bin.Status === "Reserved"
+                          ? "lightblue"
+                          : bin.Level < 50
+                          ? "green"
+                          : 50 <= bin.Level && bin.Level < 80
+                          ? "orange"
+                          : "red"
+                      ]
+                    }}
                   />
                   <Callout>
                     <View
                       style={{
-                        width: 150,
-                        height: 100,
+                        width: 200,
+                        height: 115,
                         justifyContent: "center"
                       }}
                     >
                       <Text style={{ fontWeight: "bold" }}>
-                        Trash Level: 50%
+                        Bin Id: {"" + bin.id}
                       </Text>
                       <Text style={{ fontWeight: "bold" }}>
-                        Battery Level: 87%
+                        Bin Level: {"" + bin.Level}%
                       </Text>
-                      <Text style={{ fontWeight: "bold" }}>Status: Active</Text>
+                      <Text style={{ fontWeight: "bold" }}>
+                        Battery Level: {"" + bin.Battery}%
+                      </Text>
+                      <Text style={{ fontWeight: "bold" }}>
+                        Status: {bin.Status}
+                      </Text>
                     </View>
                   </Callout>
-                </MapView.Marker.Animated>
+                </MapView.Marker>
               </TouchableOpacity>
             ))}
           </MapView>
           <TouchableOpacity
-            onPress={() => {
-              console.log("Reserved!");
-            }}
+            onPress={this.reserveBin}
+            disabled={
+              this.state.selectedBin === null ||
+              (this.state.selectedBin.Status === "Reserved" && false)
+            }
             style={{
               backgroundColor: "lightgreen",
               width: 75,
@@ -178,6 +262,25 @@ export default class MapScreen extends React.Component {
             }}
           >
             <Text style={{ textAlign: "center" }}>Reserve</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={this.emptyBin}
+            disabled={
+              this.state.selectedBin === null ||
+              (this.state.selectedBin.Status === "Reserved" && false)
+            }
+            style={{
+              backgroundColor: "lightgreen",
+              width: 75,
+              height: 50,
+              position: "absolute",
+              top: 600,
+              bottom: 20,
+              left: 200,
+              right: 50
+            }}
+          >
+            <Text style={{ textAlign: "center" }}>Empty</Text>
           </TouchableOpacity>
         </View>
       </View>
