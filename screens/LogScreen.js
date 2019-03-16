@@ -21,16 +21,14 @@ export default class LogScreen extends React.Component {
     logs: []
   };
   componentDidMount() {
-    // go to db and get all the users
-    db.collection("Log").onSnapshot(querySnapshot => {
-      logs = [];
-      querySnapshot.forEach(doc => {
-        logs.push({ id: doc.id, ...doc.data() });
-      });
-      this.setState({ logs });
-      console.log("Current users: ", this.state.logs.length);
-    });
-    //     // go to db and get all the records
+    // db.collection("Log").onSnapshot(querySnapshot => {
+    //   logs = [];
+    //   querySnapshot.forEach(doc => {
+    //     logs.push({ id: doc.id, ...doc.data() });
+    //   });
+    //   this.setState({ logs });
+    //   console.log("Current users: ", this.state.logs.length);
+    // });
   }
   render() {
     console.log(this.state);

@@ -12,7 +12,12 @@ import firebase from "firebase";
 import functions from "firebase/functions";
 import db from "../db.js";
 import { Card, ListItem, Button, Icon, Header } from "react-native-elements";
-
+import {
+  Ionicons,
+  FontAwesome,
+  AntDesign,
+  MaterialCommunityIcons
+} from "@expo/vector-icons";
 export default class DashboardScreen extends React.Component {
   static navigationOptions = {
     header: null
@@ -115,6 +120,22 @@ export default class DashboardScreen extends React.Component {
               </View>
             </Card>
           </TouchableOpacity>
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-evenly" }}
+          >
+            <AntDesign
+              name="table"
+              size={25}
+              color="black"
+              onPress={() => this.props.navigation.navigate("ShiftScreen")}
+            />
+            <MaterialCommunityIcons
+              name="star-four-points"
+              size={25}
+              color="black"
+              onPress={() => this.props.navigation.navigate("ShiftScreen")}
+            />
+          </View>
         </View>
       </View>
     );
