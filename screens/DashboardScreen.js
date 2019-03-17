@@ -23,9 +23,12 @@ export default class DashboardScreen extends React.Component {
     header: null
   };
   state = {
-    users: []
+    users: [],
+    zones: [],
+    trash: []
   };
-  componentDidMount() {
+
+  async componentWillMount() {
     // go to db and get all the users
     db.collection("Users").onSnapshot(querySnapshot => {
       users = [];
@@ -36,31 +39,64 @@ export default class DashboardScreen extends React.Component {
       console.log("Current users: ", this.state.users.length);
     });
 
-    // go to db and get all the records
-  }
+    db.collection("Zone").onSnapshot(querySnapshot => {
+      zones = [];
+      querySnapshot.forEach(doc => {
+        zones.push({ id: doc.id, ...doc.data() });
+        this.getTrashData(doc.id);
+      });
+      this.setState({ zones });
+      //  console.log("Zone", doc.id);
 
+      console.log("Current zones: ", this.state.zones.length);
+    });
+    this.count();
+  }
+  getTrashData = id => {
+    let trash = [...this.state.trash];
+    db.collection(`Zone/${id}/Trash`).onSnapshot(querySnapshot => {
+      querySnapshot.forEach(doc => {
+        trash.push({ id: doc.id, ...doc.data() });
+      });
+      this.setState({ trash });
+
+      //console.log("Current zones: ", this.state.trash.length);
+    });
+  };
   av = 0;
   ex = 0;
   ab = 0;
-  count = () => {
+  full = 0;
+  low = 0;
+  medium = 0;
+  countUser = () => {
     this.state.users.map(user =>
       user.Status == "available"
         ? (this.av = this.av + 1)
         : user.Status == "absent"
         ? (this.ab = this.ab + 1)
-        : (this.ex = this.ex = 1)
+        : (this.ex = this.ex + 1)
     );
-    // this.setState({ available: av });
-    // this.setState({ absent: ab });
-    // this.setState({ excused: ex });
   };
+  countTrash = () => {
+    this.state.trash.map(tra =>
+      tra.Level < 50
+        ? (this.low = this.low + 1)
+        : tra.Level >= 50 && tra.Level < 80
+        ? (this.medium = this.medium + 1)
+        : (this.full = this.full + 1)
+    );
+  };
+  tra = 0;
   render() {
     return (
       <View style={styles.container}>
-        {this.count()}
-        {console.log("available", this.av)}
-        {console.log("absent", this.ab)}
-        {console.log("excused", this.ex)}
+        {this.av === 0 && this.countUser()}
+        {this.countTrash()}
+        {console.log("full", this.full)}
+        {console.log("medium", this.medium)}
+        {console.log("low", this.low)}
+
         <Header
           centerComponent={{
             text: "Supervisor Dashboard",
@@ -80,7 +116,9 @@ export default class DashboardScreen extends React.Component {
             >
               <View style={{ alignItems: "center" }}>
                 <Text style={{ fontSize: 20, padding: 10 }}>
-                  Full: 5{"    "}Emptied: 2{"    "}Medium: 1
+                  Full: {this.full}
+                  {"    "}Medium: {this.medium}
+                  {"    "}Low: {this.low}
                 </Text>
               </View>
             </Card>
@@ -125,15 +163,15 @@ export default class DashboardScreen extends React.Component {
           >
             <AntDesign
               name="table"
-              size={25}
+              size={45}
               color="black"
               onPress={() => this.props.navigation.navigate("ShiftScreen")}
             />
             <MaterialCommunityIcons
               name="star-four-points"
-              size={25}
+              size={45}
               color="black"
-              onPress={() => this.props.navigation.navigate("ShiftScreen")}
+              onPress={() => this.props.navigation.navigate("PointsScreen")}
             />
           </View>
         </View>

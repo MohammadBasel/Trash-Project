@@ -7,31 +7,30 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Picker
+  Picker,
+  FlatList
 } from "react-native";
 import firebase from "firebase";
 import functions from "firebase/functions";
 import db from "../db.js";
-import { Card, ListItem, Button, Icon, Header } from "react-native-elements";
+import {
+  Card,
+  ListItem,
+  Button,
+  Icon,
+  Header,
+  Divider,
+  Avatar
+} from "react-native-elements";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
-export default class ShiftScreen extends React.Component {
+export default class PointsScreen extends React.Component {
   static navigationOptions = {
     header: null
   };
   state = {
-    shift: [],
     users: []
   };
   componentDidMount() {
-    // go to db and get all the users
-    db.collection("Shift").onSnapshot(querySnapshot => {
-      shift = [];
-      querySnapshot.forEach(doc => {
-        shift.push({ id: doc.id, ...doc.data() });
-      });
-      this.setState({ shift });
-      console.log("Current shift: ", this.state.shift.length);
-    });
     db.collection("Users").onSnapshot(querySnapshot => {
       users = [];
       querySnapshot.forEach(doc => {
@@ -47,6 +46,33 @@ export default class ShiftScreen extends React.Component {
     //   await this.fetchAll();
     //   connection.on("items", this.fetchAll);
   }
+
+  list = item => {
+    return (
+      <View>
+        <TouchableOpacity>
+          <ListItem
+            // onPress={() => this.props.navigation.navigate("Info", { item })}
+            key={item.id}
+            title={item.Name}
+            //  subtitle={item.Phone}
+
+            leftAvatar={
+              <Avatar
+                rounded
+                source={{
+                  uri: "../assets/images/bin.png"
+                }}
+              />
+            }
+
+            // onPress={() => this.props.navigation.navigate("Info")}
+          />
+          <Divider style={{ backgroundColor: "blue" }} />
+        </TouchableOpacity>
+      </View>
+    );
+  };
   render() {
     return (
       <View style={styles.container}>
@@ -61,33 +87,29 @@ export default class ShiftScreen extends React.Component {
             />
           }
           centerComponent={{
-            text: "Shifts Table",
+            text: "Points Table",
             style: { color: "#fff", marginLeft: 20 }
           }}
         />
-        {this.state.shift.map(shif => (
-          <View>
-            {this.state.users.map(user => (
-              <View>
-                {shif.Users.includes(user.id) && (
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-evenly"
-                    }}
-                  >
-                    <Text>{user.id}</Text>
-                    <View>
-                      <Text>{shif.Day}</Text>
-                      <Text>{shif.End_Time}</Text>
-                      <Text>{shif.Start_Time}</Text>
-                    </View>
-                  </View>
-                )}
-              </View>
-            ))}
+        {this.state.users.map(user => (
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-evenly" }}
+            key={user.id}
+          >
+            <Text style={{ padding: 10 }}>{user.Name}</Text>
+            <Text style={{ padding: 10 }}>{user.Points}</Text>
           </View>
         ))}
+
+        {/* <FlatList
+          data={this.state.users}
+          keyExtractor={item => item.id}
+          extraData={this.state}
+          renderItem={
+            ({ item }) => this.list(item)
+            //console.log("items", item);
+          }
+        /> */}
       </View>
     );
   }

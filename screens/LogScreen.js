@@ -18,18 +18,19 @@ export default class LogScreen extends React.Component {
     header: null
   };
   state = {
-    logs: []
+    //  logs: [{ Desc: "helloo" }, { Desc: "hi" }]
+    result: []
   };
-  componentDidMount() {
-    // db.collection("Log").onSnapshot(querySnapshot => {
-    //   logs = [];
-    //   querySnapshot.forEach(doc => {
-    //     logs.push({ id: doc.id, ...doc.data() });
-    //   });
-    //   this.setState({ logs });
-    //   console.log("Current users: ", this.state.logs.length);
-    // });
-  }
+  // componentDidMount() {
+  //   db.collection("Log").onSnapshot(querySnapshot => {
+  //     logs = [];
+  //     querySnapshot.forEach(doc => {
+  //       logs.push({ id: doc.id, ...doc.data() });
+  //     });
+  //     this.setState({ logs });
+  //     console.log("Current users: ", this.state.logs.length);
+  //   });
+  // }
   render() {
     console.log(this.state);
     return (
@@ -50,9 +51,9 @@ export default class LogScreen extends React.Component {
           }}
         />
         <View>
-          {/* {this.state.logs.map(log => (
-            <Text> {log.Log}</Text>
-          ))} */}
+          {this.state.logs.map(log => (
+            <Text> {log.Desc}</Text>
+          ))}
         </View>
         <Text>Log here</Text>
       </View>
