@@ -36,7 +36,6 @@ export default class Login extends React.Component {
 count = 6
 
 
-  finishLoginOrRegister = async () => {};
 
   login = async () => {
     this.count = this.count + 1
@@ -64,10 +63,6 @@ count = 6
           this.setState({error : "ops, password or email is wromg try again"})
         }
       
-    }
-  
-
-    let avatar = "default.png";
     try {
       await firebase
         .auth()
@@ -151,7 +146,7 @@ count = 6
         </View>
         
        
-:  <AppNavigator /> }
+          ):  <AppNavigator /> }
 
       </View>
     );
