@@ -38,6 +38,7 @@ count = 6
 
 
   login = async () => {
+
     this.count = this.count + 1
     console.log("the count", this.count)
         try {
@@ -63,6 +64,12 @@ count = 6
           this.setState({error : "ops, password or email is wromg try again"})
         }
       
+
+    }
+
+
+    let avatar = "default.png";
+
     try {
       await firebase
         .auth()
@@ -129,6 +136,7 @@ count = 6
                 onChangeText={email => this.setState({ email })}
                 value={this.state.email}
               />
+
 
 
             <TextInput
