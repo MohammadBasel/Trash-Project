@@ -39,6 +39,7 @@ count = 6
   finishLoginOrRegister = async () => {};
 
   login = async () => {
+
     this.count = this.count + 1
     console.log("the count", this.count)
         try {
@@ -65,7 +66,7 @@ count = 6
         }
       
     }
-  
+
 
     let avatar = "default.png";
     try {
@@ -134,6 +135,7 @@ count = 6
                 onChangeText={email => this.setState({ email })}
                 value={this.state.email}
               />
+
 
 
             <TextInput
