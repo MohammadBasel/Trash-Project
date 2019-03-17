@@ -29,33 +29,46 @@ export default class Login extends React.Component {
     password: "",
     avatar: null,
     caption: "",
-    flag: true
-  };
+    flag : true,
+    error: "",
+    phone: ""
+  }
+count = 6
+
 
   finishLoginOrRegister = async () => {};
 
   login = async () => {
+
+    this.count = this.count + 1
+    console.log("the count", this.count)
+        try {
+          await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
+
+
+          await db.collection('Users').doc(this.state.email).update({ Online: true })
+          
+
+          this.push
+          this.setState({flag : true})
+        } catch (error) {
+
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          // ...
+          console.log(errorMessage)
+          this.setState({flag : false})
+          if( error.message == "The email address is badly formatted."){
+            this.setState({error : error.message})
+          }
+          this.setState({error : "ops, password or email is wromg try again"})
+        }
+      
+    }
+
+
     let avatar = "default.png";
-    // try {
-
-    //   await firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
-    //   // upload this.state.avatar called this.state.email to firebase storage
-    //   if (this.state.avatar) {
-    //     avatar = this.state.email
-    //     await uploadImageAsync("avatars", this.state.avatar, this.state.email)
-    //   }
-
-    //   console.log("avatar upload: ", avatar)
-    //   const name = this.state.name || this.state.email
-    //   await db.collection('users').doc(this.state.email).set({ name, avatar, online: true })
-    // } catch (error) {
-    //   // Handle Errors here.
-    //   var errorCode = error.code;
-    //   var errorMessage = error.message;
-    //   // ...
-    //   console.log(errorCode)
-    //   console.log(errorMessage)
-    // }
     try {
       await firebase
         .auth()
@@ -123,24 +136,25 @@ export default class Login extends React.Component {
                 value={this.state.email}
               />
 
-              <TextInput
-                style={{ paddingTop: 20 }}
-                autoCapitalize="none"
-                placeholder="Password"
-                onChangeText={password => this.setState({ password })}
-                value={this.state.password}
-              />
 
-              <Button
-                onPress={this.login}
-                title="Login"
-                style={{ width: 100, paddingTop: 50 }}
-              />
-            </View>
+
+            <TextInput
+            secureTextEntry = {true}
+            style={{ paddingTop: 20}}
+              autoCapitalize="none"
+              placeholder="Password"
+              onChangeText={password => this.setState({ password })}
+              value={this.state.password}
+            />
+            <Text style={{color:"red"}}>{this.state.error}</Text>
+            <Button onPress={this.login} title="Login" style={{ width: 100, paddingTop: 50 }} />
+            
           </View>
-        ) : (
-          <AppNavigator />
-        )}
+        </View>
+        
+       
+:  <AppNavigator /> }
+
       </View>
     );
   }

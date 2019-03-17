@@ -15,6 +15,8 @@ import Employee from "../screens/Employee";
 import ShiftScreen from "../screens/ShiftScreen";
 import LogScreen from "../screens/LogScreen";
 import PointsScreen from "../screens/PointsScreen";
+import ChatScreen from "../screens/ChatScreen";
+import ChatList from "../screens/ChatList";
 const HomeStack = createStackNavigator({
   Home: HomeScreen
 });
@@ -32,6 +34,27 @@ HomeStack.navigationOptions = {
     />
   )
 };
+
+const ChatStack = createStackNavigator({
+  Chat: ChatScreen,
+  ChatList : ChatList
+});
+
+ChatStack.navigationOptions = {
+  tabBarLabel: "Chat",
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon
+      focused={focused}
+      name={
+        Platform.OS === "ios"
+          ? `ios-chatbubbles${focused ? "" : "-outline"}`
+          : "ios-chatbubbles"
+      }
+    />
+  )
+};
+
+
 
 const LinksStack = createStackNavigator({
   Links: LinksScreen
@@ -83,5 +106,7 @@ export default createBottomTabNavigator({
   HomeStack,
   LinksStack,
   MapStack,
-  DashboardStack
+  DashboardStack,
+  ChatStack
+
 });
