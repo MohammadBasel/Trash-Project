@@ -9,6 +9,7 @@ import TabBarIcon from "../components/TabBarIcon";
 import HomeScreen from "../screens/HomeScreen";
 import LinksScreen from "../screens/LinksScreen";
 import MapScreen from "../screens/MapScreen";
+import MaintenanceScreen from "../screens/MaintenanceScreen";
 
 const HomeStack = createStackNavigator({
   Home: HomeScreen
@@ -56,8 +57,24 @@ MapStack.navigationOptions = {
   )
 };
 
+const MaintenanceStack = createStackNavigator({
+  Maintenance: MaintenanceScreen
+});
+
+MaintenanceStack.navigationOptions = {
+  tabBarLabel: "Maintenance Dashboard",
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon
+      focused={focused}
+      name={Platform.OS === "ios" ? "ios-options" : "md-options"}
+    />
+  )
+};
+
 export default createBottomTabNavigator({
   HomeStack,
   LinksStack,
-  MapStack
+  MapStack,
+  MaintenanceStack
+
 });
