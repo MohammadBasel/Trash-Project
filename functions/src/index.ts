@@ -2,7 +2,8 @@
 // import * as admin from 'firebase-admin'
 // import fetch from 'node-fetch'
 
-//admin.initializeApp(functions.config().firebase)
+
+// admin.initializeApp(functions.config().firebase)
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
 //

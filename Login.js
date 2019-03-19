@@ -42,7 +42,21 @@ export default class Login extends React.Component {
       await firebase
         .auth()
         .signInWithEmailAndPassword(this.state.email, this.state.password);
+  }
+count = 6
 
+
+
+  login = async () => {
+
+    this.count = this.count + 1
+    console.log("the count", this.count)
+        try {
+          await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
+
+
+          await db.collection('Users').doc(this.state.email).update({ Online: true })
+          
       await db
         .collection("Users")
         .doc(this.state.email)
@@ -51,19 +65,25 @@ export default class Login extends React.Component {
       this.push;
       this.setState({ flag: true });
     } catch (error) {
-      // Handle Errors here.
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      // ...
-      console.log(errorMessage);
-      this.setState({ flag: false });
-      if (error.message == "The email address is badly formatted.") {
-        this.setState({ error: error.message });
-      }
-      this.setState({ error: "ops, password or email is wromg try again" });
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          // ...
+          console.log(errorMessage)
+          this.setState({flag : false})
+          if( error.message == "The email address is badly formatted."){
+            this.setState({error : error.message})
+          }
+          this.setState({error : "ops, password or email is wromg try again"})
+        }
+      
+
     }
 
+
+
     let avatar = "default.png";
+
     try {
       await firebase
         .auth()
@@ -131,25 +151,24 @@ export default class Login extends React.Component {
                 value={this.state.email}
               />
 
-              <TextInput
-                secureTextEntry={true}
-                style={{ paddingTop: 20 }}
-                autoCapitalize="none"
-                placeholder="Password"
-                onChangeText={password => this.setState({ password })}
-                value={this.state.password}
-              />
-              <Text style={{ color: "red" }}>{this.state.error}</Text>
-              <Button
-                onPress={this.login}
-                title="Login"
-                style={{ width: 100, paddingTop: 50 }}
-              />
-            </View>
+
+
+            <TextInput
+            secureTextEntry = {true}
+            style={{ paddingTop: 20}}
+              autoCapitalize="none"
+              placeholder="Password"
+              onChangeText={password => this.setState({ password })}
+              value={this.state.password}
+            />
+            <Text style={{color:"red"}}>{this.state.error}</Text>
+            <Button onPress={this.login} title="Login" style={{ width: 100, paddingTop: 50 }} />
+            
           </View>
-        ) : (
-          <AppNavigator />
-        )}
+        </View>
+        
+       
+          ):  <AppNavigator /> }
       </View>
     );
   }
