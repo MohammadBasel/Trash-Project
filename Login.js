@@ -30,16 +30,19 @@ export default class Login extends React.Component {
     avatar: null,
     caption: "",
     flag : false,
+    flag1: false,
     error: "",
-    phone: ""
+    phone: "",
+    disable : true
   }
-count = 6
+
 
 
 
   login = async () => {
-    this.count = this.count + 1
+  
     console.log("the count", this.count)
+    
         try {
           await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
 
@@ -60,11 +63,15 @@ count = 6
           if( error.message == "The email address is badly formatted."){
             this.setState({error : error.message})
           }else{
+            this.count = count + 1
           this.setState({error : "ops, password or email is wromg try again"})
         }}
+      }
+      
+      
       
 
-  };
+  
 
   render() {
     {
@@ -107,6 +114,9 @@ count = 6
               value={this.state.password}
             />
             <Text style={{color:"red"}}>{this.state.error}</Text>
+            <TouchableOpacity disabled={this.state.flag1 ? true : false} onPress={this.login} style={{color:"lightblue"}}>
+              <Text>Login</Text>
+            </TouchableOpacity>
             <Button onPress={this.login} title="Login" style={{ width: 100, paddingTop: 50 }} />
             
           </View>
