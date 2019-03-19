@@ -45,15 +45,10 @@ export default class Login extends React.Component {
     
         try {
           await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
-
-
           await db.collection('Users').doc(this.state.email).update({ Online: true })
-          
-
-          this.push
-          this.setState({flag : true})
-        } catch (error) {
-
+          this.push;
+          this.setState({ flag: true });
+    } catch (error) {
           // Handle Errors here.
           var errorCode = error.code;
           var errorMessage = error.message;
@@ -105,6 +100,7 @@ export default class Login extends React.Component {
               />
 
 
+
             <TextInput
             secureTextEntry = {true}
             style={{ paddingTop: 20}}
@@ -124,7 +120,6 @@ export default class Login extends React.Component {
         
        
           ):  <AppNavigator /> }
-
       </View>
     );
   }
