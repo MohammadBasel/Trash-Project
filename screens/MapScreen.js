@@ -41,7 +41,8 @@ export default class MapScreen extends React.Component {
       latitudeDelta: 0.0922,
       longitudeDelta: 0.0421
     },
-    selectedBin: null
+    selectedBin: null,
+    flag: false
   };
   async componentDidMount() {
     await navigator.geolocation.watchPosition(
@@ -82,7 +83,7 @@ export default class MapScreen extends React.Component {
       });
 
     db.collection(`Zone/${zoneId}/Trash`).onSnapshot(querySnapshot => {
-      let bins = [...this.state.bins];
+      let bins = [];
       querySnapshot.forEach(doc => {
         bins.push({ id: doc.id, ...doc.data() });
       });
@@ -90,7 +91,7 @@ export default class MapScreen extends React.Component {
     });
 
     db.collection(`Zone/${zoneId}/Truck`).onSnapshot(querySnapshot => {
-      let trucks = [...this.state.trucks];
+      let trucks = [];
       querySnapshot.forEach(doc => {
         trucks.push({ id: doc.id, ...doc.data() });
       });
@@ -101,31 +102,58 @@ export default class MapScreen extends React.Component {
   reserveBin = async () => {
     let truckId = null;
     for (let i = 0; i < this.state.trucks.length; i++) {
-      truckId = this.state.trucks[i].id;
       let user = this.state.trucks[i].Crew.find(c => c === this.state.user.id);
-      if (user !== undefined) break;
+      if (user !== undefined) {
+        truckId = this.state.trucks[i].id;
+        break;
+      }
     }
 
-    db.collection(`Zone/${this.state.zone.id}/Trash`)
-      .doc(this.state.selectedBin.id)
-      .update({ Status: "Reserved" });
+    const result = await db
+      .collection(`Reserve_Bin`)
+      .where("Status", "==", "inprogress")
+      .where("Truck_Id", "==", truckId)
+      .get();
 
-    db.collection("Reserve_Bin")
-      .doc()
-      .set({
-        Status: "inprogress",
-        Time: new Date(),
-        Trash_Id: this.state.selectedBin.id,
-        Truck_Id: truckId
-      });
+    if (result.size <= 0) {
+      db.collection(`Zone/${this.state.zone.id}/Trash`)
+        .doc(this.state.selectedBin.id)
+        .update({ Status: "Reserved" });
+
+      db.collection("Reserve_Bin")
+        .doc()
+        .set({
+          Status: "inprogress",
+          Time: new Date(),
+          Trash_Id: this.state.selectedBin.id,
+          Truck_Id: truckId
+        });
+    } else {
+      alert("You can not reserve more than one trash bin at a time!");
+    }
   };
 
   emptyBin = async () => {
+    let truckId = null;
+    for (let i = 0; i < this.state.trucks.length; i++) {
+      let user = this.state.trucks[i].Crew.find(c => c === this.state.user.id);
+      if (user !== undefined) {
+        truckId = this.state.trucks[i].id;
+        break;
+      }
+    }
+
     await db
       .collection(`Zone/${this.state.zone.id}/Trash`)
       .doc(this.state.selectedBin.id)
       .update({ Status: "Active", Level: 0 });
     this.setState({ selectedBin: null });
+
+    console.log("Current trash: ", this.state.selectedBin.id);
+    await db
+      .collection(`Reserve_Bin`)
+      .where("Trash_Id", "==", this.state.selectedBin.id)
+      .update({ Status: "Complete" });
   };
 
   convertToObjects = arr => {
@@ -156,10 +184,7 @@ export default class MapScreen extends React.Component {
             showsMyLocationButton={true}
             showsUserLocation
             onPress={() => {
-              this.setState(
-                { selectedBin: null },
-                console.log("Current Bin is: ", this.state.selectedBin)
-              );
+              this.setState({ selectedBin: null });
             }}
             style={{
               flex: 1,
@@ -186,12 +211,13 @@ export default class MapScreen extends React.Component {
               strokeColor="green"
               strokeWidth={2}
             />
-
             {this.state.bins.map((bin, i) => (
               <TouchableOpacity key={i}>
                 <MapView.Marker
-                  redraw
                   tracksViewChanges
+                  ref={marker => {
+                    this.marker = marker;
+                  }}
                   onPress={() => {
                     this.setState({ selectedBin: bin });
                   }}
