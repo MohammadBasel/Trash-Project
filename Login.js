@@ -32,25 +32,18 @@ export default class Login extends React.Component {
     flag : false,
     error: "",
     phone: ""
-  }
-count = 6
-
-
-
+  };
+  count = 6;
   login = async () => {
+
     this.count = this.count + 1
     console.log("the count", this.count)
-        try {
+    try {
           await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
-
-
           await db.collection('Users').doc(this.state.email).update({ Online: true })
-          
-
-          this.push
-          this.setState({flag : true})
-        } catch (error) {
-
+          this.push;
+          this.setState({ flag: true });
+    } catch (error) {
           // Handle Errors here.
           var errorCode = error.code;
           var errorMessage = error.message;
@@ -62,8 +55,6 @@ count = 6
           }else{
           this.setState({error : "ops, password or email is wromg try again"})
         }}
-      
-
   };
 
   render() {
@@ -98,6 +89,7 @@ count = 6
               />
 
 
+
             <TextInput
             secureTextEntry = {true}
             style={{ paddingTop: 20}}
@@ -114,7 +106,6 @@ count = 6
         
        
           ):  <AppNavigator /> }
-
       </View>
     );
   }
