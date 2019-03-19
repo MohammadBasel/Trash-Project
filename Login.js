@@ -29,9 +29,19 @@ export default class Login extends React.Component {
     password: "",
     avatar: null,
     caption: "",
-    flag : true,
+    flag: true,
     error: "",
     phone: ""
+  };
+  count = 6;
+
+  login = async () => {
+    this.count = this.count + 1;
+    console.log("the count", this.count);
+    try {
+      await firebase
+        .auth()
+        .signInWithEmailAndPassword(this.state.email, this.state.password);
   }
 count = 6
 
@@ -47,11 +57,14 @@ count = 6
 
           await db.collection('Users').doc(this.state.email).update({ Online: true })
           
+      await db
+        .collection("Users")
+        .doc(this.state.email)
+        .update({ Online: true });
 
-          this.push
-          this.setState({flag : true})
-        } catch (error) {
-
+      this.push;
+      this.setState({ flag: true });
+    } catch (error) {
           // Handle Errors here.
           var errorCode = error.code;
           var errorMessage = error.message;
@@ -66,6 +79,7 @@ count = 6
       
 
     }
+
 
 
     let avatar = "default.png";
@@ -155,7 +169,6 @@ count = 6
         
        
           ):  <AppNavigator /> }
-
       </View>
     );
   }
