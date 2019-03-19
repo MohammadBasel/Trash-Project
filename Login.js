@@ -8,7 +8,8 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
+  Dimensions
 } from "react-native";
 import HomeScreen from "./navigation/MainTabNavigator";
 import AppNavigator from "./navigation/AppNavigator";
@@ -17,6 +18,8 @@ import { WebBrowser } from "expo";
 
 import firebase from "firebase";
 import db from "./db";
+
+const { width, height } = Dimensions.get("window");
 
 export default class Login extends React.Component {
   static navigationOptions = {
@@ -29,11 +32,11 @@ export default class Login extends React.Component {
     password: "",
     avatar: null,
     caption: "",
-    flag: true,
+    flag: false,
     error: "",
     phone: ""
   };
-  count = 6;
+  count = 0;
 
   login = async () => {
     this.count = this.count + 1;
@@ -42,72 +45,17 @@ export default class Login extends React.Component {
       await firebase
         .auth()
         .signInWithEmailAndPassword(this.state.email, this.state.password);
-  }
-count = 6
 
-
-
-  login = async () => {
-
-    this.count = this.count + 1
-    console.log("the count", this.count)
-        try {
-          await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
-
-
-          await db.collection('Users').doc(this.state.email).update({ Online: true })
-          
       await db
         .collection("Users")
         .doc(this.state.email)
         .update({ Online: true });
 
-      this.push;
-      this.setState({ flag: true });
-    } catch (error) {
-          // Handle Errors here.
-          var errorCode = error.code;
-          var errorMessage = error.message;
-          // ...
-          console.log(errorMessage)
-          this.setState({flag : false})
-          if( error.message == "The email address is badly formatted."){
-            this.setState({error : error.message})
-          }
-          this.setState({error : "ops, password or email is wromg try again"})
-        }
-      
-
-    }
-
-
-
-    let avatar = "default.png";
-
-    try {
-      await firebase
-        .auth()
-        .signInWithEmailAndPassword(this.state.email, this.state.password);
-
-      if (this.state.avatar) {
-        avatar = this.state.email;
-        await db
-          .collection("users")
-          .doc(this.state.email)
-          .update({ avatar });
-      }
-
       await db
-        .collection("users")
+        .collection("Users")
         .doc(this.state.email)
-        .update({ online: true });
+        .update({ Online: true });
 
-      if (this.state.name) {
-        await db
-          .collection("users")
-          .doc(this.state.email)
-          .update({ name: this.state.name });
-      }
       this.push;
       this.setState({ flag: true });
     } catch (error) {
@@ -117,6 +65,10 @@ count = 6
       // ...
       console.log(errorMessage);
       this.setState({ flag: false });
+      if (error.message == "The email address is badly formatted.") {
+        this.setState({ error: error.message });
+      }
+      this.setState({ error: "ops, password or email is wromg try again" });
     }
   };
 
@@ -151,24 +103,25 @@ count = 6
                 value={this.state.email}
               />
 
-
-
-            <TextInput
-            secureTextEntry = {true}
-            style={{ paddingTop: 20}}
-              autoCapitalize="none"
-              placeholder="Password"
-              onChangeText={password => this.setState({ password })}
-              value={this.state.password}
-            />
-            <Text style={{color:"red"}}>{this.state.error}</Text>
-            <Button onPress={this.login} title="Login" style={{ width: 100, paddingTop: 50 }} />
-            
+              <TextInput
+                secureTextEntry={true}
+                style={{ paddingTop: 20 }}
+                autoCapitalize="none"
+                placeholder="Password"
+                onChangeText={password => this.setState({ password })}
+                value={this.state.password}
+              />
+              <Text style={{ color: "red" }}>{this.state.error}</Text>
+              <Button
+                onPress={this.login}
+                title="Login"
+                style={{ width: 100, paddingTop: 50 }}
+              />
+            </View>
           </View>
-        </View>
-        
-       
-          ):  <AppNavigator /> }
+        ) : (
+          <AppNavigator />
+        )}
       </View>
     );
   }

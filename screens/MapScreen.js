@@ -5,12 +5,15 @@ import {
   Image,
   TouchableHighlight,
   Button,
-  TouchableOpacity
+  TouchableOpacity,
+  Dimensions
   /*, StyleSheet*/
 } from "react-native";
 import { ExpoConfigView } from "@expo/samples";
 import MapView, { Callout } from "react-native-maps";
 import db from "../db";
+
+const { width, height } = Dimensions.get("window");
 
 export default class MapScreen extends React.Component {
   static navigationOptions = {
