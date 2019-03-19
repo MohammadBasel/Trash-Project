@@ -37,7 +37,7 @@ HomeStack.navigationOptions = {
 
 const ChatStack = createStackNavigator({
   Chat: ChatScreen,
-  ChatList : ChatList
+  ChatList: ChatList
 });
 
 ChatStack.navigationOptions = {
@@ -53,8 +53,6 @@ ChatStack.navigationOptions = {
     />
   )
 };
-
-
 
 const LinksStack = createStackNavigator({
   Links: LinksScreen
@@ -108,5 +106,4 @@ export default createBottomTabNavigator({
   MapStack,
   DashboardStack,
   ChatStack
-
 });

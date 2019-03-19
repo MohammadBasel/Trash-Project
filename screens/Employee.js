@@ -29,21 +29,29 @@ export default class Employee extends React.Component {
   state = {
     users: [],
     available: "0",
-    filteredItems: [{}]
+    filteredItems: [{}],
+    zoneid: ""
   };
-  componentDidMount() {
-    // go to db and get all the users
+  zone = "";
+  async componentWillMount() {
+    const currentuser = firebase.auth().currentUser.email;
     db.collection("Users").onSnapshot(querySnapshot => {
       users = [];
       querySnapshot.forEach(doc => {
-        users.push({ id: doc.id, ...doc.data() });
-      });
-      this.setState({ users });
-      console.log("Current users: ", this.state.users.length);
-    });
+        doc.id == currentuser && (this.zone = doc.data().Zone);
 
-    // go to db and get all the records
+        doc.data().Zone == this.zone &&
+          users.push({ id: doc.id, ...doc.data() });
+      });
+      this.setState({ zoneid: this.zone });
+      this.setState({ users });
+      console.log("Current users: ", this.state.users);
+    });
+    console.log("The zone", this.state.zoneid);
   }
+
+  // go to db and get all the records
+
   handlePicker = async value => {
     await this.setState({ available: value });
     this.handleFilter();
@@ -70,11 +78,6 @@ export default class Employee extends React.Component {
     await this.setState({ filteredItems: itemFilter });
     console.log("Lastestst", itemFilter);
   };
-
-  async componentWillMount() {
-    //   await this.fetchAll();
-    //   connection.on("items", this.fetchAll);
-  }
 
   list = item => {
     return (
@@ -105,6 +108,7 @@ export default class Employee extends React.Component {
     );
   };
   render() {
+    console.log("the user", this.state.users);
     return (
       <View style={styles.container}>
         <Header

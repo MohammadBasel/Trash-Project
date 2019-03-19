@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   View,
   Picker,
-  FlatList
+  FlatList,
+  TextInput
 } from "react-native";
 import firebase from "firebase";
 import functions from "firebase/functions";
@@ -20,15 +21,19 @@ import {
   Icon,
   Header,
   Divider,
-  Avatar
+  Avatar,
+  Badge
 } from "react-native-elements";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
+import SwitchToggle from "react-native-switch-toggle";
+
 export default class PointsScreen extends React.Component {
   static navigationOptions = {
     header: null
   };
   state = {
-    users: []
+    users: [],
+    switch: false
   };
   componentDidMount() {
     db.collection("Users").onSnapshot(querySnapshot => {
@@ -46,7 +51,10 @@ export default class PointsScreen extends React.Component {
     //   await this.fetchAll();
     //   connection.on("items", this.fetchAll);
   }
-
+  turnOn = () => {
+    if (this.state.switch == false) this.setState({ switch: true });
+    else this.setState({ switch: false });
+  };
   list = item => {
     return (
       <View>
@@ -55,8 +63,7 @@ export default class PointsScreen extends React.Component {
             // onPress={() => this.props.navigation.navigate("Info", { item })}
             key={item.id}
             title={item.Name}
-            //  subtitle={item.Phone}
-
+            subtitle={item.Phone}
             leftAvatar={
               <Avatar
                 rounded
@@ -65,7 +72,13 @@ export default class PointsScreen extends React.Component {
                 }}
               />
             }
-
+            rightAvatar={
+              <Badge
+                value={item.Points}
+                status="success"
+                style={{ fontSize: 20 }}
+              />
+            }
             // onPress={() => this.props.navigation.navigate("Info")}
           />
           <Divider style={{ backgroundColor: "blue" }} />
@@ -91,7 +104,28 @@ export default class PointsScreen extends React.Component {
             style: { color: "#fff", marginLeft: 20 }
           }}
         />
-        {this.state.users.map(user => (
+        <SwitchToggle
+          containerStyle={{
+            marginTop: 16,
+            width: 108,
+            height: 48,
+            borderRadius: 25,
+            backgroundColor: "#ccc",
+            padding: 5
+          }}
+          circleStyle={{
+            width: 38,
+            height: 38,
+            borderRadius: 19,
+            backgroundColor: "white" // rgb(102,134,205)
+          }}
+          switchOn={this.state.switch}
+          onPress={this.turnOn}
+          circleColorOff="white"
+          circleColorOn="red"
+          duration={500}
+        />
+        {/* {this.state.users.map(user => (
           <View
             style={{ flexDirection: "row", justifyContent: "space-evenly" }}
             key={user.id}
@@ -99,9 +133,9 @@ export default class PointsScreen extends React.Component {
             <Text style={{ padding: 10 }}>{user.Name}</Text>
             <Text style={{ padding: 10 }}>{user.Points}</Text>
           </View>
-        ))}
+        ))} */}
 
-        {/* <FlatList
+        <FlatList
           data={this.state.users}
           keyExtractor={item => item.id}
           extraData={this.state}
@@ -109,7 +143,15 @@ export default class PointsScreen extends React.Component {
             ({ item }) => this.list(item)
             //console.log("items", item);
           }
-        /> */}
+        />
+
+        <TextInput
+          style={{ height: 40, borderColor: "gray", borderWidth: 1 }}
+          // onChangeText={(text) => this.setState({text})}
+          //value={this.state.text}
+          editable={false}
+          placeholder="Name"
+        />
       </View>
     );
   }
@@ -117,9 +159,9 @@ export default class PointsScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
 
-    alignItems: "center"
+    // alignItems: "center"
     //justifyContent: "center"
     //justifyContent: "space-evenly"
   },

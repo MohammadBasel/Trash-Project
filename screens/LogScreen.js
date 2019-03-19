@@ -44,7 +44,21 @@ export default class Employee extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text>new page</Text>
+        <Header
+          placement="left"
+          leftComponent={
+            <Ionicons
+              name="md-arrow-round-back"
+              size={25}
+              color="#fff"
+              onPress={() => this.props.navigation.navigate("Dashboard")}
+            />
+          }
+          centerComponent={{
+            text: "Logs",
+            style: { color: "#fff", marginLeft: 20 }
+          }}
+        />
         {this.state.logs.map(log => (
           <Text>{log.Desc}</Text>
         ))}
