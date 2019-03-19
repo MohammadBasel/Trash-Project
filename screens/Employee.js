@@ -7,12 +7,20 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Picker
+  Picker,
+  FlatList
 } from "react-native";
 import firebase from "firebase";
 import functions from "firebase/functions";
 import db from "../db.js";
-import { Card, ListItem, Button, Icon, Header } from "react-native-elements";
+import {
+  Card,
+  ListItem,
+  Button,
+  Icon,
+  Header,
+  Divider
+} from "react-native-elements";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 export default class Employee extends React.Component {
   static navigationOptions = {
@@ -67,6 +75,35 @@ export default class Employee extends React.Component {
     //   await this.fetchAll();
     //   connection.on("items", this.fetchAll);
   }
+
+  list = item => {
+    return (
+      <View>
+        <TouchableOpacity>
+          <ListItem
+            // onPress={() => this.props.navigation.navigate("Info", { item })}
+            key={item.id}
+            title={item.Name}
+            subtitle={item.Status}
+            leftAvatar={{ source: { uri: "item.picture.thumbnail" } }}
+            // leftAvatar={
+            //   <Avatar
+            //     rounded
+            //     source={{
+            //       uri: item.picture.thumbnail
+            //     }}
+            //   />
+            // }
+
+            subtitleStyle={{ textAlign: "left" }}
+            titleStyle={{ textAlign: "left" }}
+            // onPress={() => this.props.navigation.navigate("Info")}
+          />
+          <Divider style={{ backgroundColor: "blue" }} />
+        </TouchableOpacity>
+      </View>
+    );
+  };
   render() {
     return (
       <View style={styles.container}>
@@ -96,13 +133,14 @@ export default class Employee extends React.Component {
           <Picker.Item label="Excused" value="excused" />
         </Picker>
         {console.log(this.state.available)}
-        {this.state.available == "0"
+        {/* {this.state.available == "0"
           ? this.state.users.map(user => (
               <View key={user.id}>
                 <View>
                   <Text>Name: {user.Name}</Text>
                   <Text>Availability: {user.Status}</Text>
                 </View>
+                
               </View>
             ))
           : this.state.filteredItems.map(user => (
@@ -112,7 +150,17 @@ export default class Employee extends React.Component {
                   <Text>Availability: {user.Status}</Text>
                 </View>
               </View>
-            ))}
+            ))} */}
+        <FlatList
+          data={
+            this.state.available == "0"
+              ? this.state.users
+              : this.state.filteredItems
+          }
+          extraData={this.state}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => <View>{this.list(item)}</View>}
+        />
       </View>
     );
   }
@@ -120,9 +168,8 @@ export default class Employee extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-
-    alignItems: "center"
+    flex: 1
+    //alignItems: "center"
     //justifyContent: "space-evenly"
   },
   card: {
