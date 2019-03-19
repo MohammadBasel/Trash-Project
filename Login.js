@@ -29,41 +29,20 @@ export default class Login extends React.Component {
     password: "",
     avatar: null,
     caption: "",
-    flag: true,
+    flag : false,
     error: "",
     phone: ""
   };
   count = 6;
-
-  login = async () => {
-    this.count = this.count + 1;
-    console.log("the count", this.count);
-    try {
-      await firebase
-        .auth()
-        .signInWithEmailAndPassword(this.state.email, this.state.password);
-  }
-count = 6
-
-
-
   login = async () => {
 
     this.count = this.count + 1
     console.log("the count", this.count)
-        try {
+    try {
           await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
-
-
           await db.collection('Users').doc(this.state.email).update({ Online: true })
-          
-      await db
-        .collection("Users")
-        .doc(this.state.email)
-        .update({ Online: true });
-
-      this.push;
-      this.setState({ flag: true });
+          this.push;
+          this.setState({ flag: true });
     } catch (error) {
           // Handle Errors here.
           var errorCode = error.code;
@@ -73,51 +52,9 @@ count = 6
           this.setState({flag : false})
           if( error.message == "The email address is badly formatted."){
             this.setState({error : error.message})
-          }
+          }else{
           this.setState({error : "ops, password or email is wromg try again"})
-        }
-      
-
-    }
-
-
-
-    let avatar = "default.png";
-
-    try {
-      await firebase
-        .auth()
-        .signInWithEmailAndPassword(this.state.email, this.state.password);
-
-      if (this.state.avatar) {
-        avatar = this.state.email;
-        await db
-          .collection("users")
-          .doc(this.state.email)
-          .update({ avatar });
-      }
-
-      await db
-        .collection("users")
-        .doc(this.state.email)
-        .update({ online: true });
-
-      if (this.state.name) {
-        await db
-          .collection("users")
-          .doc(this.state.email)
-          .update({ name: this.state.name });
-      }
-      this.push;
-      this.setState({ flag: true });
-    } catch (error) {
-      // Handle Errors here.
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      // ...
-      console.log(errorMessage);
-      this.setState({ flag: false });
-    }
+        }}
   };
 
   render() {
