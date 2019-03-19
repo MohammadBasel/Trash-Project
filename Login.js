@@ -36,8 +36,7 @@ export default class Login extends React.Component {
     error: "",
     phone: ""
   };
-  count = 0;
-
+  count = 6;
   login = async () => {
     this.count = this.count + 1;
     console.log("the count", this.count);
@@ -45,17 +44,10 @@ export default class Login extends React.Component {
       await firebase
         .auth()
         .signInWithEmailAndPassword(this.state.email, this.state.password);
-
       await db
         .collection("Users")
         .doc(this.state.email)
         .update({ Online: true });
-
-      await db
-        .collection("Users")
-        .doc(this.state.email)
-        .update({ Online: true });
-
       this.push;
       this.setState({ flag: true });
     } catch (error) {
@@ -67,8 +59,9 @@ export default class Login extends React.Component {
       this.setState({ flag: false });
       if (error.message == "The email address is badly formatted.") {
         this.setState({ error: error.message });
+      } else {
+        this.setState({ error: "ops, password or email is wromg try again" });
       }
-      this.setState({ error: "ops, password or email is wromg try again" });
     }
   };
 
