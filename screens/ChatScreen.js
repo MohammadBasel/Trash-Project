@@ -64,6 +64,7 @@ export default class ChatScreen extends React.Component {
            
         }
     }
+
     if (check == true){
         
 
