@@ -15,7 +15,6 @@ import HomeScreen from "./navigation/MainTabNavigator";
 import AppNavigator from "./navigation/AppNavigator";
 import { MonoText } from "./components/StyledText";
 import { WebBrowser } from "expo";
-
 import firebase from "firebase";
 import db from "./db";
 
@@ -32,7 +31,7 @@ export default class Login extends React.Component {
     password: "",
     avatar: null,
     caption: "",
-    flag: false,
+    flag: true,
     error: "",
     phone: ""
   };
