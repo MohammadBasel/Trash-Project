@@ -55,7 +55,7 @@ export default class DashboardScreen extends React.Component {
     });
   }
   getTrashData = id => {
-    let trash = [...this.state.trash];
+    let trash = [];
     db.collection(`Zone/${id}/Trash`).onSnapshot(querySnapshot => {
       querySnapshot.forEach(doc => {
         trash.push({ id: doc.id, ...doc.data() });
@@ -92,6 +92,9 @@ export default class DashboardScreen extends React.Component {
   countTrash = () => {
     console.log("Zonee", this.state.zone);
     console.log("This is th trash", this.state.trash);
+    this.low = 0;
+    this.medium = 0;
+    this.full = 0;
     this.state.trash.map(tra =>
       tra.Level < 50
         ? (this.low = this.low + 1)

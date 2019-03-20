@@ -20,15 +20,42 @@ export default class Employee extends React.Component {
   };
   state = {
     logs: [],
-    available: "0",
-    filteredItems: [{}]
+    trashid: "0",
+    filteredItems: [{}],
+    zones: [],
+    zone: "",
+    users: [],
+    trash: [],
+    truckid: "0",
+    trucks: []
   };
-  componentDidMount() {
-    // go to db and get all the users
+  componentWillMount() {
+    const currentuser = firebase.auth().currentUser.email;
+
+    db.collection("Users").onSnapshot(querySnapshot => {
+      zone = "";
+      querySnapshot.forEach(doc => {
+        doc.id == currentuser && (zone = doc.data().Zone);
+      });
+      this.setState({ zone });
+      console.log("Zone his", zone);
+
+      // console.log("Current zones: ", this.state.zones.length);
+    });
+    db.collection("Zone").onSnapshot(querySnapshot => {
+      zones = [];
+      querySnapshot.forEach(doc => {
+        zones.push({ id: doc.id, ...doc.data() });
+        this.getTrashData(this.state.zone);
+        this.getTruckData(this.state.zone);
+      });
+      this.setState({ zones });
+    });
     db.collection("Logging").onSnapshot(querySnapshot => {
       logs = [];
       querySnapshot.forEach(doc => {
-        logs.push({ id: doc.id, ...doc.data() });
+        doc.data().Zone_Id == this.state.zone &&
+          logs.push({ id: doc.id, ...doc.data() });
       });
       this.setState({ logs });
       console.log("Current logs: ", this.state.logs.length);
@@ -37,11 +64,54 @@ export default class Employee extends React.Component {
     // go to db and get all the records
   }
 
-  async componentWillMount() {
-    //   await this.fetchAll();
-    //   connection.on("items", this.fetchAll);
-  }
+  getTrashData = id => {
+    let trash = [...this.state.trash];
+    db.collection(`Zone/${id}/Trash`).onSnapshot(querySnapshot => {
+      querySnapshot.forEach(doc => {
+        trash.push({ id: doc.id, ...doc.data() });
+      });
+      this.setState({ trash });
+
+      //console.log("Current zones: ", this.state.trash.length);
+    });
+  };
+
+  getTruckData = id => {
+    let trucks = [...this.state.trucks];
+    db.collection(`Zone/${id}/Truck`).onSnapshot(querySnapshot => {
+      querySnapshot.forEach(doc => {
+        trucks.push({ id: doc.id, ...doc.data() });
+      });
+      this.setState({ trucks });
+
+      //console.log("Current zones: ", this.state.trash.length);
+    });
+  };
+  handlePickerTrash = async value => {
+    await this.setState({ trashid: value });
+    // this.handleFilter();
+  };
+  handlePickerTruck = async value => {
+    await this.setState({ truckid: value });
+    // this.handleFilter();
+  };
+
+  handleFilter = () => {
+    //     itemfilter=[]
+    //     if(this.state.trashid="0"){
+    //       if(this.state.truckid="0"){
+    // itemfilter=this.state.logs
+    //       }
+    //       else{
+    //         this.state.logs.map(log=>(
+    //           log.Trash_Id.slice(33,20)==this.state.
+    //         ))
+    //       }
+    //     }
+  };
+  try = "/Zone/uxLepYH8A8usOlfNpgCi/Truck/VZDfh0BLdBU3Sw3wBifW";
   render() {
+    console.log("TRUCKS", this.state.trucks);
     return (
       <View style={styles.container}>
         <Header
@@ -59,8 +129,47 @@ export default class Employee extends React.Component {
             style: { color: "#fff", marginLeft: 20 }
           }}
         />
+        <Text>
+          {"\n"}
+          {"\n"}
+        </Text>
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <View>
+            <Text>Choose a Trash</Text>
+            <Picker
+              selectedValue={this.state.trashid}
+              style={{ height: 50, width: 150 }}
+              onValueChange={(itemValue, itemIndex) =>
+                this.handlePickerTrash(itemValue)
+              }
+            >
+              <Picker.Item label="All" value="0" />
+              {this.state.trash.map(tra => (
+                <Picker.Item label={tra.id} value={tra.id} />
+              ))}
+            </Picker>
+          </View>
+          <View>
+            <Text>Choose a Truck</Text>
+            <Picker
+              selectedValue={this.state.truckid}
+              style={{ height: 50, width: 150 }}
+              onValueChange={(itemValue, itemIndex) =>
+                this.handlePickerTruck(itemValue)
+              }
+            >
+              <Picker.Item label="All" value="0" />
+              {this.state.trucks.map(truck => (
+                <Picker.Item label={truck.id} value={truck.id} />
+              ))}
+            </Picker>
+          </View>
+        </View>
+        {console.log("triaaallll", this.try.substring(33, 20))}
         {this.state.logs.map(log => (
-          <Text>{log.Desc}</Text>
+          <View>
+            <Text>{log.Desc}</Text>
+          </View>
         ))}
       </View>
     );

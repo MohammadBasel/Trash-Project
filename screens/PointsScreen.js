@@ -33,20 +33,31 @@ export default class PointsScreen extends React.Component {
   };
   state = {
     users: [],
-    switch: false
+    switch: false,
+    updateduser: []
   };
   componentDidMount() {
+    const currentuser = firebase.auth().currentUser.email;
     db.collection("Users").onSnapshot(querySnapshot => {
       users = [];
       querySnapshot.forEach(doc => {
-        users.push({ id: doc.id, ...doc.data() });
+        doc.id == currentuser && (this.zone = doc.data().Zone);
+
+        doc.data().Zone == this.zone &&
+          users.push({ id: doc.id, ...doc.data() });
       });
+
       this.setState({ users });
-      console.log("Current users: ", this.state.users.length);
+      this.setState({ zone: this.zone });
+      console.log("Current users: ", this.state.users);
     });
     // go to db and get all the records
   }
 
+  fun = () => {
+    let arr = [{ user: "lsdfjklsdjf", points: 75 }];
+    let user = arr.find(u => u.user == "skldfjkls");
+  };
   async componentWillMount() {
     //   await this.fetchAll();
     //   connection.on("items", this.fetchAll);
@@ -56,6 +67,7 @@ export default class PointsScreen extends React.Component {
     else this.setState({ switch: false });
   };
   list = item => {
+    let point = 0;
     return (
       <View>
         <TouchableOpacity>
@@ -73,11 +85,17 @@ export default class PointsScreen extends React.Component {
               />
             }
             rightAvatar={
-              <Badge
-                value={item.Points}
-                status="success"
-                style={{ fontSize: 20 }}
-              />
+              <View>
+                <TextInput
+                  style={{ height: 40, borderColor: "gray", borderWidth: 1 }}
+                  onChangeText={text => this.getValue(text, item.id)}
+                  value={!Number.isNaN(item.Points) ? "" + item.Points : ""}
+                  editable={this.state.switch}
+
+                  //placeholder="Points"
+                />
+                {/* */}
+              </View>
             }
             // onPress={() => this.props.navigation.navigate("Info")}
           />
@@ -86,7 +104,37 @@ export default class PointsScreen extends React.Component {
       </View>
     );
   };
+
+  saveChange = async () => {
+    // this.state.users.map(
+    for (i = 0; i < this.state.users.length; i++) {
+      await db
+        .collection("Users")
+        .doc(this.state.users[i].id)
+        .update({ Points: this.state.users[i].Points });
+    }
+    // );
+  };
+  getValue = (value, id) => {
+    console.log("Val is, ", value);
+    console.log("Id is, ", id);
+    if (value !== undefined) {
+      let changes = [...this.state.users];
+      let user = changes.find(u => u.id === id);
+      user.Points = parseInt(value);
+      let index = changes.indexOf(user);
+      changes.splice(index, 1, user);
+      this.setState({ users: changes });
+    }
+  };
+  add = (ids, point) => {
+    let updateduser = [...this.state.updateduser];
+    updateduser.push({ id: ids, Points: point });
+    this.setState({ updateduser });
+    console.log("Updated user", updateduser);
+  };
   render() {
+    console.log(this.state.users);
     return (
       <View style={styles.container}>
         <Header
@@ -103,6 +151,11 @@ export default class PointsScreen extends React.Component {
             text: "Points Table",
             style: { color: "#fff", marginLeft: 20 }
           }}
+          rightComponent={
+            this.state.switch && (
+              <Button onPress={this.saveChange} title="Save changes" />
+            )
+          }
         />
         <SwitchToggle
           containerStyle={{
@@ -143,14 +196,6 @@ export default class PointsScreen extends React.Component {
             ({ item }) => this.list(item)
             //console.log("items", item);
           }
-        />
-
-        <TextInput
-          style={{ height: 40, borderColor: "gray", borderWidth: 1 }}
-          // onChangeText={(text) => this.setState({text})}
-          //value={this.state.text}
-          editable={false}
-          placeholder="Name"
         />
       </View>
     );
