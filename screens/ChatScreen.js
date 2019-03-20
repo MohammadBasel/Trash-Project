@@ -17,7 +17,7 @@ import { MonoText } from '../components/StyledText';
 import firebase, { auth,FirebaseAuth } from 'firebase';
 import db from '../db.js';
 import { Header,ListItem,Badge,Slider,Divider ,Avatar } from 'react-native-elements';
-
+import { Ionicons,FontAwesome,MaterialIcons } from '@expo/vector-icons';
 export default class ChatScreen extends React.Component {
   static navigationOptions = {
     header: null,
@@ -50,6 +50,9 @@ export default class ChatScreen extends React.Component {
     
       
   }
+
+
+
   keyExtractor = (item, index) => index
 
   renderChats = ({ item }) => {
@@ -70,18 +73,18 @@ export default class ChatScreen extends React.Component {
 
     return(
       <View>
+
     <ListItem
-   
-    leftAvatar={{ source : { uri: 'https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2Favatar.png?alt=media&token=f45c29e5-2487-49e5-915b-dedc985c297d' ,activeOpacity:0.9 }}}
+   onPress = {() =>this.props.navigation.navigate("ChatList",{data:item.id, Members : item.Members, title : item.Title
+      
+      
+   })}
+       leftAvatar={{ source : { uri: 'https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2Favatar.png?alt=media&token=f45c29e5-2487-49e5-915b-dedc985c297d' ,activeOpacity:0.9 }}}
     title={item.Title}
     titleStyle = {{textAlign : "left"}}
     // subtitleStyle = {{textAlign : "left"}}
     // subtitle={item.Title}
 
-    badge={{value: rand , onPress : () =>this.props.navigation.navigate("ChatList",{data:item.id, Members : item.Members, title : item.Title
-      
-      
-    })}}
     />
     <Divider style={{ backgroundColor: 'black' }} />
   </View>)
@@ -107,7 +110,17 @@ export default class ChatScreen extends React.Component {
       <View style={styles.container}>
       
        
-         <Text> CHAT SCREEN </Text>
+      <Header
+        containerStyle={{backgroundColor:'purple'}}
+        placement="left"   
+      //  leftComponent= {<Ionicons name='md-arrow-round-back'  size={25} color='#fff' onPress={()=>this.props.navigation.navigate('Chat')}/>}
+       centerComponent={{ text: "My Chats", style: { color: '#fff' } }}
+       rightComponent={ <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+        <View >
+         <MaterialIcons style={{marginRight:40}} name='add'  size={25} color='#fff' onPress={()=>this.props.navigation.navigate('UsersList')}/>
+       </View>
+      </View> }
+   />
          
 
 

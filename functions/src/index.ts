@@ -24,6 +24,18 @@ export const addMessage = functions.https.onCall(async (data, context) => {
 
     return await admin.firestore().collection(`Chat/${id}/Message`).add({Content: message, Sender_Id :email, Time : new Date()})
 }) 
+export const addChat= functions.https.onCall(async (data, context) => {
+    const message = data.message
+    const id = data.id
+    const members = data.members
+    const title = data.title
+    const email = context.auth.token.email || null
+    console.log("Success!!!!", message)
+    console.log("Success!!!!", email)
+
+    const result =await admin.firestore().collection(`Chat`).add({Members: members, Title :title});
+    return await admin.firestore().collection(`Chat/${result.id}/Message`).add({Content: message, Sender_Id :email, Time : new Date()});
+}) 
 
 // export const updateImage = functions.https.onRequest(async (req, res) => {
 //     // find all images (users with captions)
