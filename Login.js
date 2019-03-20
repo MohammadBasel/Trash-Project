@@ -41,7 +41,6 @@ export default class Login extends React.Component {
 
   login = async () => {
   
-    console.log("the count", this.count)
     
         try {
           await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
@@ -58,7 +57,6 @@ export default class Login extends React.Component {
           if( error.message == "The email address is badly formatted."){
             this.setState({error : error.message})
           }else{
-            this.count = count + 1
           this.setState({error : "ops, password or email is wromg try again"})
         }}
       }
