@@ -37,48 +37,48 @@ export default class HomeScreen extends React.Component {
 
   login = async () => {
     let avatar = "default.png"
-    
-        try {
-          await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
 
-          if (this.state.avatar) {
-            avatar = this.state.email
-            await db.collection('users').doc(this.state.email).update({ avatar })
-          }
+    try {
+      await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
 
-          await db.collection('users').doc(this.state.email).update({ online: true })
-          
-          if(this.state.name) {
-            await db.collection('users').doc(this.state.email).update({ name: this.state.name })
-          }
-        } catch (error) {
-
-          // Handle Errors here.
-          var errorCode = error.code;
-          var errorMessage = error.message;
-          // ...
-          console.log(errorMessage)
-        }
+      if (this.state.avatar) {
+        avatar = this.state.email
+        await db.collection('users').doc(this.state.email).update({ avatar })
       }
-    
-  
+
+      await db.collection('users').doc(this.state.email).update({ online: true })
+
+      if (this.state.name) {
+        await db.collection('users').doc(this.state.email).update({ name: this.state.name })
+      }
+    } catch (error) {
+
+      // Handle Errors here.
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      // ...
+      console.log(errorMessage)
+    }
+  }
+
+
 
   render() {
     return (
       <View style={styles.container}>
         <View style={styles.contentContainer}>
           <View style={styles.welcomeContainer}>
-          <Image
-          style={{width: 50, height: 50}}
-          source={{uri: 'https://www.fonepaw.com/images/android-data-recovery/recycle-bin-icon.png'}}
-        />
+            <Image
+              style={{ width: 50, height: 50 }}
+              source={{ uri: 'https://www.fonepaw.com/images/android-data-recovery/recycle-bin-icon.png' }}
+            />
             {/* <TextInput
               autoCapitalize="none"
               placeholder="Name"
               onChangeText={name => this.setState({ name })}
               value={this.state.name}
             /> */}
-            <Text style={{fontSize: 80}}>THE HOME PAGE !!!!! </Text>
+            <Text style={{ fontSize: 80 }}>THE HOME PAGE !!!!! </Text>
 
             <TextInput
               autoCapitalize="none"

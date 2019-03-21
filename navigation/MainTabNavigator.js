@@ -9,6 +9,10 @@ import TabBarIcon from "../components/TabBarIcon";
 import HomeScreen from "../screens/HomeScreen";
 import LinksScreen from "../screens/LinksScreen";
 import MapScreen from "../screens/MapScreen";
+import MaintenanceScreen from "../screens/MaintenanceScreen";
+import Battery from "../screens/Battery";
+import Trash from "../screens/Trash";
+
 import DashboardScreen from "../screens/DashboardScreen";
 import TrashStatus from "../screens/TrashStatus";
 import Employee from "../screens/Employee";
@@ -86,6 +90,23 @@ MapStack.navigationOptions = {
   )
 };
 
+const MaintenanceStack = createStackNavigator({
+  Maintenance: MaintenanceScreen,
+  Trash: Trash,
+  Battery: Battery
+});
+
+MaintenanceStack.navigationOptions = {
+  tabBarLabel: "Maintenance Dashboard",
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon
+      focused={focused}
+      name={Platform.OS === "ios" ? "ios-link" : "md-link"}
+    />
+  )
+
+}
+
 const DashboardStack = createStackNavigator({
   Dashboard: DashboardScreen,
   TrashStatus: TrashStatus,
@@ -108,6 +129,7 @@ export default createBottomTabNavigator({
   HomeStack,
   LinksStack,
   MapStack,
+  MaintenanceStack,
   DashboardStack,
   ChatStack
 
