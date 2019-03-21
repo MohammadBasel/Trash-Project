@@ -3,10 +3,27 @@ import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { AppLoading, Asset, Font, Icon } from 'expo';
 import AppNavigator from './navigation/AppNavigator';
 import Login from "./Login.js"
+import { Permissions} from 'expo';
 export default class App extends React.Component {
   state = {
     isLoadingComplete: false,
   };
+  async componentWillMount(){
+    const prompt = await Permissions.askAsync(Permissions.CAMERA_ROLL)
+    console.log("Camera roll permission 1: ", prompt)
+    const result = await Permissions.getAsync(Permissions.CAMERA_ROLL)
+    console.log("Camera roll permission 2: ", result)
+
+    const prompt1 = await Permissions.askAsync(Permissions.CAMERA)
+    console.log("Camera permission 1: ", prompt1)
+    const result2 = await Permissions.getAsync(Permissions.CAMERA)
+    console.log("Camera permission 2: ", result2)
+    const prompt2 = await Permissions.askAsync(Permissions.AUDIO_RECORDING)
+    console.log("Camera permission 1: ", prompt2)
+    const result3 = await Permissions.getAsync(Permissions.AUDIO_RECORDING)
+    console.log("Camera permission 2: ", result3)
+
+  }
 
   render() {
     if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
