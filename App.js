@@ -4,6 +4,7 @@ import { AppLoading, Asset, Font, Icon } from 'expo';
 import AppNavigator from './navigation/AppNavigator';
 import Login from "./Login.js"
 import { Permissions} from 'expo';
+console.disableYellowBox = true
 export default class App extends React.Component {
   state = {
     isLoadingComplete: false,
