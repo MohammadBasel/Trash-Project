@@ -12,16 +12,17 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Linking,
-  StatusBar
+  StatusBar,
+  Dimensions
 } from 'react-native';
 import { WebBrowser } from 'expo';
-import { Ionicons,FontAwesome } from '@expo/vector-icons';
+import { Ionicons,FontAwesome,MaterialIcons } from '@expo/vector-icons';
 import functions from 'firebase/functions';
 import { MonoText } from '../components/StyledText';
 import firebase, { auth,FirebaseAuth } from 'firebase';
 import db from '../db.js';
-import { Header,ListItem,Badge,Slider,Divider ,Avatar,Card,Input,Icon,SearchBar } from 'react-native-elements';
-
+import { Header,ListItem,Badge,Slider,Divider ,Avatar,Card,Input,Icon,SearchBar,CheckBox } from 'react-native-elements';
+const { width,height } = Dimensions.get('window');
 export default class UsersList extends React.Component {
   static navigationOptions = {
     header: null,
@@ -30,7 +31,12 @@ export default class UsersList extends React.Component {
 
   state = {
     users: [],
-    search :""
+    allusers: [],
+    search :"",
+    checked : [],
+    zoneId : "",
+    members :[],
+    oldmembers : []
     
   }
   user = ""
@@ -39,44 +45,128 @@ export default class UsersList extends React.Component {
   async componentDidMount(){
     
     console.log("the email logged in is ",firebase.auth().currentUser.email)
+    allusers = []
     users = []
+    zoneId = ""
+    checked = []
   await db.collection(`Users`)
   .onSnapshot(querySnapshot => {
     querySnapshot.forEach(doc => {
-        users.push({ id: doc.id, ...doc.data() })
+        if(doc.id === firebase.auth().currentUser.email){
+            zoneId = doc.data().Zone 
+        }
+        
+        console.log("the zone is : ", zoneId)
     })
     
-    this.setState({users})
+    
   })
+
+
+  await db.collection(`Users`)
+  .onSnapshot(querySnapshot => {
+    querySnapshot.forEach(doc => {
+        if(doc.data().Zone === zoneId){
+            if (doc.id !=firebase.auth().currentUser.email )
+            {
+            users.push({ id: doc.id, ...doc.data() })
+            checked.push(false)
+            }
+
+        }
+        
+    })
+    
+    this.setState({users,checked})
+  })
+  this.state.members.push(firebase.auth().currentUser.email)
   console.log("Current chat after method: ", this.state.users)
+  console.log("the checked : ", this.state.checked)
   }
-  addChat = async (id, Name) =>{
-    const { navigation } = this.props;
-    // const id = navigation.getParam('data');
-    // console.log("the on press if working and this is the text : ", this.state.text)
-    //  await db.collection(`Chat/${id}/Message`).doc().set({Content: this.state.text, Sender_Id :this.user, Time : new Date()})
-    const title = Name  + " "
-      const addChat = firebase.functions().httpsCallable('addChat')
-      console.log("the message is", this.state.text)
-      console.log("the id is", id)
-      const result = await addChat({ message: this.state.text , id: id})
-      this.setState({ text: ""  })
-      this.props.navigation.navigate("ChatScreen")
+
+  
+  check  = async () => {
+      check = false
+      oldmembers = []
+    await db.collection(`Chat`)
+  .onSnapshot(querySnapshot => {
+    querySnapshot.forEach(doc => {
+        
+           oldmembers.push(doc.data().members)
+        
+        
+        console.log("the zone is : ", zoneId)
+    })
+})
+
+for (let i=0; i<oldmembers.length; i++){
+    if (oldmembers[i] == this.state.members){
+        check = true
+    }
+}
+return check
+}
+
+  addChat = async () =>{
+      if(this.check === false){
+        const { navigation } = this.props;
+        let title = ""
+        // const id = navigation.getParam('data');
+        // console.log("the on press if working a nd this is the text : ", this.state.text)
+        //  await db.collection(`Chat/${id}/Message`).doc().set({Content: this.state.text, Sender_Id :this.user, Time : new Date()})
+        if (this.state.members.length > 2){
+            myId = firebase.auth().currentUser.email
+            email = String(myId).split("@")
+            myname =email[0]
+            title = myname + " 's Group"
+        }else{
+            if(this.state.members[0] != firebase.auth().currentUser.email){
+                title = this.state.members[0]
+            }else{
+                title = this.state.members[1]
+            }
+            
+        }
+    
+    
+        
+          const addChat = firebase.functions().httpsCallable('addChat')
+    
+          const result = await addChat({ Members: this.state.members , Title: title})
+    
+          this.props.navigation.navigate("Chat")
+        
+      }else{
+        this.props.navigation.navigate("Chat")
+      }
     
   }
 
   renderUsers = ({ item }) => {
     
+
     const match  = this.searchForMatch(item.id)    
     if(match){
 
     
      return(
      <View>
+         
      <ListItem
-    onPress= { this.addChat(item.id,item.Name)} 
-     rightAvatar= {{ source: { uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2Favatar.png?alt=media&token=f45c29e5-2487-49e5-915b-dedc985c297d` ,activeOpacity:0.9 }}}
-     title={item.id}
+     
+    // onPress= { this.addChat(item.id,item.Name)} 
+     leftAvatar= {{ source: { uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2Favatar.png?alt=media&token=f45c29e5-2487-49e5-915b-dedc985c297d` ,activeOpacity:0.9 }}}
+     title=
+     {
+         <View>
+        <CheckBox
+        title={item.id}
+        onPress={() => this.press(this.state.users.indexOf(item),item.id)}
+        checked={this.state.checked[this.state.users.indexOf(item)]}
+        
+      />
+      
+      </View>}
      
  
      />
@@ -94,7 +184,33 @@ export default class UsersList extends React.Component {
     return match;
   };
 
+  press = (index,id) => {
 
+   let checked = [...this.state.checked]
+   let members = [...this.state.members]
+   let exist = false
+   let place = 0
+   console.log("the check before splice : ", checked)
+   checked.splice(index, 1, !checked[index]);
+   console.log("the check after splice : ", checked)
+   for (let i=0;i<members.length;i++){
+       if (members[i] === id){
+           exist = true
+           place = i
+       }
+       }
+      
+   if (exist === true){
+    members.splice(place,1)
+   }else{
+    members.push(id)
+   }
+   
+   
+   
+   console.log("the check after splice : ", members)
+   this.setState({checked,members})
+  }
   render() {
     const { goBack } = this.props.navigation;
     
@@ -105,8 +221,25 @@ export default class UsersList extends React.Component {
             this.state.users.map(user =>
             <Text>{user.id}</Text>)
         } */}
-
+        <Header
+        containerStyle={{backgroundColor:'white'}}
+        // placement="left"   
+       leftComponent= {<Ionicons name='md-arrow-round-back'  size={25} color='black' onPress={()=>this.props.navigation.navigate('Chat')}/>}
+       centerComponent={{ text: "New Chat", style: { color: 'black' ,fontWeight : "bold"} }}
+       rightComponent={ <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+        <View >
+        <TouchableOpacity
+         style={{color: "black"}}
+         onPress={this.addChat}
+       >
+         <Text style= {{ color: 'black' ,fontWeight : "bold"}}>create</Text>
+       </TouchableOpacity>
+       </View>
+      </View> }
+   />
+   
         <SearchBar
+        style={{height : height * 0.5}}
         placeholder="Type Here..."
         onChangeText={this.updateSearch}
         value={this.state.search}
@@ -116,7 +249,7 @@ export default class UsersList extends React.Component {
         data={this.state.users}
         extraData={this.state}
         keyExtractor={this.keyExtractor}
-        renderItem={this.renderUsers}
+        renderItem={item => this.renderUsers(item)}
       /> 
       </View>
       

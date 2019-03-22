@@ -96,6 +96,7 @@ export default class ChatList extends React.Component {
     
       
   }
+
    clickable = async () =>{
     const { navigation } = this.props;
     const id = navigation.getParam('data');
@@ -152,12 +153,12 @@ export default class ChatList extends React.Component {
     <ImageZoom>
                 <Image style={{width:"100%", height:"100%"}}
                        source={{uri:item.Content}}/>
-               <Video
+               {/* <Video
 	  source={{ uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4' }}
           shouldPlay
 	  resizeMode="cover"
 	  style={{ width, height: 300 }}
-	/>
+	/> */}
             </ImageZoom>
             <Video
 	  source={{ uri: item.Content }}
@@ -191,17 +192,26 @@ export default class ChatList extends React.Component {
     
     titleStyle = {{textAlign : "left"}}
     subtitleStyle = {styles.Receiver}
-    subtitle=
-    {first === "http" ?
-    
-    <View style={{width: 200, height : 200}}>
-    <Image source={{uri : item.Content}} style={{width: "100%", height: "100%"}}/>
+    subtitle={first === "http" ?   <View style={{width: 200, height : 200}}>
+    <View>
+    <ImageZoom>
+                <Image style={{width:"100%", height:"100%"}}
+                       source={{uri:item.Content}}/>
+               {/* <Video
+	  source={{ uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4' }}
+          shouldPlay
+	  resizeMode="cover"
+	  style={{ width, height: 300 }}
+	/> */}
+            </ImageZoom>
+            <Video
+	  source={{ uri: item.Content }}
+          shouldPlay
+	  resizeMode="cover"  
+	  // style={{ width: width * 0.5, height: 300 }}
+	/>
   </View>
-    
-    :
-    item.Content
-    
-  }
+  </View> : item.Content }
 
     />
     {/* <Divider style={{ backgroundColor: 'black' }} />
@@ -231,7 +241,7 @@ export default class ChatList extends React.Component {
 
   takeImage= async () => {
     let result = await ImagePicker.launchCameraAsync({
-      mediaTypes : "Images,Videos"
+      mediaTypes : "All"
     });
 
     console.log(result);
@@ -250,17 +260,17 @@ export default class ChatList extends React.Component {
 
   render() {
     const { goBack } = this.props.navigation;
-    
+    {console.log("the back page : ", this.props.navigation.navigate.navigate().goBack())}
     return (
       <View style={styles.container}>
        <Header
         containerStyle={{backgroundColor:'purple'}}
-        placement="left"   
+        // placement="left"   
        leftComponent= {<Ionicons name='md-arrow-round-back'  size={25} color='#fff' onPress={()=>this.props.navigation.navigate('Chat')}/>}
        centerComponent={{ text: this.state.title, style: { color: '#fff' } }}
        rightComponent={ <View style={{flexDirection:'row',justifyContent:'space-between'}}>
         <View >
-         <FontAwesome style={{marginRight:40}} name='phone'  size={25} color='#fff' onPress={this.callingMethod}/>
+         <FontAwesome style={{marginRight:40}} name='phone'  size={25} color='#fff'  onPress={()=>this.props.navigation.navigate('UsersList')}/>
        </View>
       </View> }
    />
@@ -284,11 +294,11 @@ export default class ChatList extends React.Component {
               onChangeText={text => this.setState({ text: text })}
             />
             <TouchableOpacity onPress={this.pickImage}>
-            <FontAwesome style={{marginRight:40}} name='photo'  size={25} color='lightseagreen'/>
+            <FontAwesome style={{marginRight:10,paddingTop : "5%"}} name='photo'  size={25} color='lightseagreen'/>
             {/* <Text style={styles.send}>Image</Text> */}
             </TouchableOpacity>
             <TouchableOpacity onPress={this.takeImage}>
-            <FontAwesome style={{marginRight:40}} name='camera'  size={25} color='lightseagreen'/>
+            <FontAwesome style={{paddingTop : "5%"}} name='camera'  size={25} color='lightseagreen'/>
             {/* <Text style={styles.send}>Image</Text> */}
             </TouchableOpacity>
             <TouchableOpacity onPress={this.clickable}>
