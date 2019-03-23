@@ -5,12 +5,17 @@ import {
   Image,
   TouchableHighlight,
   Button,
-  TouchableOpacity
+  TouchableOpacity,
+  Dimensions
   /*, StyleSheet*/
 } from "react-native";
 import { ExpoConfigView } from "@expo/samples";
 import MapView, { Callout } from "react-native-maps";
+import firebase from "firebase";
+import { Permissions } from "expo";
 import db from "../db";
+
+const { width, height } = Dimensions.get("window");
 
 export default class MapScreen extends React.Component {
   static navigationOptions = {
@@ -42,9 +47,13 @@ export default class MapScreen extends React.Component {
       longitudeDelta: 0.0421
     },
     selectedBin: null,
+    reservationId: null,
+    isReserved: false,
     flag: false
   };
   async componentDidMount() {
+    await Permissions.askAsync(Permissions.LOCATION);
+    const email = firebase.auth().currentUser.email;
     await navigator.geolocation.watchPosition(
       position => {
         region = {
@@ -66,7 +75,7 @@ export default class MapScreen extends React.Component {
     );
     const result = await db
       .collection("Users")
-      .doc("fida@fida.com")
+      .doc(email)
       .get();
 
     const zoneId = result.data().Zone;
@@ -99,7 +108,7 @@ export default class MapScreen extends React.Component {
     });
   }
 
-  reserveBin = async () => {
+  cancelReservation = async () => {
     let truckId = null;
     for (let i = 0; i < this.state.trucks.length; i++) {
       let user = this.state.trucks[i].Crew.find(c => c === this.state.user.id);
@@ -108,26 +117,74 @@ export default class MapScreen extends React.Component {
         break;
       }
     }
+    let reservation = null;
 
+    const result = await db
+      .collection(`Reserve_Bin`)
+      .where("Trash_Id", "==", this.state.selectedBin.id)
+      .where("Status", "==", "inprogress")
+      .get();
+    result.forEach(doc => {
+      reservation = { id: doc.id, ...doc.data() };
+    });
+
+    if (reservation.Truck_Id === truckId) {
+      await db
+        .collection(`Reserve_Bin`)
+        .doc(reservation.id)
+        .update({ Status: "Cancelled" });
+      await db
+        .collection(`Zone/${this.state.zone.id}/Trash`)
+        .doc(this.state.selectedBin.id)
+        .update({ Status: "Active" });
+    } else {
+      alert(
+        "You cannot cancel this reservation because you did not created it!"
+      );
+    }
+  };
+
+  reserveBin = async () => {
+    if (this.state.selectedBin.Status === "Reserved") {
+      alert("This bin is already reserved!");
+      return;
+    } else if (this.state.selectedBin.Status === "Damaged") {
+      alert("This bin is damaged and cannot be reserved!");
+      return;
+    } else if (this.state.selectedBin.Status === "Under Maintenance") {
+      alert("This bin is Under Maintenance and cannot be reserved!");
+      return;
+    }
+
+    let truckId = null;
+    for (let i = 0; i < this.state.trucks.length; i++) {
+      let user = this.state.trucks[i].Crew.find(c => c === this.state.user.id);
+      if (user !== undefined) {
+        truckId = this.state.trucks[i].id;
+        break;
+      }
+    }
+    console.log("Truck Id is: ", truckId);
     const result = await db
       .collection(`Reserve_Bin`)
       .where("Status", "==", "inprogress")
       .where("Truck_Id", "==", truckId)
       .get();
 
+    console.log("result is: ", result.size);
+
     if (result.size <= 0) {
       db.collection(`Zone/${this.state.zone.id}/Trash`)
         .doc(this.state.selectedBin.id)
         .update({ Status: "Reserved" });
 
-      db.collection("Reserve_Bin")
-        .doc()
-        .set({
-          Status: "inprogress",
-          Time: new Date(),
-          Trash_Id: this.state.selectedBin.id,
-          Truck_Id: truckId
-        });
+      const result = await db.collection("Reserve_Bin").add({
+        Status: "inprogress",
+        Time: new Date(),
+        Trash_Id: this.state.selectedBin.id,
+        Truck_Id: truckId
+      });
+      this.setState({ reservationId: result.id });
     } else {
       alert("You can not reserve more than one trash bin at a time!");
     }
@@ -147,12 +204,11 @@ export default class MapScreen extends React.Component {
       .collection(`Zone/${this.state.zone.id}/Trash`)
       .doc(this.state.selectedBin.id)
       .update({ Status: "Active", Level: 0 });
-    this.setState({ selectedBin: null });
 
-    console.log("Current trash: ", this.state.selectedBin.id);
+    console.log("Trash Id: ", this.state.selectedBin.id);
     await db
       .collection(`Reserve_Bin`)
-      .where("Trash_Id", "==", this.state.selectedBin.id)
+      .doc(this.state.reservationId)
       .update({ Status: "Complete" });
   };
 
@@ -184,7 +240,7 @@ export default class MapScreen extends React.Component {
             showsMyLocationButton={true}
             showsUserLocation
             onPress={() => {
-              this.setState({ selectedBin: null });
+              this.setState({ selectedBin: null, isReserved: false });
             }}
             style={{
               flex: 1,
@@ -219,7 +275,9 @@ export default class MapScreen extends React.Component {
                     this.marker = marker;
                   }}
                   onPress={() => {
-                    this.setState({ selectedBin: bin });
+                    bin.Status === "Reserved"
+                      ? this.setState({ selectedBin: bin, isReserved: true })
+                      : this.setState({ selectedBin: bin, isReserved: false });
                   }}
                   coordinate={{
                     latitude: bin.Loc._lat,
@@ -232,10 +290,11 @@ export default class MapScreen extends React.Component {
                       width: 20,
                       height: 20,
                       tintColor: [
-                        bin.Status === "Damaged"
+                        bin.Status === "Damaged" ||
+                        bin.Status === "Under Maintenance"
                           ? "black"
                           : bin.Status === "Reserved"
-                          ? "lightblue"
+                          ? "blue"
                           : bin.Level < 50
                           ? "green"
                           : 50 <= bin.Level && bin.Level < 80
@@ -247,8 +306,8 @@ export default class MapScreen extends React.Component {
                   <Callout>
                     <View
                       style={{
-                        width: 200,
-                        height: 115,
+                        width: width * 0.5,
+                        height: height * 0.15,
                         justifyContent: "center"
                       }}
                     >
@@ -271,42 +330,71 @@ export default class MapScreen extends React.Component {
             ))}
           </MapView>
           <TouchableOpacity
-            onPress={this.reserveBin}
-            disabled={
-              this.state.selectedBin === null ||
-              (this.state.selectedBin.Status === "Reserved" && false)
+            onPress={
+              this.state.isReserved ? this.cancelReservation : this.reserveBin
             }
+            disabled={this.state.selectedBin === null ? true : false}
             style={{
               backgroundColor: "lightgreen",
-              width: 75,
-              height: 50,
+              padding: "15%",
+              width: width * 0.3,
+              height: height * 0.1,
               position: "absolute",
               top: 600,
               bottom: 20,
-              left: 20,
+              left: 40,
               right: 50
             }}
           >
-            <Text style={{ textAlign: "center" }}>Reserve</Text>
+            <Text style={{ textAlign: "center" }}>
+              {this.state.isReserved ? "Cancel" : "Reserve"}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={this.emptyBin}
             disabled={
               this.state.selectedBin === null ||
-              (this.state.selectedBin.Status === "Reserved" && false)
+              this.state.selectedBin.Status === "Damaged" ||
+              this.state.selectedBin.Status === "Under Maintenance"
+                ? true
+                : false
             }
             style={{
               backgroundColor: "lightgreen",
-              width: 75,
-              height: 50,
+              padding: "15%",
+              width: width * 0.1,
+              height: height * 0.08,
               position: "absolute",
               top: 600,
               bottom: 20,
-              left: 200,
+              left: 175,
               right: 50
             }}
           >
             <Text style={{ textAlign: "center" }}>Empty</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={this.emptyBin}
+            disabled={
+              this.state.selectedBin === null ||
+              this.state.selectedBin.Status === "Damaged" ||
+              this.state.selectedBin.Status === "Under Maintenance"
+                ? true
+                : false
+            }
+            style={{
+              backgroundColor: "lightgreen",
+              padding: "15%",
+              width: width * 0.3,
+              height: height * 0.1,
+              position: "absolute",
+              top: 600,
+              bottom: 20,
+              left: 300,
+              right: 50
+            }}
+          >
+            <Text style={{ textAlign: "center" }}>Report</Text>
           </TouchableOpacity>
         </View>
       </View>

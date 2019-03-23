@@ -8,15 +8,17 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
+  Dimensions
 } from "react-native";
 import HomeScreen from "./navigation/MainTabNavigator";
 import AppNavigator from "./navigation/AppNavigator";
 import { MonoText } from "./components/StyledText";
 import { WebBrowser } from "expo";
-
 import firebase from "firebase";
 import db from "./db";
+
+const { width, height } = Dimensions.get("window");
 
 export default class Login extends React.Component {
   static navigationOptions = {
@@ -61,10 +63,6 @@ export default class Login extends React.Component {
         }}
       }
       
-      
-      
-
-  
 
   render() {
     {
@@ -114,10 +112,9 @@ export default class Login extends React.Component {
             <Button onPress={this.login} title="Login" style={{ width: 100, paddingTop: 50 }} />
             
           </View>
-        </View>
-        
-       
-          ):  <AppNavigator /> }
+        ) : (
+          <AppNavigator />
+        )}
       </View>
     );
   }
