@@ -31,38 +31,38 @@ export default class Login extends React.Component {
     password: "",
     avatar: null,
     caption: "",
-    flag : true,
-    flag1: false,
+    flag: true,
+    flag1: true,
     error: "",
     phone: "",
-    disable : true
-  }
-
-
-
+    disable: true
+  };
 
   login = async () => {
-  
-    
-        try {
-          await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
-          await db.collection('Users').doc(this.state.email).update({ Online: true })
-          this.push;
-          this.setState({ flag: true });
+    try {
+      await firebase
+        .auth()
+        .signInWithEmailAndPassword(this.state.email, this.state.password);
+      await db
+        .collection("Users")
+        .doc(this.state.email)
+        .update({ Online: true });
+      this.push;
+      this.setState({ flag: true });
     } catch (error) {
-          // Handle Errors here.
-          var errorCode = error.code;
-          var errorMessage = error.message;
-          // ...
-          console.log(errorMessage)
-          this.setState({flag : false})
-          if( error.message == "The email address is badly formatted."){
-            this.setState({error : error.message})
-          }else{
-          this.setState({error : "ops, password or email is wromg try again"})
-        }}
+      // Handle Errors here.
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      // ...
+      console.log(errorMessage);
+      this.setState({ flag: false });
+      if (error.message == "The email address is badly formatted.") {
+        this.setState({ error: error.message });
+      } else {
+        this.setState({ error: "ops, password or email is wromg try again" });
       }
-      
+    }
+  };
 
   render() {
     {
@@ -95,22 +95,28 @@ export default class Login extends React.Component {
                 value={this.state.email}
               />
 
-
-
-            <TextInput
-            secureTextEntry = {true}
-            style={{ paddingTop: 20}}
-              autoCapitalize="none"
-              placeholder="Password"
-              onChangeText={password => this.setState({ password })}
-              value={this.state.password}
-            />
-            <Text style={{color:"red"}}>{this.state.error}</Text>
-            <TouchableOpacity disabled={this.state.flag1 ? true : false} onPress={this.login} style={{color:"lightblue"}}>
-              <Text>Login</Text>
-            </TouchableOpacity>
-            <Button onPress={this.login} title="Login" style={{ width: 100, paddingTop: 50 }} />
-            
+              <TextInput
+                secureTextEntry={true}
+                style={{ paddingTop: 20 }}
+                autoCapitalize="none"
+                placeholder="Password"
+                onChangeText={password => this.setState({ password })}
+                value={this.state.password}
+              />
+              <Text style={{ color: "red" }}>{this.state.error}</Text>
+              <TouchableOpacity
+                disabled={this.state.flag1 ? true : false}
+                onPress={this.login}
+                style={{ color: "lightblue" }}
+              >
+                <Text>Login</Text>
+              </TouchableOpacity>
+              <Button
+                onPress={this.login}
+                title="Login"
+                style={{ width: 100, paddingTop: 50 }}
+              />
+            </View>
           </View>
         ) : (
           <AppNavigator />
