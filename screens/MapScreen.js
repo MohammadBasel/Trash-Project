@@ -362,8 +362,8 @@ export default class MapScreen extends React.Component {
             style={{
               backgroundColor: "lightgreen",
               padding: "15%",
-              width: width * 0.3,
-              height: height * 0.1,
+              width: width * 0.1,
+              height: height * 0.08,
               position: "absolute",
               top: 600,
               bottom: 20,
