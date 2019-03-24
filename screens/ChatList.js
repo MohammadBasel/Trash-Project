@@ -27,6 +27,7 @@ import { ImagePicker,Video} from 'expo';
 import VideoPlayer from '@expo/videoplayer';
 
 import ImageZoom from 'react-native-image-pan-zoom';
+import AntDesign from '@expo/vector-icons/AntDesign';
 const { width,height } = Dimensions.get('window');
 export default class ChatList extends React.Component {
   static navigationOptions = {
@@ -260,7 +261,9 @@ export default class ChatList extends React.Component {
 
   render() {
     const { goBack } = this.props.navigation;
-    {console.log("the back page : ", this.props.navigation.navigate.navigate().goBack())}
+    const { navigation } = this.props;
+    const Members = navigation.getParam('Members');
+    const id = navigation.getParam('data');
     return (
       <View style={styles.container}>
        <Header
@@ -270,7 +273,7 @@ export default class ChatList extends React.Component {
        centerComponent={{ text: this.state.title, style: { color: '#fff' } }}
        rightComponent={ <View style={{flexDirection:'row',justifyContent:'space-between'}}>
         <View >
-         <FontAwesome style={{marginRight:40}} name='phone'  size={25} color='#fff'  onPress={()=>this.props.navigation.navigate('UsersList')}/>
+         <AntDesign style={{marginRight:40}} name='bars'  size={25} color='#fff'  onPress={()=>this.props.navigation.navigate('MyUsersList', {Members : Members, id  :id})}/>
        </View>
       </View> }
    />

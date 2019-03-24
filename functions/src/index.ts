@@ -35,6 +35,25 @@ export const addChat= functions.https.onCall(async (data, context) => {
     //return await admin.firestore().collection(`Chat/${result.id}/Message`).add({Content: message, Sender_Id :email, Time : new Date()});
 }) 
 
+
+export const updateMembers= functions.https.onCall(async (data, context) => {
+    const id = data.id
+    console.log("the id : ", id)
+    const members = data.Members
+    const title = data.Title
+    // const title = data.Title
+    // const email = context.auth.token.email || null
+    if( title == null){
+        return await admin.firestore().collection(`Chat`).doc(id).update({Members: members});
+    }else{
+        return await admin.firestore().collection(`Chat`).doc(id).update({Members: members,Title: title});
+    }
+    }
+
+   
+    //return await admin.firestore().collection(`Chat/${result.id}/Message`).add({Content: message, Sender_Id :email, Time : new Date()});
+}) 
+
 // export const updateImage = functions.https.onRequest(async (req, res) => {
 //     // find all images (users with captions)
 //     const querySnapshot = await admin.firestore().collection("users").where("caption", ">", "").get()

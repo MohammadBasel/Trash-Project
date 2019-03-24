@@ -77,10 +77,12 @@ export default class ChatScreen extends React.Component {
       <View>
 
     <ListItem
-   onPress = {() =>this.props.navigation.navigate("ChatList",{data:item.id, Members : item.Members, title : item.Title
+   onPress = {() =>this.props.navigation.navigate("ChatList"
+   ,{data:item.id, Members : item.Members, title : item.Title
       
       
-   })}
+   }
+  )}
        leftAvatar={{ source : { uri: 'https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2Favatar.png?alt=media&token=f45c29e5-2487-49e5-915b-dedc985c297d' ,activeOpacity:0.9 }}}
     title={item.Title}
     titleStyle = {{textAlign : "left"}}

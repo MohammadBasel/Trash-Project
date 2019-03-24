@@ -22,6 +22,7 @@ import PointsScreen from "../screens/PointsScreen";
 import ChatScreen from "../screens/ChatScreen";
 import ChatList from "../screens/ChatList";
 import UsersList from "../screens/UsersList";
+import MyUsersList from "../screens/MyUsersList";
 const HomeStack = createStackNavigator({
   Home: HomeScreen
 });
@@ -43,7 +44,8 @@ HomeStack.navigationOptions = {
 const ChatStack = createStackNavigator({
   Chat: ChatScreen,
   ChatList : ChatList,
-  UsersList : UsersList
+  UsersList : UsersList,
+  MyUsersList : MyUsersList
 });
 
 ChatStack.navigationOptions = {

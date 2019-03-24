@@ -44,7 +44,9 @@ export default class UsersList extends React.Component {
   
   async componentDidMount(){
     const { navigation } = this.props;
-    const members = navigation.getParam('Members');
+    const Members = navigation.getParam('Members');
+    console.log("the members from props : ",navigation.getParam('Members') )
+    
     console.log("the email logged in is ",firebase.auth().currentUser.email)
     allusers = []
     users = []
@@ -71,7 +73,22 @@ export default class UsersList extends React.Component {
             if (doc.id !=firebase.auth().currentUser.email )
             {
             users.push({ id: doc.id, ...doc.data() })
-            checked.push(false)
+            let found = false
+            for(let i=0;i < Members.length; i++){
+                console.log("the member is from for loop: ",Members[i] )
+
+                if( Members[i] == doc.id){
+                    found = true
+                    this.state.members.push(doc.id)
+                }
+            }
+            if(found == false){
+              checked.push(false)
+            }else{
+              checked.push(true)
+            }
+            
+            
             }
 
         }
@@ -85,34 +102,13 @@ export default class UsersList extends React.Component {
   console.log("the checked : ", this.state.checked)
   }
 
-  
-  check  = async () => {
-      check = false
-      oldmembers = []
-    await db.collection(`Chat`)
-  .onSnapshot(querySnapshot => {
-    querySnapshot.forEach(doc => {
-        
-           oldmembers.push(doc.data().members)
-        
-        
-        console.log("the zone is : ", zoneId)
-    })
-})
 
-for (let i=0; i<oldmembers.length; i++){
-    if (oldmembers[i] == this.state.members){
-        check = true
-    }
-}
-return check
-}
 
-  addChat = async () =>{
-      if(this.check === false){
+updateMembers = async () =>{
+      ///sssss
         const { navigation } = this.props;
         let title = ""
-        // const id = navigation.getParam('data');
+        const id = navigation.getParam('id');
         // console.log("the on press if working a nd this is the text : ", this.state.text)
         //  await db.collection(`Chat/${id}/Message`).doc().set({Content: this.state.text, Sender_Id :this.user, Time : new Date()})
         if (this.state.members.length > 2){
@@ -131,15 +127,18 @@ return check
     
     
         
-          const addChat = firebase.functions().httpsCallable('addChat')
+          const updateMembers = firebase.functions().httpsCallable('updateMembers')
+          if (this.state.members.length > 2){
+          const result = await updateMembers({ Members: this.state.members, id: id, Title : title})
+          }
+          else{
+            const result = await updateMembers({ Members: this.state.members, id: id,  Title : null})
+
+          }
     
-          const result = await addChat({ Members: this.state.members , Title: title})
-    
-          this.props.navigation.navigate("Chat")
+         this.props.navigation.navigate("ChatList")
         
-      }else{
-        this.props.navigation.navigate("Chat")
-      }
+     
     
   }
 
@@ -226,14 +225,14 @@ return check
         containerStyle={{backgroundColor:'white'}}
         // placement="left"   
        leftComponent= {<Ionicons name='md-arrow-round-back'  size={25} color='black' onPress={()=>this.props.navigation.navigate('Chat')}/>}
-       centerComponent={{ text: "New Chat", style: { color: 'black' ,fontWeight : "bold"} }}
+       centerComponent={{ text: "Edit Chat Members", style: { color: 'black' ,fontWeight : "bold"} }}
        rightComponent={ <View style={{flexDirection:'row',justifyContent:'space-between'}}>
         <View >
         <TouchableOpacity
          style={{color: "black"}}
-         onPress={this.addChat}
+         onPress={this.updateMembers}
        >
-         <Text style= {{ color: 'black' ,fontWeight : "bold"}}>create</Text>
+         <Text style= {{ color: 'black' ,fontWeight : "bold"}}>updateMembers</Text>
        </TouchableOpacity>
        </View>
       </View> }
