@@ -162,18 +162,8 @@ export default class MaintenanceScreen extends React.Component {
     }
 
     render() {
-        // console.log("Current trash render : ", this.state.trashs[this.state.trashs.length - 1])
-        // console.log("trash length render : ", this.state.trashs.length)
-        // console.log("trash first render : ", this.state.trashs[0])
-        // console.log("trash last render : ", this.state.trashs[this.state.trashs.length -1])
-        // console.log(" render : ", this.state)
         return (
             <ScrollView style={styles.container}>
-                {/* <Header
-                    leftComponent={{ icon: 'menu', color: '#fff' }}
-                    centerComponent={{ text: 'MY TITLE', style: { color: '#fff' } }}
-                    rightComponent={{ icon: 'home', color: '#fff' }}
-                /> */}
                 <View>
 
                 </View>

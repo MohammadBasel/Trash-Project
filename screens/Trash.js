@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { ScrollView, StyleSheet, View, Text, TouchableOpacity, Picker } from 'react-native';
 import { ExpoLinksView } from '@expo/samples';
 import db from "../db.js"
 
@@ -8,7 +8,7 @@ import { Header, ListItem, Divider, Badge, Avatar, Card, Button, Icon } from "re
 let bins = []
 export default class Trash extends React.Component {
     static navigationOptions = {
-        title: 'Battery',
+        title: 'Damaged Trash',
         headerTintColor: 'white',
         headerStyle: { backgroundColor: 'blue', borderWidth: 1, borderBottomColor: 'white' },
         headerTitleStyle: { color: 'white' }
@@ -16,14 +16,15 @@ export default class Trash extends React.Component {
     state = {
         trashs: [],
         zones: [],
+        filter: "All"
     }
-    trashs = []
-    zones = []
+    // trashs = []
+    // zones = []
     
     async componentDidMount() {
-        await this.getZoneData()
-        
+        await this.getZoneData()   
     }
+
     getZoneData = async () => { 
         db.collection("Zone")
             .onSnapshot(querySnapshot => {
@@ -73,18 +74,24 @@ export default class Trash extends React.Component {
 
     }
     render() {
-        // // console.log("zone length : ", this.state.zones.length)
-        // // console.log("zone id1 : ", this.state.zones[0])
-        // // console.log("zone id last : ", this.state.zones[this.state.zones.length -1])
-        // console.log("final",this.state)
-        // console.log("final this",this.trash)
         return (
             <ScrollView style={styles.container}>
+            <Picker
+                selectedValue={this.state.filter}
+                style={{height: 50, width: 200}}
+                onValueChange={(itemValue, itemIndex) =>
+                    this.setState({filter: itemValue})
+                }>
+                <Picker.Item label="All" value="All" />
+                <Picker.Item label="Damaged" value="Damaged" />
+                <Picker.Item label="Under Maintenance" value="Under Maintenance" />
+            </Picker>
             <View >
                  {
                     this.state.zones.map((item, i) => ( 
                       item.trashs.map((trash, j) => (
-                        trash.Status != "Active" && trash.Status != "Reserved"&& (       
+                        trash.Status != "Active" && trash.Status != "Reserved"&& (
+                            this.state.filter == "All" ? (     
                             <ListItem
                                 key={j}
                                 title={`Status: ${trash.Status}`}
@@ -93,6 +100,17 @@ export default class Trash extends React.Component {
                                 rightElement={trash.Status == "Damaged"?(<Text onPress={() => this.Update(trash.id, "fix")} style={{color: "blue"}}>Fix</Text>):(<Text onPress={() => this.Update(trash.id, "clear")} style={{color: "blue"}}>Clear</Text>)}
                                 
                             />
+                            ):
+                            this.state.filter == trash.Status && (
+                                <ListItem
+                                key={j}
+                                title={`Status: ${trash.Status}`}
+                                subtitle={`id: ${trash.id}`}
+                                leftIcon={{ name: trash.icon }}
+                                rightElement={trash.Status == "Damaged"?(<Text onPress={() => this.Update(trash.id, "fix")} style={{color: "blue"}}>Fix</Text>):(<Text onPress={() => this.Update(trash.id, "clear")} style={{color: "blue"}}>Clear</Text>)}
+                                
+                            />
+                            )
                         )
                     ))
                   ))
