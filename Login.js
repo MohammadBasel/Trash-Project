@@ -37,8 +37,11 @@ export default class Login extends React.Component {
     phone: "",
     disable: true
   };
-
+  count = 6;
   login = async () => {
+    this.count = this.count + 1;
+    console.log("the count", this.count);
+
     try {
       await firebase
         .auth()
@@ -104,6 +107,7 @@ export default class Login extends React.Component {
                 value={this.state.password}
               />
               <Text style={{ color: "red" }}>{this.state.error}</Text>
+
               <TouchableOpacity
                 disabled={this.state.flag1 ? true : false}
                 onPress={this.login}

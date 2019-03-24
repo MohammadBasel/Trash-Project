@@ -7,12 +7,20 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Picker
+  Picker,
+  FlatList
 } from "react-native";
 import firebase from "firebase";
 import functions from "firebase/functions";
 import db from "../db.js";
-import { Card, ListItem, Button, Icon, Header } from "react-native-elements";
+import {
+  Card,
+  ListItem,
+  Button,
+  Icon,
+  Header,
+  Divider
+} from "react-native-elements";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 export default class Employee extends React.Component {
   static navigationOptions = {
@@ -21,21 +29,29 @@ export default class Employee extends React.Component {
   state = {
     users: [],
     available: "0",
-    filteredItems: [{}]
+    filteredItems: [{}],
+    zoneid: ""
   };
-  componentDidMount() {
-    // go to db and get all the users
+  zone = "";
+  async componentWillMount() {
+    const currentuser = firebase.auth().currentUser.email;
     db.collection("Users").onSnapshot(querySnapshot => {
       users = [];
       querySnapshot.forEach(doc => {
-        users.push({ id: doc.id, ...doc.data() });
-      });
-      this.setState({ users });
-      console.log("Current users: ", this.state.users.length);
-    });
+        doc.id == currentuser && (this.zone = doc.data().Zone);
 
-    // go to db and get all the records
+        doc.data().Zone == this.zone &&
+          users.push({ id: doc.id, ...doc.data() });
+      });
+      this.setState({ zoneid: this.zone });
+      this.setState({ users });
+      console.log("Current users: ", this.state.users);
+    });
+    console.log("The zone", this.state.zoneid);
   }
+
+  // go to db and get all the records
+
   handlePicker = async value => {
     await this.setState({ available: value });
     this.handleFilter();
@@ -63,11 +79,36 @@ export default class Employee extends React.Component {
     console.log("Lastestst", itemFilter);
   };
 
-  async componentWillMount() {
-    //   await this.fetchAll();
-    //   connection.on("items", this.fetchAll);
-  }
+  list = item => {
+    return (
+      <View>
+        <TouchableOpacity>
+          <ListItem
+            // onPress={() => this.props.navigation.navigate("Info", { item })}
+            key={item.id}
+            title={item.Name}
+            subtitle={item.Status}
+            leftAvatar={{ source: { uri: "item.picture.thumbnail" } }}
+            // leftAvatar={
+            //   <Avatar
+            //     rounded
+            //     source={{
+            //       uri: item.picture.thumbnail
+            //     }}
+            //   />
+            // }
+
+            subtitleStyle={{ textAlign: "left" }}
+            titleStyle={{ textAlign: "left" }}
+            // onPress={() => this.props.navigation.navigate("Info")}
+          />
+          <Divider style={{ backgroundColor: "blue" }} />
+        </TouchableOpacity>
+      </View>
+    );
+  };
   render() {
+    console.log("the user", this.state.users);
     return (
       <View style={styles.container}>
         <Header
@@ -96,13 +137,14 @@ export default class Employee extends React.Component {
           <Picker.Item label="Excused" value="excused" />
         </Picker>
         {console.log(this.state.available)}
-        {this.state.available == "0"
+        {/* {this.state.available == "0"
           ? this.state.users.map(user => (
               <View key={user.id}>
                 <View>
                   <Text>Name: {user.Name}</Text>
                   <Text>Availability: {user.Status}</Text>
                 </View>
+                
               </View>
             ))
           : this.state.filteredItems.map(user => (
@@ -112,7 +154,17 @@ export default class Employee extends React.Component {
                   <Text>Availability: {user.Status}</Text>
                 </View>
               </View>
-            ))}
+            ))} */}
+        <FlatList
+          data={
+            this.state.available == "0"
+              ? this.state.users
+              : this.state.filteredItems
+          }
+          extraData={this.state}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => <View>{this.list(item)}</View>}
+        />
       </View>
     );
   }
@@ -120,9 +172,8 @@ export default class Employee extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-
-    alignItems: "center"
+    flex: 1
+    //alignItems: "center"
     //justifyContent: "space-evenly"
   },
   card: {

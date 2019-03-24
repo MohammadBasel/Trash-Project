@@ -18,42 +18,199 @@ export default class TrashStatus extends React.Component {
     header: null
   };
   state = {
-    zones: []
+    zones: [],
+    trash: [],
+    zone: ""
   };
-  componentDidMount() {
-    // go to db and get all the users
+  async componentWillMount() {
+    const currentuser = firebase.auth().currentUser.email;
+
+    db.collection("Users").onSnapshot(querySnapshot => {
+      zone = "";
+      querySnapshot.forEach(doc => {
+        doc.id == currentuser && (zone = doc.data().Zone);
+      });
+      this.setState({ zone });
+      console.log("Zone his", zone);
+
+      // console.log("Current zones: ", this.state.zones.length);
+    });
     db.collection("Zone").onSnapshot(querySnapshot => {
       zones = [];
       querySnapshot.forEach(doc => {
         zones.push({ id: doc.id, ...doc.data() });
+        this.getTrashData(this.state.zone);
       });
       this.setState({ zones });
-      console.log("Current users: ", this.state.zones.length);
     });
-
-    // go to db and get all the records
   }
+  getTrashData = id => {
+    let trash = [...this.state.trash];
+    db.collection(`Zone/${id}/Trash`).onSnapshot(querySnapshot => {
+      querySnapshot.forEach(doc => {
+        trash.push({ id: doc.id, ...doc.data() });
+      });
+      this.setState({ trash });
+
+      //console.log("Current zones: ", this.state.trash.length);
+    });
+  };
   render() {
     console.log(this.state);
     return (
       <View style={styles.container}>
-        <Header
-          placement="left"
-          leftComponent={
-            <Ionicons
-              name="md-arrow-round-back"
-              size={25}
-              color="#fff"
-              onPress={() => this.props.navigation.navigate("Dashboard")}
-            />
-          }
-          centerComponent={{
-            text: "Trash Status",
-            style: { color: "#fff", marginLeft: 20 }
-          }}
-        />
-        {/* <Text>{this.state.zones.map(zone => {})}</Text> */}
-        <Text>Hellooo</Text>
+        <ScrollView>
+          <Header
+            placement="left"
+            leftComponent={
+              <Ionicons
+                name="md-arrow-round-back"
+                size={25}
+                color="#fff"
+                onPress={() => this.props.navigation.navigate("Dashboard")}
+              />
+            }
+            centerComponent={{
+              text: "Trash Status",
+              style: { color: "#fff", marginLeft: 20 }
+            }}
+          />
+          <Card title="FULL">
+            {this.state.trash.map(
+              (u, i) =>
+                u.Level > 80 && (
+                  <View>
+                    <View
+                      key={i}
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between"
+                      }}
+                    >
+                      <Text>
+                        <Text style={{ fontWeight: "bold" }}>Id:</Text>
+                        {u.id}
+                      </Text>
+                      <Text>
+                        <Text style={{ fontWeight: "bold" }}>Trash Level:</Text>
+                        {u.Level}
+                      </Text>
+                    </View>
+                    <View
+                      key={i}
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between"
+                      }}
+                    >
+                      <Text>
+                        <Text style={{ fontWeight: "bold" }}>
+                          Battery Level:
+                        </Text>
+                        {u.Battery}
+                      </Text>
+                      <Text>
+                        <Text style={{ fontWeight: "bold" }}>Status: </Text>
+                        {u.Status}
+                      </Text>
+                    </View>
+                    <Text>
+                      {"\n"} {"\n"}
+                    </Text>
+                  </View>
+                )
+            )}
+          </Card>
+          <Card title="MEDIUM">
+            {this.state.trash.map((u, i) =>
+              u.Level >= 50 && u.Level < 80 ? (
+                <View>
+                  <View
+                    key={i}
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between"
+                    }}
+                  >
+                    <Text>
+                      <Text style={{ fontWeight: "bold" }}>Id:</Text>
+                      {u.id}
+                    </Text>
+                    <Text>
+                      <Text style={{ fontWeight: "bold" }}>Trash Level:</Text>
+                      {u.Level}
+                    </Text>
+                  </View>
+                  <View
+                    key={i}
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between"
+                    }}
+                  >
+                    <Text>
+                      <Text style={{ fontWeight: "bold" }}>Battery Level:</Text>
+                      {u.Battery}
+                    </Text>
+                    <Text>
+                      <Text style={{ fontWeight: "bold" }}>Status: </Text>
+                      {u.Status}
+                    </Text>
+                  </View>
+                  <Text>
+                    {"\n"} {"\n"}
+                  </Text>
+                </View>
+              ) : null
+            )}
+          </Card>
+          <Card title="LOW">
+            {this.state.trash.map(
+              (u, i) =>
+                u.Level <= 50 && (
+                  <View>
+                    <View
+                      key={i}
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between"
+                      }}
+                    >
+                      <Text>
+                        <Text style={{ fontWeight: "bold" }}>Id:</Text>
+                        {u.id}
+                      </Text>
+                      <Text>
+                        <Text style={{ fontWeight: "bold" }}>Trash Level:</Text>
+                        {u.Level}
+                      </Text>
+                    </View>
+                    <View
+                      key={i}
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between"
+                      }}
+                    >
+                      <Text>
+                        <Text style={{ fontWeight: "bold" }}>
+                          Battery Level:
+                        </Text>
+                        {u.Battery}
+                      </Text>
+                      <Text>
+                        <Text style={{ fontWeight: "bold" }}>Status: </Text>
+                        {u.Status}
+                      </Text>
+                    </View>
+                    <Text>
+                      {"\n"} {"\n"}
+                    </Text>
+                  </View>
+                )
+            )}
+          </Card>
+        </ScrollView>
       </View>
     );
   }

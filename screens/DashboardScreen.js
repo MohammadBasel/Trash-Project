@@ -25,44 +25,55 @@ export default class DashboardScreen extends React.Component {
   state = {
     users: [],
     zones: [],
-    trash: []
+    trash: [],
+    zone: ""
   };
-
+  zone = "";
   async componentWillMount() {
     // go to db and get all the users
+    const currentuser = firebase.auth().currentUser.email;
     db.collection("Users").onSnapshot(querySnapshot => {
       users = [];
       querySnapshot.forEach(doc => {
-        users.push({ id: doc.id, ...doc.data() });
-      });
-      this.setState({ users });
-      console.log("Current users: ", this.state.users.length);
-    });
+        doc.id == currentuser && (this.zone = doc.data().Zone);
 
+        doc.data().Zone == this.zone &&
+          users.push({ id: doc.id, ...doc.data() });
+      });
+
+      this.setState({ users });
+      this.setState({ zone: this.zone });
+      console.log("Current users: ", this.state.users);
+    });
     db.collection("Zone").onSnapshot(querySnapshot => {
       zones = [];
       querySnapshot.forEach(doc => {
         zones.push({ id: doc.id, ...doc.data() });
-        this.getTrashData(doc.id);
+        this.getTrashData(this.state.zone);
       });
       this.setState({ zones });
-      //  console.log("Zone", doc.id);
-
-      console.log("Current zones: ", this.state.zones.length);
     });
-    this.count();
   }
   getTrashData = id => {
-    let trash = [...this.state.trash];
+    let trash = [];
     db.collection(`Zone/${id}/Trash`).onSnapshot(querySnapshot => {
       querySnapshot.forEach(doc => {
         trash.push({ id: doc.id, ...doc.data() });
       });
       this.setState({ trash });
-
-      //console.log("Current zones: ", this.state.trash.length);
     });
   };
+  // getTrashData = id => {
+  //   let trash = [...this.state.trash];
+  //   db.collection(`Zone/${id}/Trash`).onSnapshot(querySnapshot => {
+  //     querySnapshot.forEach(doc => {
+  //       trash.push({ id: doc.id, ...doc.data() });
+  //     });
+  //     this.setState({ trash });
+
+  //     //console.log("Current zones: ", this.state.trash.length);
+  //   });
+  // };
   av = 0;
   ex = 0;
   ab = 0;
@@ -79,6 +90,11 @@ export default class DashboardScreen extends React.Component {
     );
   };
   countTrash = () => {
+    console.log("Zonee", this.state.zone);
+    console.log("This is th trash", this.state.trash);
+    this.low = 0;
+    this.medium = 0;
+    this.full = 0;
     this.state.trash.map(tra =>
       tra.Level < 50
         ? (this.low = this.low + 1)
