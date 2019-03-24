@@ -21,7 +21,7 @@ import functions from 'firebase/functions';
 import { MonoText } from '../components/StyledText';
 import firebase, { auth,FirebaseAuth } from 'firebase';
 import db from '../db.js';
-import { Header,ListItem,Badge,Slider,Divider ,Avatar,Card,Input,Icon } from 'react-native-elements';
+import { Header,ListItem,Badge,Slider,Divider ,Avatar,Card,Input,Icon,Overlay  } from 'react-native-elements';
 import { uploadImageAsync,uploadVideoAsync } from '../ImageUtils.js'
 import { ImagePicker,Video} from 'expo';
 import VideoPlayer from '@expo/videoplayer';
@@ -151,7 +151,7 @@ export default class ChatList extends React.Component {
     subtitleStyle = { styles.Sender }
     subtitle={first === "http" ?   <View style={{width: 200, height : 200}}>
     <View>
-    <ImageZoom>
+    {/* <Overlay isVisible = {true}> */}
                 <Image style={{width:"100%", height:"100%"}}
                        source={{uri:item.Content}}/>
                {/* <Video
@@ -160,7 +160,7 @@ export default class ChatList extends React.Component {
 	  resizeMode="cover"
 	  style={{ width, height: 300 }}
 	/> */}
-            </ImageZoom>
+            {/* </Overlay> */}
             <Video
 	  source={{ uri: item.Content }}
           shouldPlay
@@ -195,7 +195,7 @@ export default class ChatList extends React.Component {
     subtitleStyle = {styles.Receiver}
     subtitle={first === "http" ?   <View style={{width: 200, height : 200}}>
     <View>
-    <ImageZoom>
+    <Overlay fullScreen={true}>
                 <Image style={{width:"100%", height:"100%"}}
                        source={{uri:item.Content}}/>
                {/* <Video
@@ -204,7 +204,7 @@ export default class ChatList extends React.Component {
 	  resizeMode="cover"
 	  style={{ width, height: 300 }}
 	/> */}
-            </ImageZoom>
+            </Overlay>
             <Video
 	  source={{ uri: item.Content }}
           shouldPlay
