@@ -127,12 +127,7 @@ export default class PointsScreen extends React.Component {
       this.setState({ users: changes });
     }
   };
-  add = (ids, point) => {
-    let updateduser = [...this.state.updateduser];
-    updateduser.push({ id: ids, Points: point });
-    this.setState({ updateduser });
-    console.log("Updated user", updateduser);
-  };
+
   render() {
     console.log(this.state.users);
     return (
@@ -178,15 +173,6 @@ export default class PointsScreen extends React.Component {
           circleColorOn="red"
           duration={500}
         />
-        {/* {this.state.users.map(user => (
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-evenly" }}
-            key={user.id}
-          >
-            <Text style={{ padding: 10 }}>{user.Name}</Text>
-            <Text style={{ padding: 10 }}>{user.Points}</Text>
-          </View>
-        ))} */}
 
         <FlatList
           data={this.state.users}

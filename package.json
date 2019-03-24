@@ -20,6 +20,7 @@
     "react-native-geolocation-service": "^2.0.0",
     "react-native-maps": "^0.23.0",
     "react-native-switch-toggle": "^1.0.8",
+    "react-native-table-component": "^1.2.0",
     "react-navigation": "^3.0.9"
   },
   "devDependencies": {

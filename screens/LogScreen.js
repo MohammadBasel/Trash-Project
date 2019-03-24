@@ -21,7 +21,7 @@ export default class Employee extends React.Component {
   state = {
     logs: [],
     trashid: "0",
-    filteredItems: [{}],
+    filteredItems: [],
     zones: [],
     zone: "",
     users: [],
@@ -58,6 +58,7 @@ export default class Employee extends React.Component {
           logs.push({ id: doc.id, ...doc.data() });
       });
       this.setState({ logs });
+      this.setState({ filteredItems: logs });
       console.log("Current logs: ", this.state.logs.length);
     });
 
@@ -87,31 +88,48 @@ export default class Employee extends React.Component {
       //console.log("Current zones: ", this.state.trash.length);
     });
   };
+  handleFilter = async () => {
+    itemfilter = [];
+    if (this.state.trashid === "0") {
+      if (this.state.truckid === "0") {
+        itemfilter = this.state.logs;
+      } else {
+        for (let i = 0; i < this.state.logs.length; i++) {
+          this.state.logs[i].Truck_Id.substring(32) == this.state.truckid &&
+            itemfilter.push(this.state.logs[i]);
+          console.log("logs", this.state.logs[i]);
+        }
+      }
+    } else if (this.state.truckid === "0") {
+      for (let i = 0; i < this.state.logs.length; i++) {
+        this.state.logs[i].Trash_Id.substring(32) == this.state.trashid &&
+          itemfilter.push(this.state.logs[i]);
+        console.log("logs", this.state.logs[i]);
+      }
+    } else {
+      for (let i = 0; i < this.state.logs.length; i++) {
+        this.state.logs[i].Trash_Id.substring(32) == this.state.trashid &&
+          this.state.logs[i].Truck_Id.substring(32) == this.state.truckid &&
+          itemfilter.push(this.state.logs[i]);
+        console.log("logs", this.state.logs[i]);
+      }
+    }
+    await this.setState({ filteredItems: itemfilter });
+  };
   handlePickerTrash = async value => {
     await this.setState({ trashid: value });
-    // this.handleFilter();
+    this.handleFilter();
   };
   handlePickerTruck = async value => {
     await this.setState({ truckid: value });
-    // this.handleFilter();
+    this.handleFilter();
   };
 
-  handleFilter = () => {
-    //     itemfilter=[]
-    //     if(this.state.trashid="0"){
-    //       if(this.state.truckid="0"){
-    // itemfilter=this.state.logs
-    //       }
-    //       else{
-    //         this.state.logs.map(log=>(
-    //           log.Trash_Id.slice(33,20)==this.state.
-    //         ))
-    //       }
-    //     }
-  };
   try = "/Zone/uxLepYH8A8usOlfNpgCi/Truck/VZDfh0BLdBU3Sw3wBifW";
   render() {
-    console.log("TRUCKS", this.state.trucks);
+    //console.log("TRUCKS", this.state.trucks);
+    console.log("TRASHID", this.state.trashid);
+    console.log("TRUCKSID", this.state.truckid);
     return (
       <View style={styles.container}>
         <Header
@@ -165,10 +183,13 @@ export default class Employee extends React.Component {
             </Picker>
           </View>
         </View>
-        {console.log("triaaallll", this.try.substring(33, 20))}
-        {this.state.logs.map(log => (
+        {console.log("triaaallll", this.try.substring(33))}
+        {this.state.filteredItems.map(log => (
           <View>
+            {/* {console.log("LOGS", log)} */}
             <Text>{log.Desc}</Text>
+            <Text>{log.Trash_Id}</Text>
+            <Text>{log.Truck_Id}</Text>
           </View>
         ))}
       </View>
