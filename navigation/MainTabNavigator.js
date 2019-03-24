@@ -43,7 +43,6 @@ HomeStack.navigationOptions = {
 
 const ChatStack = createStackNavigator({
   Chat: ChatScreen,
-
   ChatList : ChatList,
   UsersList : UsersList,
   MyUsersList : MyUsersList
@@ -54,11 +53,7 @@ ChatStack.navigationOptions = {
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
-      name={
-        Platform.OS === "ios"
-          ? `ios-chatbubbles${focused ? "" : "-outline"}`
-          : "ios-chatbubbles"
-      }
+      name={Platform.OS === "ios" ? "ios-chatbubbles" : "md-chatbubbles"}
     />
   )
 };
@@ -105,8 +100,7 @@ MaintenanceStack.navigationOptions = {
       name={Platform.OS === "ios" ? "ios-link" : "md-link"}
     />
   )
-
-}
+};
 
 const DashboardStack = createStackNavigator({
   Dashboard: DashboardScreen,
