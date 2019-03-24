@@ -29,7 +29,7 @@ export default class Login extends React.Component {
     password: "",
     avatar: null,
     caption: "",
-    flag : true,
+    flag : false,
     error: "",
     phone: ""
   };

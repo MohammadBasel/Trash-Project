@@ -17,8 +17,8 @@ export default class Battery extends React.Component {
         trashs: [],
         zones: [],
     }
-    trashs = []
-    zones = []
+    // trashs = []
+    // zones = []
     
     async componentDidMount() {
         await this.getZoneData()
