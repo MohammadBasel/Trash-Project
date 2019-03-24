@@ -29,8 +29,8 @@ export default class HomeScreen extends React.Component {
 
   state = {
     users: {},
-    // user: firebase.auth().currentUser.email
-    user: "achouak@achouak.com"
+    user: firebase.auth().currentUser.email
+    // user: "achouak@achouak.com"
   }
   users = {}
 
