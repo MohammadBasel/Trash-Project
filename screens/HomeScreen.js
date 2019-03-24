@@ -8,8 +8,14 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
+import {
+  Ionicons, AntDesign, Octicons, Entypo, FontAwesome,
+  Foundation
+} from "@expo/vector-icons";
+import { Header, Slider, Card, Avatar, Divider } from "react-native-elements"
+
 import { WebBrowser } from 'expo';
 
 import { MonoText } from '../components/StyledText';
@@ -22,119 +28,77 @@ export default class HomeScreen extends React.Component {
   };
 
   state = {
-    name: "",
-    email: "",
-    password: "",
-    avatar: null,
-    caption: ""
+    users: {},
+    user: firebase.auth().currentUser.email
+    // user: "achouak@achouak.com"
   }
+  users = {}
 
+async componentDidMount() {
+ await this.getData()
+ console.log("Current users: ", this.state.users)
+  console.log("Current user/////: ", firebase.auth().currentUser)  
+}
 
+getData = async () => {
+  users = {}
+  db.collection("Users")
+      .onSnapshot(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          if(this.state.user == doc.id){
+            users = { id: doc.id, ...doc.data() }
+          }
+          this.setState({users})
+        })
+        console.log("users length: ", this.state.users)
+        
+      })
+}
 
-  finishLoginOrRegister = async () => {
-
-  }
-
-  login = async () => {
-    let avatar = "default.png"
-
-    try {
-      await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
-
-      if (this.state.avatar) {
-        avatar = this.state.email
-        await db.collection('users').doc(this.state.email).update({ avatar })
-      }
-
-      await db.collection('users').doc(this.state.email).update({ online: true })
-
-      if (this.state.name) {
-        await db.collection('users').doc(this.state.email).update({ name: this.state.name })
-      }
-    } catch (error) {
-
-      // Handle Errors here.
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      // ...
-      console.log(errorMessage)
-    }
-  }
-
-
+avatarURL = (email) => {
+  console.log("email wala user", this.state.user.replace("@", "%40"))
+  return email.replace("@", "%40")
+}
 
   render() {
+    console.log("Current usersstate: ", this.state.users)
     return (
       <View style={styles.container}>
-        <View style={styles.contentContainer}>
-          <View style={styles.welcomeContainer}>
-            <Image
-              style={{ width: 50, height: 50 }}
-              source={{ uri: 'https://www.fonepaw.com/images/android-data-recovery/recycle-bin-icon.png' }}
+       <Header
+          placement="left"
+          centerComponent={{ text:this.state.users.Name, style: { color: '#fff' } }}
+          rightComponent={<Text><FontAwesome name="phone" size={20} color="white" onPress={() => Alert.alert(" Call this number" + items.phone)} /><Text>  </Text><Foundation name="video" size={20} color="white" onPress={() => Alert.alert("Video Call this number" + items.phone)} /></Text>}
+
+      />
+        <View>
+          <View style={{ paddingTop: 5, flexDirection: "row" }}>
+            <Avatar
+                size="xlarge"
+                rounded
+                source={{
+                    uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/${this.avatarURL(this.state.user)}%2Favatar.png?alt=media`
+                }}
             />
-            {/* <TextInput
-              autoCapitalize="none"
-              placeholder="Name"
-              onChangeText={name => this.setState({ name })}
-              value={this.state.name}
-            /> */}
-            <Text style={{ fontSize: 80 }}>THE HOME PAGE !!!!! </Text>
-
-            <TextInput
-              autoCapitalize="none"
-              placeholder="Email"
-              onChangeText={email => this.setState({ email })}
-              value={this.state.email}
-            />
-
-            <TextInput
-              autoCapitalize="none"
-              placeholder="Password"
-              onChangeText={password => this.setState({ password })}
-              value={this.state.password}
-            />
-
-            <Button onPress={this.login} title="Login" style={{ width: 100, paddingTop: 20 }} />
-
-          </View>
+            <Card
+                title={this.state.users.Name}>
+                <View style={{ marginBottom: 10 }}>
+                    <View>
+                        <Text>Zone: {this.state.users.Zone}</Text>
+                        <Text>Email: {this.state.user}</Text>
+                        <Text>Phone: {this.state.users.Phone}</Text>
+                        <Text>Role: {this.state.users.Role}</Text>
+                    </View>
+                </View>
+            </Card>
+          </View >
+          <Card
+              title='Points'>
+              <Text style={{ textAlign: "left" }}>Points earn: {this.state.users.Points}</Text>
+          </Card>
         </View>
-
       </View>
     );
   }
-
-  _maybeRenderDevelopmentModeWarning() {
-    if (__DEV__) {
-      const learnMoreButton = (
-        <Text onPress={this._handleLearnMorePress} style={styles.helpLinkText}>
-          Learn more
-        </Text>
-      );
-
-      return (
-        <Text style={styles.developmentModeText}>
-          Development mode is enabled, your app will be slower but you can use useful development
-          tools. {learnMoreButton}
-        </Text>
-      );
-    } else {
-      return (
-        <Text style={styles.developmentModeText}>
-          You are not in development mode, your app will run at full speed.
-        </Text>
-      );
-    }
-  }
-
-  _handleLearnMorePress = () => {
-    WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/guides/development-mode');
-  };
-
-  _handleHelpPress = () => {
-    WebBrowser.openBrowserAsync(
-      'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
-    );
-  };
 }
 
 const styles = StyleSheet.create({
