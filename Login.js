@@ -31,7 +31,8 @@ export default class Login extends React.Component {
     password: "",
     avatar: null,
     caption: "",
-    flag : false,
+    flag: false,
+    flag1: true,
     error: "",
     phone: "",
     disable: true

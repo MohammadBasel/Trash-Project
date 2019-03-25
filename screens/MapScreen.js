@@ -10,7 +10,7 @@ import {
   /*, StyleSheet*/
 } from "react-native";
 import { ExpoConfigView } from "@expo/samples";
-import MapView, { Callout } from "react-native-maps";
+import MapView, { Callout, PROVIDER_GOOGLE } from "react-native-maps";
 import firebase from "firebase";
 import { Permissions, ImagePicker } from "expo";
 import db from "../db";
@@ -39,35 +39,14 @@ export default class MapScreen extends React.Component {
   state = {
     user: null,
     zone: null,
-    coords: [
-      {
-        latitude: 38.893165,
-        longitude: -77.077957
-      },
-      {
-        latitude: 38.893276,
-        longitude: -77.077407
-      },
-      {
-        latitude: 38.893276,
-        longitude: -77.077407
-      },
-      {
-        latitude: 38.892032,
-        longitude: -77.077247
-      },
-      {
-        latitude: 38.890857,
-        longitude: -77.077087
-      }
-    ],
+    route: null,
     forcast: null,
     bins: [],
     trucks: [],
     coordsArr: [{ latitude: 25.381649, longitude: 51.479143 }],
     region: {
-      latitude: 37.78825,
-      longitude: -122.4324,
+      latitude: 25.381649,
+      longitude: 51.479143,
       latitudeDelta: 0.0922,
       longitudeDelta: 0.0421
     },
@@ -140,7 +119,7 @@ export default class MapScreen extends React.Component {
     )
       .then(response => response.json())
       .then(forcast => {
-        this.setState({ forcast }), console.log("Forcast is: ", forcast);
+        this.setState({ forcast });
       });
   };
 
@@ -149,18 +128,7 @@ export default class MapScreen extends React.Component {
     console.log("destination Loco: ", destinationLoc);
 
     const req = {
-      location: [
-        {
-          latLng: {
-            lng: 25.3604823,
-            lat: 51.4801991
-          },
-          latLng: {
-            lng: 25.375834,
-            lat: 51.48307
-          }
-        }
-      ],
+      locations: [startLoc, destinationLoc],
       options: {
         avoids: [],
         avoidTimedConditions: false,
@@ -177,27 +145,27 @@ export default class MapScreen extends React.Component {
     };
     //&from=25.3604823,51.4801991&to=25.375834,51.48307
     try {
-      // let resp = await fetch(
-      //   `http://www.mapquestapi.com/directions/v2/route?key=0nQiUEMlaswV1NZOEs28vqk0VORCLSCZ`,
-      //   {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json"
-      //     },
-      //     body: JSON.stringify(req)
-      //   }
-      // );
-      //console.log("Res is: ", resp);
-      // let respJson = await resp.json();
-      // let points = Polyline.decode(respJson.routes[0].overview_polyline.points);
-      // let coords = points.map((point, index) => {
-      //   return {
-      //     latitude: point[0],
-      //     longitude: point[1]
-      //   };
-      // });
-      // this.setState({ coords: coords });
-      // return coords;
+      let resp = await fetch(
+        `http://www.mapquestapi.com/directions/v2/route?key=0nQiUEMlaswV1NZOEs28vqk0VORCLSCZ`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(req)
+        }
+      )
+        .then(response => response.json())
+        .then(data => {
+          let points = data.route.shape.shapePoints;
+          const route = [];
+          for (let i = 0; i < points.length; i += 2) {
+            if (i < points.length - 1)
+              route.push({ latitude: points[i], longitude: points[i + 1] });
+          }
+          this.setState({ route });
+          //console.log("Route is:", data);
+        });
     } catch (error) {
       alert(error);
       return error;
@@ -260,14 +228,14 @@ export default class MapScreen extends React.Component {
         break;
       }
     }
-    console.log("Truck Id is: ", truckId);
+    //console.log("Truck Id is: ", truckId);
     const result = await db
       .collection(`Reserve_Bin`)
       .where("Status", "==", "inprogress")
       .where("Truck_Id", "==", truckId)
       .get();
 
-    console.log("result is: ", result.size);
+    //console.log("result is: ", result.size);
 
     if (result.size <= 0) {
       db.collection(`Zone/${this.state.zone.id}/Trash`)
@@ -325,21 +293,36 @@ export default class MapScreen extends React.Component {
     return temp;
   };
 
-  handleMarker = (markerCoords, bin) => {
+  handleMarker = (markerCoords, selectedBin) => {
+    console.log("Bin inside Handler: ", selectedBin);
     const origin =
       "" + this.state.region.latitude + "," + this.state.region.longitude;
     const distination =
       "" + markerCoords.latitude + "," + markerCoords.longitude;
-    //this.getDirections(origin, distination);
-    console.log("BIN isss: ", bin);
-    if (bin.Status === "Reserved") {
-      this.setState({ selectedBin: bin, isReserved: true });
+    this.getDirections(origin, distination);
+    if (selectedBin.Status === "Reserved") {
+      console.log("Bin Reserved: ", selectedBin);
+      this.setState({ selectedBin, isReserved: true, flag: true });
     } else {
-      this.setState({ selectedBin: bin, isReserved: false });
+      console.log("Bin UnReserved: ", selectedBin);
+      this.setState(
+        { selectedBin, isReserved: false, flag: true },
+        console.log("State Print: ", this.state.selectedBin)
+      );
     }
   };
 
+  unSelect = () => {
+    this.setState({
+      selectedBin: null,
+      isReserved: false,
+      route: null,
+      flag: false
+    });
+  };
+
   render() {
+    console.log("Selected Bin: ", this.state.selectedBin);
     // console.log(this.state);
     return (
       <View
@@ -350,74 +333,77 @@ export default class MapScreen extends React.Component {
       >
         <View
           style={{
-            flex: 1
+            flex: 1,
+            padding: "1%"
           }}
         >
-          <View>
-            {this.state.forcast !== null && (
-              <Card
-                containerStyle={{
-                  backgroundColor: "rgba(56, 172, 236, 1)",
-                  borderWidth: 0,
-                  borderRadius: 10
+          {this.state.forcast !== null && (
+            <Card
+              containerStyle={{
+                backgroundColor: "rgba(56, 172, 236, 1)",
+                borderWidth: 0,
+                marginTop: 0,
+                marginLeft: "auto",
+                marginRight: "auto",
+                borderRadius: 10,
+                width: width
+              }}
+            >
+              <Text>
+                {this.state.forcast.observations.location[0].country},{" "}
+                {this.state.forcast.observations.location[0].state},{" "}
+                {this.state.forcast.observations.location[0].city}
+              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center"
+                }}
+              >
+                <Image
+                  style={{ width: 50, height: 50 }}
+                  source={{
+                    uri: this.state.forcast.observations.location[0]
+                      .observation[0].iconLink
+                  }}
+                />
+                <Text style={{ fontSize: 38 }}>
+                  {new Date().getHours() + ":" + new Date().getMinutes()}
+                </Text>
+              </View>
+              <Divider
+                style={{ backgroundColor: "#dfe6e9", marginVertical: 20 }}
+              />
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between"
                 }}
               >
                 <Text>
-                  {this.state.forcast.observations.location[0].country},{" "}
-                  {this.state.forcast.observations.location[0].state},{" "}
-                  {this.state.forcast.observations.location[0].city}
+                  {
+                    this.state.forcast.observations.location[0].observation[0]
+                      .description
+                  }
                 </Text>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center"
-                  }}
-                >
-                  <Image
-                    style={{ width: 50, height: 50 }}
-                    source={{
-                      uri: this.state.forcast.observations.location[0]
-                        .observation[0].iconLink
-                    }}
-                  />
-                  <Text style={{ fontSize: 38 }}>
-                    {new Date().getHours() + ":" + new Date().getMinutes()}
-                  </Text>
-                </View>
-                <Divider
-                  style={{ backgroundColor: "#dfe6e9", marginVertical: 20 }}
-                />
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between"
-                  }}
-                >
-                  <Text>
-                    {
-                      this.state.forcast.observations.location[0].observation[0]
-                        .description
-                    }
-                  </Text>
-                  <Text>
-                    {
-                      this.state.forcast.observations.location[0].observation[0]
-                        .temperature
-                    }
-                    {"\u00b0"}C
-                  </Text>
-                </View>
-              </Card>
-            )}
-          </View>
+                <Text>
+                  {
+                    this.state.forcast.observations.location[0].observation[0].temperature.split(
+                      "."
+                    )[0]
+                  }
+                  {"\u00b0"}C
+                </Text>
+              </View>
+            </Card>
+          )}
           <MapView
             showsCompass={true}
             showsMyLocationButton={true}
             showsUserLocation
-            onPress={() => {
-              this.setState({ selectedBin: null, isReserved: false });
-            }}
+            provider={PROVIDER_GOOGLE}
+            onPress={this.unSelect}
             style={{
               flex: 1,
               width: width,
@@ -446,7 +432,18 @@ export default class MapScreen extends React.Component {
               strokeWidth={2}
             />
             {this.state.bins.map((bin, i) => (
-              <TouchableOpacity key={i}>
+              <TouchableOpacity
+                key={i}
+                onPress={() =>
+                  this.handleMarker(
+                    {
+                      latitude: bin.Loc._lat,
+                      longitude: bin.Loc._long
+                    },
+                    bin
+                  )
+                }
+              >
                 <MapView.Marker
                   tracksViewChanges
                   ref={marker => {
@@ -510,14 +507,15 @@ export default class MapScreen extends React.Component {
                 </MapView.Marker>
               </TouchableOpacity>
             ))}
-            {this.state.coords !== null && (
+            {this.state.route !== null && (
               <MapView.Polyline
-                coordinates={this.state.coords}
+                coordinates={this.state.route}
                 strokeWidth={2}
                 strokeColor="red"
               />
             )}
           </MapView>
+
           <TouchableOpacity
             onPress={
               this.state.isReserved ? this.cancelReservation : this.reserveBin
@@ -532,10 +530,10 @@ export default class MapScreen extends React.Component {
               width: width * 0.2,
               height: height * 0.06,
               position: "absolute",
-              top: 600,
-              bottom: 20,
-              left: 40,
-              right: 50
+              top: height - 190,
+              bottom: height - 20,
+              left: width - 400,
+              right: width - 50
             }}
           >
             <Text style={{ textAlign: "center" }}>
@@ -560,10 +558,10 @@ export default class MapScreen extends React.Component {
               width: width * 0.2,
               height: height * 0.06,
               position: "absolute",
-              top: 600,
-              bottom: 20,
-              left: 175,
-              right: 50
+              top: height - 190,
+              bottom: height - 20,
+              left: width - 300,
+              right: width - 50
             }}
           >
             <Text style={{ textAlign: "center" }}>Empty</Text>
@@ -586,10 +584,10 @@ export default class MapScreen extends React.Component {
               width: width * 0.2,
               height: height * 0.06,
               position: "absolute",
-              top: 600,
-              bottom: 20,
-              left: 300,
-              right: 50
+              top: height - 190,
+              bottom: height - 20,
+              left: width - 200,
+              right: width - 50
             }}
           >
             <Text style={{ textAlign: "center" }}>Report</Text>
