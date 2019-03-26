@@ -113,7 +113,7 @@ export default class Login extends React.Component {
                 onPress={this.login}
                 style={{ color: "lightblue" }}
               >
-                <Text>Login</Text>
+                {/* <Text>Login</Text> */}
               </TouchableOpacity>
               <Button
                 onPress={this.login}
