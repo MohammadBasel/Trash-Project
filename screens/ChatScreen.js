@@ -9,7 +9,8 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  FlatList
+  FlatList,
+  Dimensions 
 } from 'react-native';
 import { WebBrowser } from 'expo';
 
@@ -18,7 +19,7 @@ import firebase, { auth,FirebaseAuth } from 'firebase';
 import db from '../db.js';
 import { Header,ListItem,Badge,Slider,Divider ,Avatar } from 'react-native-elements';
 import { Ionicons,FontAwesome,MaterialIcons } from '@expo/vector-icons';
-
+import ImageZoom from 'react-native-image-pan-zoom';
 
 export default class ChatScreen extends React.Component {
   static navigationOptions = {
@@ -134,6 +135,14 @@ export default class ChatScreen extends React.Component {
         keyExtractor={this.keyExtractor}
         renderItem={this.renderChats}
       /> 
+
+        {/* <ImageZoom cropWidth={Dimensions.get('window').width}
+                       cropHeight={Dimensions.get('window').height}
+                       imageWidth={200}
+                       imageHeight={200}>
+                <Image style={{width:200, height:200}}
+                       source={{uri:'http://v1.qzone.cc/avatar/201407/07/00/24/53b9782c444ca987.jpg!200x200.jpg'}}/>
+            </ImageZoom> */}
           </View>
         
     );

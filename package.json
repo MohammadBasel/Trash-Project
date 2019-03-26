@@ -25,10 +25,10 @@
     "react-native-image-pan-zoom": "^2.1.11",
     "react-native-maps": "^0.23.0",
     "react-native-maps-directions": "^1.6.0",
+    "react-native-popup-dialog": "^0.17.0",
     "react-native-push-notification": "^3.1.2",
     "react-native-switch-toggle": "^1.0.8",
     "react-native-table-component": "^1.2.0",
-    "react-native-video": "^4.4.0",
     "react-navigation": "^3.0.9"
   },
   "devDependencies": {

@@ -13,7 +13,10 @@ import {
   KeyboardAvoidingView,
   Linking,
   StatusBar,
-  Dimensions 
+  Dimensions ,
+  Animated,
+  CameraRoll,
+  TouchableWithoutFeedback 
 } from 'react-native';
 import { WebBrowser } from 'expo';
 import { Ionicons,FontAwesome } from '@expo/vector-icons';
@@ -23,13 +26,17 @@ import firebase, { auth,FirebaseAuth } from 'firebase';
 import db from '../db.js';
 import { Header,ListItem,Badge,Slider,Divider ,Avatar,Card,Input,Icon,Overlay  } from 'react-native-elements';
 import { uploadImageAsync,uploadVideoAsync } from '../ImageUtils.js'
-import { ImagePicker,Video} from 'expo';
+import { ImagePicker,Video,SMS } from 'expo';
 import VideoPlayer from '@expo/videoplayer';
+import Dialog, { DialogFooter,DialogButton,DialogTitle, DialogContent } from 'react-native-popup-dialog';
 
 import ImageZoom from 'react-native-image-pan-zoom';
 import AntDesign from '@expo/vector-icons/AntDesign';
 const { width,height } = Dimensions.get('window');
 export default class ChatList extends React.Component {
+  _handleVideoRef = component => {
+    
+  }
   static navigationOptions = {
     header: null,
     text :""
@@ -44,7 +51,9 @@ export default class ChatList extends React.Component {
     messages : [],
     title : "",
     otherPerson : "",
-    phoneNumber:""
+    phoneNumber:"",
+    fadeAnim: new Animated.Value(0),
+    visible : false
     
   }
   user = ""
@@ -93,8 +102,12 @@ export default class ChatList extends React.Component {
     })
     
     console.log("Current messages after method: ", this.state.messages)
-   
-    
+    // const isAvailable = await SMS.isAvailableAsync();
+    // if (isAvailable) {
+    //   SMS.sendSMSAsync("+97430733103", "hi")
+    // } else {
+    //   // misfortune... there's no SMS available on this device
+    // }
       
   }
 
@@ -149,10 +162,10 @@ export default class ChatList extends React.Component {
     title={"me"}
     titleStyle = {{textAlign : "right"}}
     subtitleStyle = { styles.Sender }
-    subtitle={first === "http" ?   <View style={{width: 200, height : 200}}>
+    subtitle={first === "http" ?  
     <View>
     {/* <Overlay isVisible = {true}> */}
-                <Image style={{width:"100%", height:"100%"}}
+                <Image
                        source={{uri:item.Content}}/>
                {/* <Video
 	  source={{ uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4' }}
@@ -162,13 +175,16 @@ export default class ChatList extends React.Component {
 	/> */}
             {/* </Overlay> */}
             <Video
+            
+            
 	  source={{ uri: item.Content }}
           shouldPlay
+          isLooping
 	  resizeMode="cover"
-	  style={{ width: width * 0.5, height: 300 }}
+	  style={{ width: width * 0.5, height: height * 0.5 }}
 	/>
   </View>
-  </View> : item.Content }
+ : item.Content }
     
 
     />
@@ -193,25 +209,34 @@ export default class ChatList extends React.Component {
     
     titleStyle = {{textAlign : "left"}}
     subtitleStyle = {styles.Receiver}
-    subtitle={first === "http" ?   <View style={{width: 200, height : 200}}>
-    <View>
-    <Overlay fullScreen={true}>
-                <Image style={{width:"100%", height:"100%"}}
-                       source={{uri:item.Content}}/>
-               {/* <Video
-	  source={{ uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4' }}
-          shouldPlay
-	  resizeMode="cover"
-	  style={{ width, height: 300 }}
-	/> */}
-            </Overlay>
+    subtitle={first === "http" ?  
+   <View style={{ width: width * 0.5, height: 300 }}>
+
+    
+                <Image
+                       source={{uri:item.Content}}
+                       onPress={() => {
+                        this.setState({ visible: true });
+                        
+                      }}
+                      style={{width: "100%", height : "100%"}}/>
+                       
+               
+                       <Button  onPress={this.changeVisible}>
+{console.log("i'm getting inside the touchable opacity")}
             <Video
-	  source={{ uri: item.Content }}
+           
+    source={{ uri: item.Content }}
+    
           shouldPlay
-	  resizeMode="cover"  
-	  // style={{ width: width * 0.5, height: 300 }}
+          isLooping
+    resizeMode="cover" 
+    
+    // style={{ width: width * 0.5, height: 300 }}
+  
 	/>
-  </View>
+ </Button >
+
   </View> : item.Content }
 
     />
@@ -221,7 +246,10 @@ export default class ChatList extends React.Component {
    }
     
   }
-  
+  changeVisible = () =>{
+    console.log("I'm getting here")
+    this.setState({visible : true})
+  }
   pickImage= async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
@@ -309,7 +337,26 @@ export default class ChatList extends React.Component {
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
-
+        <Dialog
+    visible={this.state.visible}
+    dialogTitle={<DialogTitle title="Dialog Title" />}
+    footer={
+      <DialogFooter>
+        <DialogButton
+          text="CANCEL"
+          onPress={() => {this.setState({visible : false})}}
+        />
+        <DialogButton
+          text="OK"
+          onPress={() => {}}
+        />
+      </DialogFooter>
+    }
+  >
+    <DialogContent>
+      <Text>hi </Text>
+    </DialogContent>
+  </Dialog>
       </View>
       
           
