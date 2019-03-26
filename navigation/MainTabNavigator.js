@@ -43,9 +43,9 @@ HomeStack.navigationOptions = {
 
 const ChatStack = createStackNavigator({
   Chat: ChatScreen,
-  ChatList : ChatList,
-  UsersList : UsersList,
-  MyUsersList : MyUsersList
+  ChatList: ChatList,
+  UsersList: UsersList,
+  MyUsersList: MyUsersList
 });
 
 ChatStack.navigationOptions = {

@@ -9,16 +9,40 @@ import {
   Dimensions
   /*, StyleSheet*/
 } from "react-native";
+import PushNotification from "react-native-push-notification";
+import { PushNotificationIOS } from "react-native";
 import { ExpoConfigView } from "@expo/samples";
 import MapView, { Callout, PROVIDER_GOOGLE } from "react-native-maps";
+import MapViewDirections from "react-native-maps-directions";
 import firebase from "firebase";
 import { Permissions, ImagePicker } from "expo";
 import db from "../db";
 import Polyline from "@mapbox/polyline";
 import { Card, Divider } from "react-native-elements";
 
-const { width, height } = Dimensions.get("window");
+const localNotification = () => {
+  PushNotification.localNotification({
+    autoCancel: true,
+    largeIcon: "ic_launcher",
+    smallIcon: "ic_notification",
+    bigText: "My big text that will be shown when notification is expanded",
+    subText: "This is a subText",
+    color: "green",
+    vibrate: true,
+    vibration: 300,
+    title: "Notification Title",
+    message: "Notification Message",
+    playSound: true,
+    soundName: "default",
+    actions: '["Accept", "Reject"]'
+  });
+};
 
+const { width, height } = Dimensions.get("window");
+const ASPECT_RATIO = width / height;
+const LATITUDE_DELTA = 0.0922;
+const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+const GOOGLE_API_KEY = "AIzaSyCYvMpmVhFc0ydILEuXGJNYNGFnBoKPCL8";
 export default class MapScreen extends React.Component {
   static navigationOptions = {
     title: "Map"
@@ -47,14 +71,15 @@ export default class MapScreen extends React.Component {
     region: {
       latitude: 25.381649,
       longitude: 51.479143,
-      latitudeDelta: 0.0922,
-      longitudeDelta: 0.0421
+      latitudeDelta: LATITUDE_DELTA,
+      longitudeDelta: LONGITUDE_DELTA
     },
     selectedBin: null,
     reservationId: null,
     isReserved: false,
     flag: false
   };
+  mapView = null;
   async componentDidMount() {
     this.getWhether();
     await Permissions.askAsync(Permissions.LOCATION);
@@ -64,8 +89,8 @@ export default class MapScreen extends React.Component {
         region = {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA
         };
         this.setState({ region });
       },
@@ -82,10 +107,11 @@ export default class MapScreen extends React.Component {
       .collection("Users")
       .doc(email)
       .get();
-
     const zoneId = result.data().Zone;
+
     const user = { id: result.id, ...result.data() };
-    db.collection("Zone")
+    await db
+      .collection("Zone")
       .doc(zoneId)
       .onSnapshot(querySnapshot => {
         const id = querySnapshot.id;
@@ -109,6 +135,7 @@ export default class MapScreen extends React.Component {
       querySnapshot.forEach(doc => {
         trucks.push({ id: doc.id, ...doc.data() });
       });
+      console.log("Trucks Changed!");
       this.setState({ trucks });
     });
   }
@@ -123,10 +150,18 @@ export default class MapScreen extends React.Component {
       });
   };
 
-  getDirections = async (startLoc, destinationLoc) => {
-    console.log("Start Loco: ", startLoc);
-    console.log("destination Loco: ", destinationLoc);
+  onReady = result => {
+    this.mapView.fitToCoordinates(result.coordinates, {
+      edgePadding: {
+        right: width / 20,
+        bottom: height / 20,
+        left: width / 20,
+        top: height / 20
+      }
+    });
+  };
 
+  getDirections = async (startLoc, destinationLoc) => {
     const req = {
       locations: [startLoc, destinationLoc],
       options: {
@@ -145,27 +180,34 @@ export default class MapScreen extends React.Component {
     };
     //&from=25.3604823,51.4801991&to=25.375834,51.48307
     try {
-      let resp = await fetch(
-        `http://www.mapquestapi.com/directions/v2/route?key=0nQiUEMlaswV1NZOEs28vqk0VORCLSCZ`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(req)
-        }
-      )
-        .then(response => response.json())
-        .then(data => {
-          let points = data.route.shape.shapePoints;
-          const route = [];
-          for (let i = 0; i < points.length; i += 2) {
-            if (i < points.length - 1)
-              route.push({ latitude: points[i], longitude: points[i + 1] });
-          }
-          this.setState({ route });
-          //console.log("Route is:", data);
-        });
+      // const response = await fetch(
+      //   `https://route.api.here.com/routing/7.2/calculateroute.json?app_id=PxvQ4FeG3DpNYbNZBjKH&app_code=dkAcfxUgh-PHLxJox3majw&waypoint0=geo!${startLoc}&waypoint1=geo!${destinationLoc}&mode=fastest;car;traffic:disabled`
+      // )
+      //   .then(response => response.json())
+      //   .then(data => {
+      //     console.log("Route is:", data);
+      //   });
+      // let resp = await fetch(
+      //   `http://www.mapquestapi.com/directions/v2/route?key=0nQiUEMlaswV1NZOEs28vqk0VORCLSCZ`,
+      //   {
+      //     method: "POST",
+      //     headers: {
+      //       "Content-Type": "application/json"
+      //     },
+      //     body: JSON.stringify(req)
+      //   }
+      // )
+      //   .then(response => response.json())
+      //   .then(data => {
+      //     let points = data.route.shape.shapePoints;
+      //     const route = [];
+      //     for (let i = 0; i < points.length; i += 2) {
+      //       if (i < points.length - 1)
+      //         route.push({ latitude: points[i], longitude: points[i + 1] });
+      //     }
+      //     this.setState({ route });
+      //     //console.log("Route is:", data);
+      //   });
     } catch (error) {
       alert(error);
       return error;
@@ -294,21 +336,30 @@ export default class MapScreen extends React.Component {
   };
 
   handleMarker = (markerCoords, selectedBin) => {
-    console.log("Bin inside Handler: ", selectedBin);
-    const origin =
-      "" + this.state.region.latitude + "," + this.state.region.longitude;
-    const distination =
-      "" + markerCoords.latitude + "," + markerCoords.longitude;
-    this.getDirections(origin, distination);
+    const origin = {
+      latitude: this.state.region.latitude,
+      longitude: this.state.region.longitude
+    };
+    const distination = {
+      latitude: markerCoords.latitude,
+      longitude: markerCoords.longitude
+    };
+    const route = [origin, distination];
+    this.setState({ route });
+    // const origin =
+    //   "" + this.state.region.latitude + "," + this.state.region.longitude;
+    // const distination =
+    //   "" + markerCoords.latitude + "," + markerCoords.longitude;
+    //this.getDirections(origin, distination);
     if (selectedBin.Status === "Reserved") {
-      console.log("Bin Reserved: ", selectedBin);
-      this.setState({ selectedBin, isReserved: true, flag: true });
+      this.setState({ selectedBin, isReserved: true });
+    } else if (
+      selectedBin.Status === "Damaged" ||
+      selectedBin.Status === "Under Maintenance"
+    ) {
+      this.setState({ selectedBin: null, isReserved: false });
     } else {
-      console.log("Bin UnReserved: ", selectedBin);
-      this.setState(
-        { selectedBin, isReserved: false, flag: true },
-        console.log("State Print: ", this.state.selectedBin)
-      );
+      this.setState({ selectedBin, isReserved: false });
     }
   };
 
@@ -320,10 +371,12 @@ export default class MapScreen extends React.Component {
       flag: false
     });
   };
+  onError = errorMessage => {
+    alert(errorMessage);
+  };
 
   render() {
-    console.log("Selected Bin: ", this.state.selectedBin);
-    // console.log(this.state);
+    console.log(this.state.route);
     return (
       <View
         style={{
@@ -399,7 +452,9 @@ export default class MapScreen extends React.Component {
             </Card>
           )}
           <MapView
+            ref={c => (this.mapView = c)}
             showsCompass={true}
+            toolbarEnabled
             showsMyLocationButton={true}
             showsUserLocation
             provider={PROVIDER_GOOGLE}
@@ -432,95 +487,142 @@ export default class MapScreen extends React.Component {
               strokeWidth={2}
             />
             {this.state.bins.map((bin, i) => (
-              <TouchableOpacity
+              <MapView.Marker
                 key={i}
-                onPress={() =>
+                tracksViewChanges
+                ref={marker => {
+                  this.marker = marker;
+                }}
+                onPress={e => {
+                  e.stopPropagation();
                   this.handleMarker(
                     {
                       latitude: bin.Loc._lat,
                       longitude: bin.Loc._long
                     },
                     bin
-                  )
-                }
+                  );
+                }}
+                coordinate={{
+                  latitude: bin.Loc._lat,
+                  longitude: bin.Loc._long
+                }}
               >
-                <MapView.Marker
-                  tracksViewChanges
-                  ref={marker => {
-                    this.marker = marker;
+                <Image
+                  source={require("../assets/images/bin.png")}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    tintColor: [
+                      bin.Status === "Damaged" ||
+                      bin.Status === "Under Maintenance"
+                        ? "black"
+                        : bin.Status === "Reserved"
+                        ? "blue"
+                        : bin.Level < 50
+                        ? "green"
+                        : 50 <= bin.Level && bin.Level < 80
+                        ? "orange"
+                        : "red"
+                    ]
                   }}
-                  onPress={() =>
-                    this.handleMarker(
-                      {
-                        latitude: bin.Loc._lat,
-                        longitude: bin.Loc._long
-                      },
-                      bin
-                    )
-                  }
-                  coordinate={{
-                    latitude: bin.Loc._lat,
-                    longitude: bin.Loc._long
-                  }}
-                >
-                  <Image
-                    source={require("../assets/images/bin.png")}
+                />
+                <Callout>
+                  <View
                     style={{
-                      width: 20,
-                      height: 20,
-                      tintColor: [
-                        bin.Status === "Damaged" ||
-                        bin.Status === "Under Maintenance"
-                          ? "black"
-                          : bin.Status === "Reserved"
-                          ? "blue"
-                          : bin.Level < 50
-                          ? "green"
-                          : 50 <= bin.Level && bin.Level < 80
-                          ? "orange"
-                          : "red"
-                      ]
+                      width: width * 0.5,
+                      height: height * 0.15,
+                      justifyContent: "center"
                     }}
-                  />
-                  <Callout>
-                    <View
-                      style={{
-                        width: width * 0.5,
-                        height: height * 0.15,
-                        justifyContent: "center"
-                      }}
-                    >
-                      <Text style={{ fontWeight: "bold" }}>
-                        Bin Id: {"" + bin.id}
-                      </Text>
-                      <Text style={{ fontWeight: "bold" }}>
-                        Bin Level: {"" + bin.Level}%
-                      </Text>
-                      <Text style={{ fontWeight: "bold" }}>
-                        Battery Level: {"" + bin.Battery}%
-                      </Text>
-                      <Text style={{ fontWeight: "bold" }}>
-                        Status: {bin.Status}
-                      </Text>
-                    </View>
-                  </Callout>
-                </MapView.Marker>
-              </TouchableOpacity>
+                  >
+                    <Text style={{ fontWeight: "bold" }}>
+                      Bin Id: {"" + bin.id}
+                    </Text>
+                    <Text style={{ fontWeight: "bold" }}>
+                      Bin Level: {"" + bin.Level}%
+                    </Text>
+                    <Text style={{ fontWeight: "bold" }}>
+                      Battery Level: {"" + bin.Battery}%
+                    </Text>
+                    <Text style={{ fontWeight: "bold" }}>
+                      Status: {bin.Status}
+                    </Text>
+                  </View>
+                </Callout>
+              </MapView.Marker>
+            ))}
+            {this.state.trucks.map((truck, i) => (
+              <MapView.Marker
+                key={i}
+                tracksViewChanges
+                ref={marker => {
+                  this.marker = marker;
+                }}
+                coordinate={{
+                  latitude: truck.Location._lat,
+                  longitude: truck.Location._long
+                }}
+              >
+                <Image
+                  source={require("../assets/images/truck.png")}
+                  style={{
+                    width: 50,
+                    height: 50
+                  }}
+                />
+                <Callout>
+                  <View
+                    style={{
+                      width: width * 0.5,
+                      height: height * 0.15,
+                      justifyContent: "center"
+                    }}
+                  >
+                    <Text style={{ fontWeight: "bold" }}>
+                      truck Id: {"" + truck.id}
+                    </Text>
+                    <Text style={{ fontWeight: "bold" }}>
+                      {console.log("Truck is: ", truck)}
+                      Crew:
+                    </Text>
+                    {truck.Crew.map(memeber => {
+                      <Text>
+                        {memeber} {console.log("Memeber is: ", memeber)}
+                      </Text>;
+                    })}
+                  </View>
+                </Callout>
+              </MapView.Marker>
             ))}
             {this.state.route !== null && (
-              <MapView.Polyline
-                coordinates={this.state.route}
-                strokeWidth={2}
-                strokeColor="red"
+              // <MapView.Polyline
+              //   coordinates={this.state.route}
+              //   strokeWidth={2}
+              //   strokeColor="red"
+              // />
+
+              <MapViewDirections
+                origin={this.state.route[0]}
+                destination={this.state.route[1]}
+                apikey={GOOGLE_API_KEY}
+                strokeWidth={3}
+                strokeColor="#7a66ff"
+                onReady={this.onReady}
+                onError={this.onError}
               />
             )}
           </MapView>
-
           <TouchableOpacity
             onPress={
               this.state.isReserved ? this.cancelReservation : this.reserveBin
             }
-            disabled={this.state.selectedBin === null ? true : false}
+            disabled={
+              this.state.selectedBin === null ||
+              this.state.selectedBin.Status === "Damaged" ||
+              this.state.selectedBin.Status === "Under Maintenance"
+                ? true
+                : false
+            }
             style={{
               backgroundColor: "#7a66ff",
               opacity: this.state.selectedBin === null ? 0.5 : 1,
@@ -567,7 +669,7 @@ export default class MapScreen extends React.Component {
             <Text style={{ textAlign: "center" }}>Empty</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={this.emptyBin}
+            onPress={() => this.props.navigation.navigate("Chat")}
             disabled={
               this.state.selectedBin === null ||
               this.state.selectedBin.Status === "Damaged" ||
