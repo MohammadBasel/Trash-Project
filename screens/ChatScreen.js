@@ -59,6 +59,7 @@ export default class ChatScreen extends React.Component {
   keyExtractor = (item, index) => index
 
   renderChats = ({ item }) => {
+    console.log("the item : ",item)
       console.log("i'm getting inside")
     var rand = Math.floor(1 + (Math.random() * (100-1)));
     check = false

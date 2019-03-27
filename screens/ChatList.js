@@ -16,9 +16,10 @@ import {
   Dimensions ,
   Animated,
   CameraRoll,
-  TouchableWithoutFeedback 
+  TouchableWithoutFeedback ,
+
 } from 'react-native';
-import { WebBrowser } from 'expo';
+import { WebBrowser,FileSystem  } from 'expo';
 import { Ionicons,FontAwesome } from '@expo/vector-icons';
 import functions from 'firebase/functions';
 import { MonoText } from '../components/StyledText';
@@ -28,8 +29,8 @@ import { Header,ListItem,Badge,Slider,Divider ,Avatar,Card,Input,Icon,Overlay  }
 import { uploadImageAsync,uploadVideoAsync } from '../ImageUtils.js'
 import { ImagePicker,Video,SMS } from 'expo';
 import VideoPlayer from '@expo/videoplayer';
-import Dialog, { DialogFooter,DialogButton,DialogTitle, DialogContent } from 'react-native-popup-dialog';
-
+// import Dialog, { DialogFooter,DialogButton,DialogTitle, DialogContent } from 'react-native-popup-dialog';
+import Dialog from "react-native-dialog";
 import ImageZoom from 'react-native-image-pan-zoom';
 import AntDesign from '@expo/vector-icons/AntDesign';
 const { width,height } = Dimensions.get('window');
@@ -53,7 +54,11 @@ export default class ChatList extends React.Component {
     otherPerson : "",
     phoneNumber:"",
     fadeAnim: new Animated.Value(0),
-    visible : false
+    visible : false,
+    visible1 : false,
+    resize : false,
+    url : "",
+    url1 : ""
     
   }
   user = ""
@@ -141,8 +146,16 @@ export default class ChatList extends React.Component {
     console.log("the content : ",converting )
     const first = String(item.Content).substring(0, 4);
     console.log("first is : ", first)
+    if(first == "http"){
+      
+     // let type = firebase.storage().downloadUrl(item.Content).getMetadata().storageMetadata.getContentType()
+      // ref().child(item.Content).Type
+      
+    }
     
+  
    if (item.Sender_Id == this.user){
+    
     
     
 
@@ -164,16 +177,16 @@ export default class ChatList extends React.Component {
     subtitleStyle = { styles.Sender }
     subtitle={first === "http" ?  
     <View>
+    <View style={{ width: width * 0.5, height: 300 }}>
     {/* <Overlay isVisible = {true}> */}
+    
+    <TouchableOpacity onLongPress={ () => {this.changeVisibleKeepUrl(item.Content)}} onPress = {this.resizeImage} style={{}}>
                 <Image
-                       source={{uri:item.Content}}/>
-               {/* <Video
-	  source={{ uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4' }}
-          shouldPlay
-	  resizeMode="cover"
-	  style={{ width, height: 300 }}
-	/> */}
-            {/* </Overlay> */}
+                       source={{uri:item.Content}} style= {this.state.resize ? styles.imagesize1 : styles.imagesize2}/>
+                       </TouchableOpacity>
+                       </View>
+
+            <TouchableOpacity onLongPress={ () => {this.changeVisibleKeepUrl1(item.Content)}} onPress = {this.resizeImage}>
             <Video
             
             
@@ -181,8 +194,10 @@ export default class ChatList extends React.Component {
           shouldPlay
           isLooping
 	  resizeMode="cover"
-	  style={{ width: width * 0.5, height: height * 0.5 }}
+	  style={{ width: "100%", height: 300}}
 	/>
+  </TouchableOpacity>
+    
   </View>
  : item.Content }
     
@@ -210,32 +225,40 @@ export default class ChatList extends React.Component {
     titleStyle = {{textAlign : "left"}}
     subtitleStyle = {styles.Receiver}
     subtitle={first === "http" ?  
-   <View style={{ width: width * 0.5, height: 300 }}>
+    <View>
+   <View style={{ width: width * 0.5, height: height * 0.5 }}>
+
+    <TouchableOpacity onLongPress={ () => {this.changeVisibleKeepUrl(item.Content)}} onPress = {this.resizeImage}>
+    <Image
+           source={{uri:item.Content}}
+           onPress={() => {
+            this.setState({ visible: true });
+            
+          }}
+          style={{width: "100%", height : "100%"}}/>
+          </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity onLongPress={ () => {this.changeVisibleKeepUrl(item.Content)}} onPress = {this.resizeImage}>
+          {console.log("i'm getting inside the touchable opacity")}
+                      <Video
+                     
+              source={{ uri: item.Content }}
+              
+                    shouldPlay
+                    isLooping
+              resizeMode="cover" 
+              
+              style={{ width: width * 0.5, height: height * 0.5 }}
+            
+            />
+            </TouchableOpacity>
+
 
     
-                <Image
-                       source={{uri:item.Content}}
-                       onPress={() => {
-                        this.setState({ visible: true });
-                        
-                      }}
-                      style={{width: "100%", height : "100%"}}/>
                        
                
-                       <Button  onPress={this.changeVisible}>
-{console.log("i'm getting inside the touchable opacity")}
-            <Video
-           
-    source={{ uri: item.Content }}
-    
-          shouldPlay
-          isLooping
-    resizeMode="cover" 
-    
-    // style={{ width: width * 0.5, height: 300 }}
-  
-	/>
- </Button >
+                     
 
   </View> : item.Content }
 
@@ -246,9 +269,28 @@ export default class ChatList extends React.Component {
    }
     
   }
-  changeVisible = () =>{
+  changeVisibleKeepUrl = (url) =>{
+    console.log("the url : ", url)
     console.log("I'm getting here")
     this.setState({visible : true})
+    this.setState({url : url})
+    // var promise = CameraRoll.saveImageWithTag(url);
+  }
+  changeVisibleKeepUrl1 = (url) =>{
+    this.setState({visible1 : true})
+    this.setState({url1 : url})
+  }
+  changeVisible = () =>{
+    this.setState({visible : false})
+  }
+  changeVisible1 = () =>{
+    this.setState({visible : false})
+  }
+  resizeImage = () =>{
+    console.log("ii'm here in resi")
+    console.log("the resize before : ", this.state.resize)
+    this.setState({resize : !this.state.resize})
+    console.log("the resize after : ", this.state.resize)
   }
   pickImage= async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -276,13 +318,56 @@ export default class ChatList extends React.Component {
     console.log(result);
 
     if (!result.cancelled) {
-      const  url = await uploadVideoAsync(this.user, result.uri, new Date())
+      const  url = await uploadImageAsync(this.user, result.uri, new Date())
       console.log("the url : ", url)
       this.setState({text : url})
       this.clickable()
       
     }
   };
+  saveImage = () =>{
+
+    console.log("the url in the save  image is : ", this.state.url)
+    if (Platform.OS === 'ios'){
+      var promise =  CameraRoll.saveToCameraRoll(this.state.url)
+      this.setState({visible : false})
+    }else{
+      FileSystem.downloadAsync(
+        this.state.url,
+        FileSystem.documentDirectory + 'small.png'
+      )
+        .then(({ uri }) => {
+          console.log('Finished downloading to ', uri);
+          var promise =  CameraRoll.saveToCameraRoll(uri)
+          this.setState({visible : false})
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    }
+  }
+
+  saveVideo = () =>{
+
+    // console.log("the url in the save  image is : ", this.state.url1)
+    // if (Platform.OS === 'ios'){
+    //   var promise =  CameraRoll.saveToCameraRoll(this.state.url1)
+    //   this.setState({visible1 : false})
+    // }else{
+      FileSystem.downloadAsync(
+        this.state.url1,
+        FileSystem.documentDirectory + 'small.mp4'
+      )
+        .then(({ uri }) => {
+          console.log('Finished downloading to ', uri);
+          var promise =  CameraRoll.saveToCameraRoll(uri)
+          this.setState({visible1 : false})
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    // }
+  }
 
 
 
@@ -337,26 +422,23 @@ export default class ChatList extends React.Component {
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
-        <Dialog
-    visible={this.state.visible}
-    dialogTitle={<DialogTitle title="Dialog Title" />}
-    footer={
-      <DialogFooter>
-        <DialogButton
-          text="CANCEL"
-          onPress={() => {this.setState({visible : false})}}
-        />
-        <DialogButton
-          text="OK"
-          onPress={() => {}}
-        />
-      </DialogFooter>
-    }
-  >
-    <DialogContent>
-      <Text>hi </Text>
-    </DialogContent>
-  </Dialog>
+        <Dialog.Container visible={this.state.visible}>
+          <Dialog.Title>Save Image</Dialog.Title>
+          <Dialog.Description>
+            Do you want to save the picture to the gallery?
+          </Dialog.Description>
+          <Dialog.Button label="Cancel" onPress={this.changeVisible}/>
+          <Dialog.Button label="Save" onPress={this.saveImage}/>
+        </Dialog.Container>
+
+          <Dialog.Container visible={this.state.visible1}>
+          <Dialog.Title>Save Video</Dialog.Title>
+          <Dialog.Description>
+            Do you want to save the Video to the gallery?
+          </Dialog.Description>
+          <Dialog.Button label="Cancel" onPress={this.changeVisible1}/>
+          <Dialog.Button label="Save" onPress={this.saveVideo}/>
+        </Dialog.Container>
       </View>
       
           
@@ -542,5 +624,13 @@ const styles = StyleSheet.create({
     height: 19.21,
     width: 100
   },
+  imagesize1 :{
+    width : width * 1,
+    height : height *1
+  },
+  imagesize2 : {
+    width : "100%",
+    height : "100%"
+  }
 
 });

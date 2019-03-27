@@ -101,6 +101,7 @@ export default class UsersList extends React.Component {
 })
 
 for (let i=0; i<oldmembers.length; i++){
+  console.log("the memebers in old is : ", oldmembers[i])
     if (oldmembers[i] == this.state.members){
         check = true
     }
@@ -109,7 +110,27 @@ return check
 }
 
   addChat = async () =>{
-      if(this.check === false){
+    console.log("the check is : ", this.check())
+    check = false
+      oldmembers = []
+    await db.collection(`Chat`)
+  .onSnapshot(querySnapshot => {
+    querySnapshot.forEach(doc => {
+        
+           oldmembers.push(doc.data().members)
+        
+        
+        console.log("the zone is : ", zoneId)
+    })
+})
+
+for (let i=0; i<oldmembers.length; i++){
+  console.log("the memebers in old is : ", oldmembers[i])
+    if (oldmembers[i] == this.state.members){
+        check = true
+    }
+}
+      if(check === false){
         const { navigation } = this.props;
         let title = ""
         // const id = navigation.getParam('data');
@@ -128,12 +149,14 @@ return check
             }
             
         }
+        finalTitle = title.split("@")
+        name = finalTitle[0]
     
     
         
           const addChat = firebase.functions().httpsCallable('addChat')
     
-          const result = await addChat({ Members: this.state.members , Title: title})
+          const result = await addChat({ Members: this.state.members , Title: name})
     
           this.props.navigation.navigate("Chat")
         
