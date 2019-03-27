@@ -13,14 +13,27 @@ import {
   KeyboardAvoidingView,
   Linking,
   StatusBar,
-  Dimensions
-} from "react-native";
-import { WebBrowser } from "expo";
-import { Ionicons, FontAwesome } from "@expo/vector-icons";
-import functions from "firebase/functions";
-import { MonoText } from "../components/StyledText";
-import firebase, { auth, FirebaseAuth } from "firebase";
-import db from "../db.js";
+  Dimensions ,
+  Animated,
+  CameraRoll,
+  TouchableWithoutFeedback ,
+
+} from 'react-native';
+import { WebBrowser,FileSystem  } from 'expo';
+import { Ionicons,FontAwesome } from '@expo/vector-icons';
+import functions from 'firebase/functions';
+import { MonoText } from '../components/StyledText';
+import firebase, { auth,FirebaseAuth } from 'firebase';
+import db from '../db.js';
+import { Header,ListItem,Badge,Slider,Divider ,Avatar,Card,Input,Icon,Overlay  } from 'react-native-elements';
+import { uploadImageAsync,uploadVideoAsync } from '../ImageUtils.js'
+import { ImagePicker,Video,SMS } from 'expo';
+import VideoPlayer from '@expo/videoplayer';
+// import Dialog, { DialogFooter,DialogButton,DialogTitle, DialogContent } from 'react-native-popup-dialog';
+import Dialog from "react-native-dialog";
+import ImageZoom from 'react-native-image-pan-zoom';
+import AntDesign from '@expo/vector-icons/AntDesign';
+const { width,height } = Dimensions.get('window');
 import {
   Header,
   ListItem,
@@ -32,14 +45,10 @@ import {
   Input,
   Icon
 } from "react-native-elements";
-import { uploadImageAsync, uploadVideoAsync } from "../ImageUtils.js";
-import { ImagePicker, Video } from "expo";
-import VideoPlayer from "@expo/videoplayer";
-
-import ImageZoom from "react-native-image-pan-zoom";
-import AntDesign from "@expo/vector-icons/AntDesign";
-const { width, height } = Dimensions.get("window");
 export default class ChatList extends React.Component {
+  _handleVideoRef = component => {
+    
+  }
   static navigationOptions = {
     header: null,
     text: ""
@@ -51,14 +60,23 @@ export default class ChatList extends React.Component {
     password: "",
     avatar: null,
     caption: "",
-    messages: [],
-    title: "",
-    otherPerson: "",
-    phoneNumber: ""
-  };
-  user = "";
+    messages : [],
+    title : "",
+    otherPerson : "",
+    phoneNumber:"",
+    fadeAnim: new Animated.Value(0),
+    visible : false,
+    visible1 : false,
+    resize : false,
+    url : "",
+    url1 : ""
+    
+  }
+  user = ""
+  
+  
+  async componentDidMount(){
 
-  async componentDidMount() {
     const { navigation } = this.props;
     const id = navigation.getParam("data");
     const members = navigation.getParam("Members");
@@ -91,12 +109,21 @@ export default class ChatList extends React.Component {
         }
       });
 
-      console.log("Current messages: ", this.state.messages.length);
-      console.log("Current messages: ", this.state.messages);
-      this.setState({ phoneNumber });
-    });
+      
+      console.log("Current messages: ", this.state.messages.length)
+      console.log("Current messages: ", this.state.messages)
+      this.setState({phoneNumber})
+    })
+    
+    console.log("Current messages after method: ", this.state.messages)
+    // const isAvailable = await SMS.isAvailableAsync();
+    // if (isAvailable) {
+    //   SMS.sendSMSAsync("+97430733103", "hi")
+    // } else {
+    //   // misfortune... there's no SMS available on this device
+    // }
+      
 
-    console.log("Current messages after method: ", this.state.messages);
   }
 
   clickable = async () => {
@@ -127,118 +154,154 @@ export default class ChatList extends React.Component {
     const converting = String(item.Content);
     console.log("the content : ", converting);
     const first = String(item.Content).substring(0, 4);
-    console.log("first is : ", first);
-
-    if (item.Sender_Id == this.user) {
-      return (
-        //   <View style={styles.row1}>
-        //   <Image style={styles.avatar1} source={{ uri: "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar.png?alt=media&token=07ce4817-ba10-4922-afe9-864236d7fda9" }} />
-        //   <View style={styles.rowText}>
-        //     <Text style={styles.sender1}>{item.Sender_Id}</Text>
-        //     <Text style={styles.message1}>{item.Content}</Text>
-        //   </View>
-        // </View>)
-        <View>
-          <ListItem
-            rightAvatar={{
-              source: {
-                uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2Favatar.png?alt=media&token=f45c29e5-2487-49e5-915b-dedc985c297d`,
-                activeOpacity: 0.9
-              }
-            }}
-            title={"me"}
-            titleStyle={{ textAlign: "right" }}
-            subtitleStyle={styles.Sender}
-            subtitle={
-              first === "http" ? (
-                <View style={{ width: 200, height: 200 }}>
-                  <View>
-                    <ImageZoom>
-                      <Image
-                        style={{ width: "100%", height: "100%" }}
-                        source={{ uri: item.Content }}
-                      />
-                      {/* <Video
-	  source={{ uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4' }}
-          shouldPlay
-	  resizeMode="cover"
-	  style={{ width, height: 300 }}
-	/> */}
-                    </ImageZoom>
-                    <Video
-                      source={{ uri: item.Content }}
-                      shouldPlay
-                      resizeMode="cover"
-                      style={{ width: width * 0.5, height: 300 }}
-                    />
-                  </View>
-                </View>
-              ) : (
-                item.Content
-              )
-            }
-          />
-          {/* <Divider style={{ backgroundColor: 'black' }} /> */}
-        </View>
-      );
-    } else {
-      const name = item.Sender_Id.split("@");
-      return (
-        //   <View style={styles.row}>
-        //   <Image style={styles.avatar} source={{ uri: "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar.png?alt=media&token=07ce4817-ba10-4922-afe9-864236d7fda9" }} />
-        //   <View style={styles.rowText}>
-        //     <Text style={styles.sender}>{item.Sender_Id}</Text>
-        //     <Text style={styles.message}>{item.Content}</Text>
-        //   </View>
-        // </View>)
-        <View>
-          <ListItem
-            leftAvatar={{
-              source: {
-                uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2Favatar.png?alt=media&token=f45c29e5-2487-49e5-915b-dedc985c297d`,
-                activeOpacity: 0.9
-              }
-            }}
-            title={name[0]}
-            titleStyle={{ textAlign: "left" }}
-            subtitleStyle={styles.Receiver}
-            subtitle={
-              first === "http" ? (
-                <View style={{ width: 200, height: 200 }}>
-                  <View>
-                    <ImageZoom>
-                      <Image
-                        style={{ width: "100%", height: "100%" }}
-                        source={{ uri: item.Content }}
-                      />
-                      {/* <Video
-	  source={{ uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4' }}
-          shouldPlay
-	  resizeMode="cover"
-	  style={{ width, height: 300 }}
-	/> */}
-                    </ImageZoom>
-                    <Video
-                      source={{ uri: item.Content }}
-                      shouldPlay
-                      resizeMode="cover"
-                      // style={{ width: width * 0.5, height: 300 }}
-                    />
-                  </View>
-                </View>
-              ) : (
-                item.Content
-              )
-            }
-          />
-          {/* <Divider style={{ backgroundColor: 'black' }} />
-           */}
-        </View>
-      );
+    console.log("first is : ", first)
+    if(first == "http"){
+      
+     // let type = firebase.storage().downloadUrl(item.Content).getMetadata().storageMetadata.getContentType()
+      // ref().child(item.Content).Type
+      
     }
-  };
+    
+  
+   if (item.Sender_Id == this.user){
+    
+    
+    
 
-  pickImage = async () => {
+
+    return(
+    //   <View style={styles.row1}>
+    //   <Image style={styles.avatar1} source={{ uri: "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar.png?alt=media&token=07ce4817-ba10-4922-afe9-864236d7fda9" }} />
+    //   <View style={styles.rowText}>
+    //     <Text style={styles.sender1}>{item.Sender_Id}</Text>
+    //     <Text style={styles.message1}>{item.Content}</Text>
+    //   </View>
+    // </View>)
+    <View>
+    <ListItem
+   
+    rightAvatar= {{ source: { uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2Favatar.png?alt=media&token=f45c29e5-2487-49e5-915b-dedc985c297d` ,activeOpacity:0.9 }}}
+    title={"me"}
+    titleStyle = {{textAlign : "right"}}
+    subtitleStyle = { styles.Sender }
+    subtitle={first === "http" ?  
+    <View>
+    <View style={{ width: width * 0.5, height: 300 }}>
+    {/* <Overlay isVisible = {true}> */}
+    
+    <TouchableOpacity onLongPress={ () => {this.changeVisibleKeepUrl(item.Content)}} onPress = {this.resizeImage} style={{}}>
+                <Image
+                       source={{uri:item.Content}} style= {this.state.resize ? styles.imagesize1 : styles.imagesize2}/>
+                       </TouchableOpacity>
+                       </View>
+
+            <TouchableOpacity onLongPress={ () => {this.changeVisibleKeepUrl1(item.Content)}} onPress = {this.resizeImage}>
+            <Video
+            
+            
+	  source={{ uri: item.Content }}
+          shouldPlay
+          isLooping
+	  resizeMode="cover"
+	  style={{ width: "100%", height: 300}}
+	/>
+  </TouchableOpacity>
+    
+  </View>
+ : item.Content }
+    
+
+    />
+    {/* <Divider style={{ backgroundColor: 'black' }} /> */}
+  </View>)            
+    
+   }else{
+    const name = item.Sender_Id.split("@")
+    return(
+    //   <View style={styles.row}>
+    //   <Image style={styles.avatar} source={{ uri: "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar.png?alt=media&token=07ce4817-ba10-4922-afe9-864236d7fda9" }} />
+    //   <View style={styles.rowText}>
+    //     <Text style={styles.sender}>{item.Sender_Id}</Text>
+    //     <Text style={styles.message}>{item.Content}</Text>
+    //   </View>
+    // </View>)
+    <View>
+    <ListItem
+   
+    leftAvatar={{  source: {uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2Favatar.png?alt=media&token=f45c29e5-2487-49e5-915b-dedc985c297d` ,activeOpacity:0.9 }}}
+    title={name[0]}
+    
+    titleStyle = {{textAlign : "left"}}
+    subtitleStyle = {styles.Receiver}
+    subtitle={first === "http" ?  
+    <View>
+   <View style={{ width: width * 0.5, height: height * 0.5 }}>
+
+    <TouchableOpacity onLongPress={ () => {this.changeVisibleKeepUrl(item.Content)}} onPress = {this.resizeImage}>
+    <Image
+           source={{uri:item.Content}}
+           onPress={() => {
+            this.setState({ visible: true });
+            
+          }}
+          style={{width: "100%", height : "100%"}}/>
+          </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity onLongPress={ () => {this.changeVisibleKeepUrl(item.Content)}} onPress = {this.resizeImage}>
+          {console.log("i'm getting inside the touchable opacity")}
+                      <Video
+                     
+              source={{ uri: item.Content }}
+              
+                    shouldPlay
+                    isLooping
+              resizeMode="cover" 
+              
+              style={{ width: width * 0.5, height: height * 0.5 }}
+            
+            />
+            </TouchableOpacity>
+
+
+    
+                       
+               
+                     
+
+  </View> : item.Content }
+
+    />
+    {/* <Divider style={{ backgroundColor: 'black' }} />
+    */}
+  </View>)
+   }
+    
+  }
+  changeVisibleKeepUrl = (url) =>{
+    console.log("the url : ", url)
+    console.log("I'm getting here")
+    this.setState({visible : true})
+    this.setState({url : url})
+    // var promise = CameraRoll.saveImageWithTag(url);
+  }
+  changeVisibleKeepUrl1 = (url) =>{
+    this.setState({visible1 : true})
+    this.setState({url1 : url})
+  }
+  changeVisible = () =>{
+    this.setState({visible : false})
+  }
+  changeVisible1 = () =>{
+    this.setState({visible : false})
+  }
+  resizeImage = () =>{
+    console.log("ii'm here in resi")
+    console.log("the resize before : ", this.state.resize)
+    this.setState({resize : !this.state.resize})
+    console.log("the resize after : ", this.state.resize)
+  }
+  pickImage= async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       aspect: [4, 3],
@@ -263,12 +326,55 @@ export default class ChatList extends React.Component {
     console.log(result);
 
     if (!result.cancelled) {
-      const url = await uploadVideoAsync(this.user, result.uri, new Date());
-      console.log("the url : ", url);
-      this.setState({ text: url });
-      this.clickable();
+      const  url = await uploadImageAsync(this.user, result.uri, new Date())
+      console.log("the url : ", url)
+      this.setState({text : url})
+      this.clickable()
     }
   };
+  saveImage = () =>{
+
+    console.log("the url in the save  image is : ", this.state.url)
+    if (Platform.OS === 'ios'){
+      var promise =  CameraRoll.saveToCameraRoll(this.state.url)
+      this.setState({visible : false})
+    }else{
+      FileSystem.downloadAsync(
+        this.state.url,
+        FileSystem.documentDirectory + 'small.png'
+      )
+        .then(({ uri }) => {
+          console.log('Finished downloading to ', uri);
+          var promise =  CameraRoll.saveToCameraRoll(uri)
+          this.setState({visible : false})
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    }
+  }
+
+  saveVideo = () =>{
+
+    // console.log("the url in the save  image is : ", this.state.url1)
+    // if (Platform.OS === 'ios'){
+    //   var promise =  CameraRoll.saveToCameraRoll(this.state.url1)
+    //   this.setState({visible1 : false})
+    // }else{
+      FileSystem.downloadAsync(
+        this.state.url1,
+        FileSystem.documentDirectory + 'small.mp4'
+      )
+        .then(({ uri }) => {
+          console.log('Finished downloading to ', uri);
+          var promise =  CameraRoll.saveToCameraRoll(uri)
+          this.setState({visible1 : false})
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    // }
+  }
 
   render() {
     const { goBack } = this.props.navigation;
@@ -350,6 +456,23 @@ export default class ChatList extends React.Component {
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
+        <Dialog.Container visible={this.state.visible}>
+          <Dialog.Title>Save Image</Dialog.Title>
+          <Dialog.Description>
+            Do you want to save the picture to the gallery?
+          </Dialog.Description>
+          <Dialog.Button label="Cancel" onPress={this.changeVisible}/>
+          <Dialog.Button label="Save" onPress={this.saveImage}/>
+        </Dialog.Container>
+
+          <Dialog.Container visible={this.state.visible1}>
+          <Dialog.Title>Save Video</Dialog.Title>
+          <Dialog.Description>
+            Do you want to save the Video to the gallery?
+          </Dialog.Description>
+          <Dialog.Button label="Cancel" onPress={this.changeVisible1}/>
+          <Dialog.Button label="Save" onPress={this.saveVideo}/>
+        </Dialog.Container>
       </View>
     );
   }
@@ -531,5 +654,13 @@ const styles = StyleSheet.create({
   ratingImage: {
     height: 19.21,
     width: 100
-  }
+  },
+  imagesize1 :{
+    width : width * 1,
+    height : height *1
+  },
+  imagesize2 : {
+    width : "100%",
+    height : "100%"
+ }
 });

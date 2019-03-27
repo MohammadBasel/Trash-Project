@@ -9,7 +9,7 @@ import {
   Dimensions
   /*, StyleSheet*/
 } from "react-native";
-import PushNotification from "react-native-push-notification";
+// import PushNotification from "react-native-push-notification";
 import { PushNotificationIOS } from "react-native";
 import { ExpoConfigView } from "@expo/samples";
 import MapView, { Callout, PROVIDER_GOOGLE } from "react-native-maps";
@@ -20,23 +20,23 @@ import db from "../db";
 import Polyline from "@mapbox/polyline";
 import { Card, Divider } from "react-native-elements";
 
-const localNotification = () => {
-  PushNotification.localNotification({
-    autoCancel: true,
-    largeIcon: "ic_launcher",
-    smallIcon: "ic_notification",
-    bigText: "My big text that will be shown when notification is expanded",
-    subText: "This is a subText",
-    color: "green",
-    vibrate: true,
-    vibration: 300,
-    title: "Notification Title",
-    message: "Notification Message",
-    playSound: true,
-    soundName: "default",
-    actions: '["Accept", "Reject"]'
-  });
-};
+// const localNotification = () => {
+//   PushNotification.localNotification({
+//     autoCancel: true,
+//     largeIcon: "ic_launcher",
+//     smallIcon: "ic_notification",
+//     bigText: "My big text that will be shown when notification is expanded",
+//     subText: "This is a subText",
+//     color: "green",
+//     vibrate: true,
+//     vibration: 300,
+//     title: "Notification Title",
+//     message: "Notification Message",
+//     playSound: true,
+//     soundName: "default",
+//     actions: '["Accept", "Reject"]'
+//   });
+// };
 
 const { width, height } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
