@@ -63,10 +63,13 @@ export default class HomeScreen extends React.Component {
   };
 
   render() {
+
+    console.log("Current usersstate: ", this.state.users);
     return (
       <View style={styles.container}>
         <Header
           placement="left"
+          containerStyle={{ backgroundColor: "#7a66ff" }}
           centerComponent={{
             text: this.state.users.Name,
             style: { color: "#fff" }

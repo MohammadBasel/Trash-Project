@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   View,
   Picker,
-  FlatList
+  FlatList,
+  Dimensions
 } from "react-native";
 import firebase from "firebase";
 import functions from "firebase/functions";
@@ -22,6 +23,8 @@ import {
   Divider
 } from "react-native-elements";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
+const { width, height } = Dimensions.get("window");
+
 export default class Employee extends React.Component {
   static navigationOptions = {
     header: null
@@ -41,6 +44,7 @@ export default class Employee extends React.Component {
         doc.id == currentuser && (this.zone = doc.data().Zone);
 
         doc.data().Zone == this.zone &&
+          doc.id != currentuser &&
           users.push({ id: doc.id, ...doc.data() });
       });
       this.setState({ zoneid: this.zone });
@@ -84,7 +88,7 @@ export default class Employee extends React.Component {
       <View>
         <TouchableOpacity>
           <ListItem
-            // onPress={() => this.props.navigation.navigate("Info", { item })}
+            onPress={() => Linking.openURL(`mailto:${item.id}`)}
             key={item.id}
             title={item.Name}
             subtitle={item.Status}
@@ -112,7 +116,7 @@ export default class Employee extends React.Component {
     return (
       <View style={styles.container}>
         <Header
-          placement="left"
+          containerStyle={{ backgroundColor: "#7a66ff" }}
           leftComponent={
             <Ionicons
               name="md-arrow-round-back"
@@ -137,24 +141,6 @@ export default class Employee extends React.Component {
           <Picker.Item label="Excused" value="excused" />
         </Picker>
         {console.log(this.state.available)}
-        {/* {this.state.available == "0"
-          ? this.state.users.map(user => (
-              <View key={user.id}>
-                <View>
-                  <Text>Name: {user.Name}</Text>
-                  <Text>Availability: {user.Status}</Text>
-                </View>
-                
-              </View>
-            ))
-          : this.state.filteredItems.map(user => (
-              <View key={user.id}>
-                <View>
-                  <Text>Name: {user.Name}</Text>
-                  <Text>Availability: {user.Status}</Text>
-                </View>
-              </View>
-            ))} */}
         <FlatList
           data={
             this.state.available == "0"

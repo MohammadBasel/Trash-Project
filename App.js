@@ -4,10 +4,9 @@ import { AppLoading, Asset, Font, Icon } from "expo";
 import AppNavigator from "./navigation/AppNavigator";
 import Login from "./Login.js";
 import { Permissions } from "expo";
-import PushNotification from "react-native-push-notification";
+// import PushNotification from "react-native-push-notification";
 import { PushNotificationIOS } from "react-native";
 console.disableYellowBox = true;
-
 export default class App extends React.Component {
   state = {
     isLoadingComplete: false

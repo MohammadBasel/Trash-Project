@@ -6,7 +6,8 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  Switch
 } from "react-native";
 import firebase from "firebase";
 import functions from "firebase/functions";
@@ -26,7 +27,8 @@ export default class DashboardScreen extends React.Component {
     users: [],
     zones: [],
     trash: [],
-    zone: ""
+    zone: "",
+    switch: false
   };
   zone = "";
   async componentWillMount() {
@@ -38,6 +40,7 @@ export default class DashboardScreen extends React.Component {
         doc.id == currentuser && (this.zone = doc.data().Zone);
 
         doc.data().Zone == this.zone &&
+          doc.id != currentuser &&
           users.push({ id: doc.id, ...doc.data() });
       });
 
@@ -104,21 +107,49 @@ export default class DashboardScreen extends React.Component {
     );
   };
   tra = 0;
+  turnOn = () => {
+    if (this.state.switch == false) this.setState({ switch: true });
+    else this.setState({ switch: false });
+  };
+  saveChange = async () => {
+    // this.state.users.map(
+    if (this.state.trash[0].Status == "Active") {
+      for (i = 0; i < this.state.trash.length; i++) {
+        await db
+          .collection(`Zone/${this.state.zone}/Trash`)
+          .doc(this.state.trash[i].id)
+          .update({ Status: "Disabled" });
+      }
+    } else {
+      for (i = 0; i < this.state.trash.length; i++) {
+        await db
+          .collection(`Zone/${this.state.zone}/Trash`)
+          .doc(this.state.trash[i].id)
+          .update({ Status: "Active" });
+      }
+    }
+
+    // );
+  };
   render() {
     return (
       <View style={styles.container}>
         {this.av === 0 && this.countUser()}
         {this.countTrash()}
-        {console.log("full", this.full)}
-        {console.log("medium", this.medium)}
-        {console.log("low", this.low)}
 
         <Header
+          containerStyle={{ backgroundColor: "#7a66ff" }}
           centerComponent={{
             text: "Supervisor Dashboard",
-            style: { color: "#fff", textAlign: "left", fontSize: 20 }
+            style: { color: "#fff", textAlign: "left", fontSize: 15 }
           }}
+          rightComponent={
+            this.state.switch && (
+              <Button onPress={this.saveChange} title="Emergency" />
+            )
+          }
         />
+        <Switch onValueChange={this.turnOn} value={this.state.switch} />
 
         <View style={{ flex: 1, justifyContent: "space-evenly" }}>
           <TouchableOpacity
