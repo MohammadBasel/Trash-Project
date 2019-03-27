@@ -18,27 +18,17 @@ import firebase from "firebase";
 import { Permissions, ImagePicker } from "expo";
 import db from "../db";
 import Polyline from "@mapbox/polyline";
-import { Card, Divider } from "react-native-elements";
+import { Popup } from "react-native-map-link";
+import { Card, Divider, Overlay } from "react-native-elements";
+import Dialog, {
+  SlideAnimation,
+  DialogContent,
+  DialogTitle,
+  DialogButton,
+  DialogFooter
+} from "react-native-popup-dialog";
 
-const localNotification = () => {
-  PushNotification.localNotification({
-    autoCancel: true,
-    largeIcon: "ic_launcher",
-    smallIcon: "ic_notification",
-    bigText: "My big text that will be shown when notification is expanded",
-    subText: "This is a subText",
-    color: "green",
-    vibrate: true,
-    vibration: 300,
-    title: "Notification Title",
-    message: "Notification Message",
-    playSound: true,
-    soundName: "default",
-    actions: '["Accept", "Reject"]'
-  });
-};
-
-const { width, height } = Dimensions.get("window");
+const { width, height, fontScale } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
@@ -77,10 +67,18 @@ export default class MapScreen extends React.Component {
     selectedBin: null,
     reservationId: null,
     isReserved: false,
-    flag: false
+    flag: false,
+    countDown: 30,
+    visiable: false,
+    directions: [],
+    bestRoutePoints: []
   };
+  fontSize = 16;
+  timer = null;
   mapView = null;
+  bestRoutePoints = [];
   async componentDidMount() {
+    //this.getDirections();
     this.getWhether();
     await Permissions.askAsync(Permissions.LOCATION);
     const email = firebase.auth().currentUser.email;
@@ -135,10 +133,21 @@ export default class MapScreen extends React.Component {
       querySnapshot.forEach(doc => {
         trucks.push({ id: doc.id, ...doc.data() });
       });
-      console.log("Trucks Changed!");
       this.setState({ trucks });
     });
   }
+
+  startTimer = () => {
+    this.setState({ countDown: this.state.countDown - 1 }, () => {
+      if (this.state.countDown === 0) {
+        console.log("Time is in: ", this.state.countDown);
+        clearInterval(this.timer);
+        this.timer = null;
+        this.setState({ countDown: 30 });
+        this.deductPoints();
+      }
+    });
+  };
 
   getWhether = async () => {
     const result = await fetch(
@@ -161,22 +170,101 @@ export default class MapScreen extends React.Component {
     });
   };
 
+  resetRoutePoints = () => {
+    this.setState({ bestRoutePoints: [] });
+  };
+
+  addRoutePoint = () => {
+    let bestRoutePoints = [...this.state.bestRoutePoints];
+    bestRoutePoints.push(this.state.selectedBin);
+    this.setState({ bestRoutePoints });
+  };
+
+  clacBestRoute = async () => {
+    if (this.state.directions.length === 0) {
+      let locations = [];
+      this.state.bestRoutePoints.forEach(point => {
+        let segment = point.Loc._lat + "," + point.Loc._long;
+        locations.push(segment);
+      });
+
+      const req = {
+        locations: locations
+      };
+
+      if (this.state.bestRoutePoints.length > 1) {
+        try {
+          let resp = await fetch(
+            `http://www.mapquestapi.com/directions/v2/optimizedroute?key=0nQiUEMlaswV1NZOEs28vqk0VORCLSCZ`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(req)
+            }
+          )
+            .then(response => response.json())
+            .then(data => {
+              let directions = [];
+              console.log("data: ", data);
+              console.log(
+                "data.route.locationSequence: ",
+                data.route.locationSequence
+              );
+
+              const sequence = data.route.locationSequence;
+              for (let i = 0; i < sequence.length; i++) {
+                directions.push(this.state.bestRoutePoints[sequence[i]]);
+                // if (i == 0) {
+                //   directions +=
+                //     "Go to trash bin number " +
+                //     this.state.bestRoutePoints[sequence[i]].id +
+                //     ".\n";
+                // } else {
+                //   directions +=
+                //     "Then, go to trash bin number " +
+                //     this.state.bestRoutePoints[sequence[i]].id +
+                //     ".\n";
+                // }
+              }
+              // console.log("Route is:", data);
+              console.log("directions are:", directions);
+              this.setState({ directions, dialogIsVisiable: true });
+            });
+        } catch (error) {
+          alert(error);
+          return error;
+        }
+      } else {
+        alert("You need to select two trash bins at least!");
+      }
+    } else {
+      this.setState({ dialogIsVisiable: true });
+    }
+  };
+
   getDirections = async (startLoc, destinationLoc) => {
     const req = {
-      locations: [startLoc, destinationLoc],
-      options: {
-        avoids: [],
-        avoidTimedConditions: false,
-        doReverseGeocode: true,
-        shapeFormat: "raw",
-        generalize: 0,
-        routeType: "fastest",
-        timeType: 1,
-        unit: "k",
-        enhancedNarrative: false,
-        drivingStyle: 2,
-        highwayEfficiency: 21.0
-      }
+      locations: [
+        "25.380331,51.489722",
+        "25.359082,51.48184",
+        "25.375834,51.48307",
+        "25.36199,51.483364"
+      ]
+      // options: {
+      //   avoids: [],
+      //   avoidTimedConditions: false,
+      //   doReverseGeocode: true,
+      //   shapeFormat: "raw",
+      //   generalize: 0,
+      //   routeType: "fastest",
+      //   timeType: 1,
+      //   unit: "k",
+      //   enhancedNarrative: false,
+      //   drivingStyle: 2,
+      //   highwayEfficiency: 21.0
+      // }
     };
     //&from=25.3604823,51.4801991&to=25.375834,51.48307
     try {
@@ -215,6 +303,7 @@ export default class MapScreen extends React.Component {
   };
 
   cancelReservation = async () => {
+    console.log("Insided cancel function");
     let truckId = null;
     for (let i = 0; i < this.state.trucks.length; i++) {
       let user = this.state.trucks[i].Crew.find(c => c === this.state.user.id);
@@ -243,6 +332,9 @@ export default class MapScreen extends React.Component {
         .collection(`Zone/${this.state.zone.id}/Trash`)
         .doc(this.state.selectedBin.id)
         .update({ Status: "Active" });
+      clearImmediate(this.timer);
+      this.timer = null;
+      this.setState({ countDown: 30 });
     } else {
       alert(
         "You cannot cancel this reservation because you did not created it!"
@@ -290,13 +382,53 @@ export default class MapScreen extends React.Component {
         Trash_Id: this.state.selectedBin.id,
         Truck_Id: truckId
       });
+      timer = setInterval(this.startTimer, 1000);
+      this.timer = timer;
       this.setState({ reservationId: result.id });
     } else {
       alert("You can not reserve more than one trash bin at a time!");
     }
   };
 
+  deductPoints = async () => {
+    let turck = null;
+    for (let i = 0; i < this.state.trucks.length; i++) {
+      let user = this.state.trucks[i].Crew.find(c => c === this.state.user.id);
+      if (user !== undefined) {
+        turck = this.state.trucks[i];
+        break;
+      }
+    }
+
+    await db
+      .collection(`Zone/${this.state.zone.id}/Trash`)
+      .doc(this.state.selectedBin.id)
+      .update({ Status: "Active" });
+
+    await db
+      .collection(`Reserve_Bin`)
+      .doc(this.state.reservationId)
+      .update({ Status: "Abandoned" });
+
+    for (let i = 0; turck.Crew.length; i++) {
+      const user = await db
+        .collection("Users")
+        .doc(turck.Crew[i])
+        .get();
+      await db
+        .collection("Users")
+        .doc(turck.Crew[i])
+        .update({ Points: user.data().Points - 2 });
+    }
+    clearImmediate(this.timer);
+    this.timer = null;
+    this.setState({ countDown: 30 });
+  };
+
   emptyBin = async () => {
+    clearImmediate(this.timer);
+    this.timer = null;
+    this.setState({ countDown: 30 });
     let turck = null;
     for (let i = 0; i < this.state.trucks.length; i++) {
       let user = this.state.trucks[i].Crew.find(c => c === this.state.user.id);
@@ -363,6 +495,11 @@ export default class MapScreen extends React.Component {
     }
   };
 
+  inArray = id => {
+    let bin = this.state.bestRoutePoints.find(bin => bin.id === id);
+    return bin !== undefined;
+  };
+
   unSelect = () => {
     this.setState({
       selectedBin: null,
@@ -376,7 +513,7 @@ export default class MapScreen extends React.Component {
   };
 
   render() {
-    console.log(this.state.route);
+    //console.log(this.state.route);
     return (
       <View
         style={{
@@ -384,6 +521,90 @@ export default class MapScreen extends React.Component {
           justifyContent: "center"
         }}
       >
+        <Overlay
+          isVisible={this.state.dialogIsVisiable}
+          windowBackgroundColor="rgba(255, 255, 255, .5)"
+          overlayBackgroundColor="red"
+          width="auto"
+          height="auto"
+          onBackdropPress={() => this.setState({ dialogIsVisiable: false })}
+        >
+          <Text>Hello from Overlay!</Text>
+          {this.state.directions.map((trashBin, i) => {
+            <Text
+              style={{ fontWeight: "bold", color: "#7a66ff" }}
+              onPress={() =>
+                this.setState({
+                  selectedBin: trashBin,
+                  dialogIsVisiable: false
+                })
+              }
+            >
+              {console.log("I am inside the text teg: ", trashBin)}
+              {trashBin.id}
+            </Text>;
+          })}
+        </Overlay>
+        <View>
+          {/* <Dialog
+            hasOverlay
+            visible={this.state.dialogIsVisiable}
+            onTouchOutside={() => {
+              this.setState({ dialogIsVisiable: false });
+            }}
+            dialogTitle={
+              <DialogTitle title="Please Follow These Instructions" />
+            }
+            // dialogAnimation={
+            //   new SlideAnimation({
+            //     slideFrom: "bottom"
+            //   })
+            // }
+          >
+           
+            
+            <DialogContent>
+              <Text>Hello1</Text>
+              <Text>Hello2</Text>
+              <Text>Hello3</Text>
+              <Text>Hello4</Text>
+             
+            </DialogContent>
+            <DialogFooter>
+              <DialogButton
+                text="Close"
+                onPress={() => {
+                  this.setState({ dialogIsVisiable: false });
+                }}
+              />
+            </DialogFooter>
+          </Dialog> */}
+        </View>
+        <Popup
+          isVisible={this.state.visiable}
+          onCancelPressed={() => this.setState({ visiable: false })}
+          onAppPressed={() => this.setState({ visiable: false })}
+          onBackButtonPressed={() => this.setState({ visiable: false })}
+          modalProps={{
+            // you can put all react-native-modal props inside.
+            animationIn: "slideInUp"
+          }}
+          options={
+            this.state.selectedBin !== null
+              ? {
+                  latitude: this.state.selectedBin.Loc._lat,
+                  longitude: this.state.selectedBin.Loc._long,
+                  sourceLatitude: this.state.region.latitude,
+                  sourceLongitude: this.state.region.longitude
+                }
+              : {}
+          }
+          style={
+            {
+              /* Optional: you can override default style by passing your values. */
+            }
+          }
+        />
         <View
           style={{
             flex: 1,
@@ -395,14 +616,11 @@ export default class MapScreen extends React.Component {
               containerStyle={{
                 backgroundColor: "rgba(56, 172, 236, 1)",
                 borderWidth: 0,
-                marginTop: 0,
-                marginLeft: "auto",
-                marginRight: "auto",
-                borderRadius: 10,
+                margin: 0,
                 width: width
               }}
             >
-              <Text>
+              <Text style={{ fontSize: this.fontSize / fontScale }}>
                 {this.state.forcast.observations.location[0].country},{" "}
                 {this.state.forcast.observations.location[0].state},{" "}
                 {this.state.forcast.observations.location[0].city}
@@ -421,7 +639,7 @@ export default class MapScreen extends React.Component {
                       .observation[0].iconLink
                   }}
                 />
-                <Text style={{ fontSize: 38 }}>
+                <Text style={{ fontSize: 38 / fontScale }}>
                   {new Date().getHours() + ":" + new Date().getMinutes()}
                 </Text>
               </View>
@@ -434,13 +652,13 @@ export default class MapScreen extends React.Component {
                   justifyContent: "space-between"
                 }}
               >
-                <Text>
+                <Text style={{ fontSize: this.fontSize / fontScale }}>
                   {
                     this.state.forcast.observations.location[0].observation[0]
                       .description
                   }
                 </Text>
-                <Text>
+                <Text style={{ fontSize: this.fontSize / fontScale }}>
                   {
                     this.state.forcast.observations.location[0].observation[0].temperature.split(
                       "."
@@ -449,6 +667,27 @@ export default class MapScreen extends React.Component {
                   {"\u00b0"}C
                 </Text>
               </View>
+              {this.timer !== null && (
+                <View>
+                  <Divider
+                    style={{ backgroundColor: "#dfe6e9", marginVertical: 20 }}
+                  />
+                  <Text style={{ fontSize: this.fontSize / fontScale }}>
+                    You have
+                    <Text
+                      style={{
+                        fontSize: this.fontSize / fontScale,
+                        fontWeight: "bold",
+                        color: this.state.countDown < 11 ? "red" : "black"
+                      }}
+                    >
+                      {" "}
+                      {this.state.countDown}{" "}
+                    </Text>
+                    seconds to empty this trash bin!
+                  </Text>
+                </View>
+              )}
             </Card>
           )}
           <MapView
@@ -515,10 +754,13 @@ export default class MapScreen extends React.Component {
                     height: 20,
                     tintColor: [
                       bin.Status === "Damaged" ||
-                      bin.Status === "Under Maintenance"
+                      bin.Status === "Under Maintenance" ||
+                      bin.Status === "Disabled"
                         ? "black"
                         : bin.Status === "Reserved"
                         ? "blue"
+                        : this.inArray(bin.id)
+                        ? "yellow"
                         : bin.Level < 50
                         ? "green"
                         : 50 <= bin.Level && bin.Level < 80
@@ -535,16 +777,36 @@ export default class MapScreen extends React.Component {
                       justifyContent: "center"
                     }}
                   >
-                    <Text style={{ fontWeight: "bold" }}>
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                        fontSize: this.fontSize / fontScale
+                      }}
+                    >
                       Bin Id: {"" + bin.id}
                     </Text>
-                    <Text style={{ fontWeight: "bold" }}>
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                        fontSize: this.fontSize / fontScale
+                      }}
+                    >
                       Bin Level: {"" + bin.Level}%
                     </Text>
-                    <Text style={{ fontWeight: "bold" }}>
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                        fontSize: this.fontSize / fontScale
+                      }}
+                    >
                       Battery Level: {"" + bin.Battery}%
                     </Text>
-                    <Text style={{ fontWeight: "bold" }}>
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                        fontSize: this.fontSize / fontScale
+                      }}
+                    >
                       Status: {bin.Status}
                     </Text>
                   </View>
@@ -578,16 +840,25 @@ export default class MapScreen extends React.Component {
                       justifyContent: "center"
                     }}
                   >
-                    <Text style={{ fontWeight: "bold" }}>
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                        fontSize: this.fontSize / fontScale
+                      }}
+                    >
                       truck Id: {"" + truck.id}
                     </Text>
-                    <Text style={{ fontWeight: "bold" }}>
-                      {console.log("Truck is: ", truck)}
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                        fontSize: this.fontSize / fontScale
+                      }}
+                    >
                       Crew:
                     </Text>
                     {truck.Crew.map(memeber => {
                       <Text>
-                        {memeber} {console.log("Memeber is: ", memeber)}
+                        {/* {memeber} {console.log("Memeber is: ", memeber)} */}
                       </Text>;
                     })}
                   </View>
@@ -619,7 +890,8 @@ export default class MapScreen extends React.Component {
             disabled={
               this.state.selectedBin === null ||
               this.state.selectedBin.Status === "Damaged" ||
-              this.state.selectedBin.Status === "Under Maintenance"
+              this.state.selectedBin.Status === "Under Maintenance" ||
+              this.state.selectedBin.Status === "Disabled"
                 ? true
                 : false
             }
@@ -632,13 +904,16 @@ export default class MapScreen extends React.Component {
               width: width * 0.2,
               height: height * 0.06,
               position: "absolute",
-              top: height - 190,
-              bottom: height - 20,
-              left: width - 400,
-              right: width - 50
+              top: height * 0.28,
+              left: width * 0.03
             }}
           >
-            <Text style={{ textAlign: "center" }}>
+            <Text
+              style={{
+                textAlign: "center",
+                fontSize: 15 / fontScale
+              }}
+            >
               {this.state.isReserved ? "Cancel" : "Reserve"}
             </Text>
           </TouchableOpacity>
@@ -647,7 +922,8 @@ export default class MapScreen extends React.Component {
             disabled={
               this.state.selectedBin === null ||
               this.state.selectedBin.Status === "Damaged" ||
-              this.state.selectedBin.Status === "Under Maintenance"
+              this.state.selectedBin.Status === "Under Maintenance" ||
+              this.state.selectedBin.Status === "Disabled"
                 ? true
                 : false
             }
@@ -660,20 +936,26 @@ export default class MapScreen extends React.Component {
               width: width * 0.2,
               height: height * 0.06,
               position: "absolute",
-              top: height - 190,
-              bottom: height - 20,
-              left: width - 300,
-              right: width - 50
+              top: height * 0.35,
+              left: width * 0.03
             }}
           >
-            <Text style={{ textAlign: "center" }}>Empty</Text>
+            <Text
+              style={{
+                textAlign: "center",
+                fontSize: this.fontSize / fontScale
+              }}
+            >
+              Empty
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => this.props.navigation.navigate("Chat")}
             disabled={
               this.state.selectedBin === null ||
               this.state.selectedBin.Status === "Damaged" ||
-              this.state.selectedBin.Status === "Under Maintenance"
+              this.state.selectedBin.Status === "Under Maintenance" ||
+              this.state.selectedBin.Status === "Disabled"
                 ? true
                 : false
             }
@@ -686,13 +968,120 @@ export default class MapScreen extends React.Component {
               width: width * 0.2,
               height: height * 0.06,
               position: "absolute",
-              top: height - 190,
-              bottom: height - 20,
-              left: width - 200,
-              right: width - 50
+              top: height * 0.42,
+              left: width * 0.03
             }}
           >
-            <Text style={{ textAlign: "center" }}>Report</Text>
+            <Text
+              style={{
+                textAlign: "center",
+                fontSize: this.fontSize / fontScale
+              }}
+            >
+              Report
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => this.setState({ visiable: true })}
+            disabled={
+              this.state.selectedBin === null ||
+              this.state.selectedBin.Status === "Damaged" ||
+              this.state.selectedBin.Status === "Under Maintenance" ||
+              this.state.selectedBin.Status === "Disabled"
+                ? true
+                : false
+            }
+            style={{
+              backgroundColor: "#7a66ff",
+              opacity: this.state.selectedBin === null ? 0.5 : 1,
+              borderRadius: 10,
+              border: "1px solid #7a66ff",
+              padding: "15%",
+              width: width * 0.2,
+              height: height * 0.06,
+              position: "absolute",
+              top: height * 0.49,
+              left: width * 0.03
+            }}
+          >
+            <Text style={{ textAlign: "center", fontSize: 12 / fontScale }}>
+              Navigate
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={this.addRoutePoint}
+            disabled={
+              this.state.selectedBin === null ||
+              this.state.selectedBin.Status === "Damaged" ||
+              this.state.selectedBin.Status === "Under Maintenance" ||
+              this.state.selectedBin.Status === "Disabled"
+                ? true
+                : false
+            }
+            style={{
+              backgroundColor: "#7a66ff",
+              opacity: this.state.selectedBin === null ? 0.5 : 1,
+              borderRadius: 10,
+              border: "1px solid #7a66ff",
+              padding: "15%",
+              width: width * 0.2,
+              height: height * 0.06,
+              position: "absolute",
+              top: height * 0.56,
+              left: width * 0.03
+            }}
+          >
+            <Text
+              style={{
+                textAlign: "center",
+                fontSize: this.fontSize / fontScale
+              }}
+            >
+              Add
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={this.clacBestRoute}
+            style={{
+              backgroundColor: "#7a66ff",
+              opacity: 1,
+              borderRadius: 10,
+              border: "1px solid #7a66ff",
+              padding: "15%",
+              width: width * 0.2,
+              height: height * 0.06,
+              position: "absolute",
+              top: height * 0.63,
+              left: width * 0.03
+            }}
+          >
+            <Text style={{ textAlign: "center", fontSize: 13 / fontScale }}>
+              Claculate
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={this.resetRoutePoints}
+            style={{
+              backgroundColor: "#7a66ff",
+              opacity: 1,
+              borderRadius: 10,
+              border: "1px solid #7a66ff",
+              padding: "15%",
+              width: width * 0.2,
+              height: height * 0.06,
+              position: "absolute",
+              top: height * 0.7,
+              left: width * 0.03
+            }}
+          >
+            <Text
+              style={{
+                textAlign: "center",
+                fontSize: this.fontSize / fontScale
+              }}
+            >
+              Reset
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
