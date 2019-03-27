@@ -45,7 +45,14 @@ const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const GOOGLE_API_KEY = "AIzaSyCYvMpmVhFc0ydILEuXGJNYNGFnBoKPCL8";
 export default class MapScreen extends React.Component {
   static navigationOptions = {
-    title: "Map"
+    title: "Map",
+    headerTintColor: "white",
+    headerStyle: {
+      backgroundColor: "#7a66ff",
+      borderWidth: 1,
+      borderBottomColor: "white"
+    },
+    headerTitleStyle: { color: "white" }
   };
   // [
   //   { latitude: 25.380331, longitude: 51.489722 },

@@ -9,7 +9,10 @@ import {
   View,
   Picker,
   FlatList,
-  TextInput
+  TextInput,
+  Switch,
+  Dimensions,
+  Linking
 } from "react-native";
 import firebase from "firebase";
 import functions from "firebase/functions";
@@ -26,6 +29,7 @@ import {
 } from "react-native-elements";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import SwitchToggle from "react-native-switch-toggle";
+const { width, height } = Dimensions.get("window");
 
 export default class PointsScreen extends React.Component {
   static navigationOptions = {
@@ -38,19 +42,22 @@ export default class PointsScreen extends React.Component {
   };
   componentDidMount() {
     const currentuser = firebase.auth().currentUser.email;
-    db.collection("Users").onSnapshot(querySnapshot => {
-      users = [];
-      querySnapshot.forEach(doc => {
-        doc.id == currentuser && (this.zone = doc.data().Zone);
+    db.collection("Users")
+      .orderBy("Points", "desc")
+      .onSnapshot(querySnapshot => {
+        users = [];
+        querySnapshot.forEach(doc => {
+          doc.id == currentuser && (this.zone = doc.data().Zone);
 
-        doc.data().Zone == this.zone &&
-          users.push({ id: doc.id, ...doc.data() });
+          doc.data().Zone == this.zone &&
+            doc.id != currentuser &&
+            users.push({ id: doc.id, ...doc.data() });
+        });
+
+        this.setState({ users });
+        this.setState({ zone: this.zone });
+        console.log("Current users: ", this.state.users);
       });
-
-      this.setState({ users });
-      this.setState({ zone: this.zone });
-      console.log("Current users: ", this.state.users);
-    });
     // go to db and get all the records
   }
 
@@ -72,7 +79,8 @@ export default class PointsScreen extends React.Component {
       <View>
         <TouchableOpacity>
           <ListItem
-            // onPress={() => this.props.navigation.navigate("Info", { item })}
+            onPress={() => Linking.openURL(`mailto:${item.id}`)}
+            title="support@example.com"
             key={item.id}
             title={item.Name}
             subtitle={item.Phone}
@@ -86,14 +94,26 @@ export default class PointsScreen extends React.Component {
             }
             rightAvatar={
               <View>
-                <TextInput
-                  style={{ height: 40, borderColor: "gray", borderWidth: 1 }}
-                  onChangeText={text => this.getValue(text, item.id)}
-                  value={!Number.isNaN(item.Points) ? "" + item.Points : ""}
-                  editable={this.state.switch}
+                {!this.state.switch ? (
+                  <Text style={{ fontSize: 20 }}>{item.Points}</Text>
+                ) : (
+                  <TextInput
+                    style={{
+                      height: width * 0.1,
+                      width: width * 0.1,
+                      borderColor: "gray",
+                      borderWidth: 1,
+                      fontSize: 20,
+                      alignItems: "center"
+                    }}
+                    onChangeText={text => this.getValue(text, item.id)}
+                    value={!Number.isNaN(item.Points) ? "" + item.Points : ""}
+                    // editable={this.state.switch}
 
-                  //placeholder="Points"
-                />
+                    //placeholder="Points"
+                  />
+                )}
+
                 {/* */}
               </View>
             }
@@ -129,11 +149,11 @@ export default class PointsScreen extends React.Component {
   };
 
   render() {
-    console.log(this.state.users);
+    console.log("USERS", this.state.users);
     return (
       <View style={styles.container}>
         <Header
-          placement="left"
+          containerStyle={{ backgroundColor: "#7a66ff" }}
           leftComponent={
             <Ionicons
               name="md-arrow-round-back"
@@ -152,28 +172,8 @@ export default class PointsScreen extends React.Component {
             )
           }
         />
-        <SwitchToggle
-          containerStyle={{
-            marginTop: 16,
-            width: 108,
-            height: 48,
-            borderRadius: 25,
-            backgroundColor: "#ccc",
-            padding: 5
-          }}
-          circleStyle={{
-            width: 38,
-            height: 38,
-            borderRadius: 19,
-            backgroundColor: "white" // rgb(102,134,205)
-          }}
-          switchOn={this.state.switch}
-          onPress={this.turnOn}
-          circleColorOff="white"
-          circleColorOn="red"
-          duration={500}
-        />
 
+        <Switch onValueChange={this.turnOn} value={this.state.switch} />
         <FlatList
           data={this.state.users}
           keyExtractor={item => item.id}

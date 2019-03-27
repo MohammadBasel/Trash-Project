@@ -8,7 +8,9 @@ import {
   TouchableOpacity,
   View,
   Picker,
-  TextInput
+  TextInput,
+  Switch,
+  Dimensions
 } from "react-native";
 import firebase from "firebase";
 import functions from "firebase/functions";
@@ -25,6 +27,7 @@ import {
   Cell
 } from "react-native-table-component";
 import SwitchToggle from "react-native-switch-toggle";
+const { width, height } = Dimensions.get("window");
 export default class ShiftScreen extends React.Component {
   static navigationOptions = {
     header: null
@@ -55,6 +58,7 @@ export default class ShiftScreen extends React.Component {
         doc.id == currentuser && (this.zone = doc.data().Zone);
 
         doc.data().Zone == this.zone &&
+          doc.id != currentuser &&
           users.push({ id: doc.id, ...doc.data() });
       });
       this.setState({ users });
@@ -137,11 +141,17 @@ export default class ShiftScreen extends React.Component {
     //   .update({ Users: Users.remove(this.state.changed[i].user_id) });
     // }
   };
+  undo = async () => {
+    changed = [...this.state.changed];
+    changed.splice(this.state.changed[this.state.changed.length - 1], 1);
+    await this.setState({ changed });
+    console.log("Changed", this.state.changed);
+  };
   render() {
     return (
       <View style={styles.container}>
         <Header
-          placement="left"
+          containerStyle={{ backgroundColor: "#7a66ff" }}
           leftComponent={
             <Ionicons
               name="md-arrow-round-back"
@@ -160,28 +170,33 @@ export default class ShiftScreen extends React.Component {
             )
           }
         />
-        <SwitchToggle
-          containerStyle={{
-            marginTop: 16,
-            width: 88,
-            height: 28,
-            borderRadius: 25,
-            backgroundColor: "#ccc",
-            padding: 5
-          }}
-          circleStyle={{
-            width: 28,
-            height: 28,
-            borderRadius: 19,
-            backgroundColor: "white" // rgb(102,134,205)
-          }}
-          switchOn={this.state.switch}
-          onPress={this.turnOn}
-          circleColorOff="white"
-          circleColorOn="red"
-          duration={500}
-        />
 
+        <Switch onValueChange={this.turnOn} value={this.state.switch} />
+        {this.state.switch && this.state.changed.length != 0 && (
+          <View>
+            <Button onPress={this.undo} title="Undo Last Change" />
+            <Text style={{ fontWeight: "bold" }}>Changes to be Made</Text>
+
+            {this.state.changed.map(change => (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between"
+                }}
+              >
+                <Text style={{ fontWeight: "bold" }}> User:{"  "}</Text>
+                <Text>
+                  {" "}
+                  {change.user_id}
+                  {"  "}
+                </Text>
+
+                <Text style={{ fontWeight: "bold" }}> Day:{"  "}</Text>
+                <Text> {change.newid.Day}</Text>
+              </View>
+            ))}
+          </View>
+        )}
         {this.state.users.map(user => (
           <ScrollView>
             <View
