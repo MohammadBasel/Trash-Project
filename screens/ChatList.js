@@ -19,7 +19,8 @@ import {
   TouchableWithoutFeedback ,
 
 } from 'react-native';
-import { WebBrowser,FileSystem  } from 'expo';
+import { WebBrowser,FileSystem   } from 'expo';
+import ContactsWrapper from 'react-native-contacts-wrapper';
 import { Ionicons,FontAwesome } from '@expo/vector-icons';
 import functions from 'firebase/functions';
 import { MonoText } from '../components/StyledText';
@@ -107,20 +108,14 @@ export default class ChatList extends React.Component {
     })
     
     console.log("Current messages after method: ", this.state.messages)
-    // const isAvailable = await SMS.isAvailableAsync();
-    // if (isAvailable) {
-    //   SMS.sendSMSAsync("+97430733103", "hi")
-    // } else {
-    //   // misfortune... there's no SMS available on this device
-    // }
+
       
   }
 
    clickable = async () =>{
     const { navigation } = this.props;
     const id = navigation.getParam('data');
-    // console.log("the on press if working and this is the text : ", this.state.text)
-    //  await db.collection(`Chat/${id}/Message`).doc().set({Content: this.state.text, Sender_Id :this.user, Time : new Date()})
+
 
       const addMessage = firebase.functions().httpsCallable('addMessage')
       console.log("the message is", this.state.text)
@@ -145,11 +140,14 @@ export default class ChatList extends React.Component {
     const converting = String(item.Content)
     console.log("the content : ",converting )
     const first = String(item.Content).substring(0, 4);
+  
     console.log("first is : ", first)
+    let ext = ""
     if(first == "http"){
       
-     // let type = firebase.storage().downloadUrl(item.Content).getMetadata().storageMetadata.getContentType()
-      // ref().child(item.Content).Type
+      let bracket = String(item.Content).split(")")
+      let questionMark = bracket[1].split("?")
+      ext = questionMark[0]
       
     }
     
@@ -161,13 +159,7 @@ export default class ChatList extends React.Component {
 
 
     return(
-    //   <View style={styles.row1}>
-    //   <Image style={styles.avatar1} source={{ uri: "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar.png?alt=media&token=07ce4817-ba10-4922-afe9-864236d7fda9" }} />
-    //   <View style={styles.rowText}>
-    //     <Text style={styles.sender1}>{item.Sender_Id}</Text>
-    //     <Text style={styles.message1}>{item.Content}</Text>
-    //   </View>
-    // </View>)
+
     <View>
     <ListItem
    
@@ -177,15 +169,16 @@ export default class ChatList extends React.Component {
     subtitleStyle = { styles.Sender }
     subtitle={first === "http" ?  
     <View>
-    <View style={{ width: width * 0.5, height: 300 }}>
-    {/* <Overlay isVisible = {true}> */}
+      {ext === ".png" || ext === ".jpg" ?
+      <View style={{ width: width * 0.5, height: 300}}>
     
-    <TouchableOpacity onLongPress={ () => {this.changeVisibleKeepUrl(item.Content)}} onPress = {this.resizeImage} style={{}}>
-                <Image
-                       source={{uri:item.Content}} style= {this.state.resize ? styles.imagesize1 : styles.imagesize2}/>
-                       </TouchableOpacity>
-                       </View>
-
+      <TouchableOpacity onLongPress={ () => {this.changeVisibleKeepUrl(item.Content)}} onPress = {this.resizeImage} style={{}}>
+                  <Image
+                         source={{uri:item.Content}} style= {this.state.resize ? styles.imagesize1 : styles.imagesize2}/>
+                         </TouchableOpacity>
+                         </View>
+                         :
+                         
             <TouchableOpacity onLongPress={ () => {this.changeVisibleKeepUrl1(item.Content)}} onPress = {this.resizeImage}>
             <Video
             
@@ -197,25 +190,24 @@ export default class ChatList extends React.Component {
 	  style={{ width: "100%", height: 300}}
 	/>
   </TouchableOpacity>
+
+    }
+    
+    
+
     
   </View>
  : item.Content }
     
 
     />
-    {/* <Divider style={{ backgroundColor: 'black' }} /> */}
+    
   </View>)            
     
    }else{
     const name = item.Sender_Id.split("@")
     return(
-    //   <View style={styles.row}>
-    //   <Image style={styles.avatar} source={{ uri: "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar.png?alt=media&token=07ce4817-ba10-4922-afe9-864236d7fda9" }} />
-    //   <View style={styles.rowText}>
-    //     <Text style={styles.sender}>{item.Sender_Id}</Text>
-    //     <Text style={styles.message}>{item.Content}</Text>
-    //   </View>
-    // </View>)
+
     <View>
     <ListItem
    
@@ -226,7 +218,8 @@ export default class ChatList extends React.Component {
     subtitleStyle = {styles.Receiver}
     subtitle={first === "http" ?  
     <View>
-   <View style={{ width: width * 0.5, height: height * 0.5 }}>
+       {ext === ".png" || ext === ".jpg" ?
+   <View style={{ width: width * 0.5, height: height * 0.5}}>
 
     <TouchableOpacity onLongPress={ () => {this.changeVisibleKeepUrl(item.Content)}} onPress = {this.resizeImage}>
     <Image
@@ -238,7 +231,7 @@ export default class ChatList extends React.Component {
           style={{width: "100%", height : "100%"}}/>
           </TouchableOpacity>
           </View>
-
+:
           <TouchableOpacity onLongPress={ () => {this.changeVisibleKeepUrl(item.Content)}} onPress = {this.resizeImage}>
           {console.log("i'm getting inside the touchable opacity")}
                       <Video
@@ -253,6 +246,7 @@ export default class ChatList extends React.Component {
             
             />
             </TouchableOpacity>
+       }
 
 
     
@@ -284,7 +278,7 @@ export default class ChatList extends React.Component {
     this.setState({visible : false})
   }
   changeVisible1 = () =>{
-    this.setState({visible : false})
+    this.setState({visible1 : false})
   }
   resizeImage = () =>{
     console.log("ii'm here in resi")
@@ -302,7 +296,13 @@ export default class ChatList extends React.Component {
     console.log(result);
 
     if (!result.cancelled) {
-      const  url = await uploadImageAsync(this.user, result.uri, new Date())
+      // console.log("the result ui : ", result. )
+      let lastdigits = String(result.uri.substring(result.uri.length-5))
+      console.log("the last digits are : ", lastdigits)
+      let wholeThings = lastdigits.split(".")
+      let ext = wholeThings[1]
+      console.log("the exte" , ext)
+      const  url = await uploadImageAsync(this.user, result.uri, (new Date()+"."+ext))
       console.log("the url : ", url)
       this.setState({text : url})
       this.clickable()
@@ -318,7 +318,13 @@ export default class ChatList extends React.Component {
     console.log(result);
 
     if (!result.cancelled) {
-      const  url = await uploadImageAsync(this.user, result.uri, new Date())
+      console.log("the result ui : ", result.uri)
+      let lastdigits = String(result.uri.substring(result.uri.length-5))
+      console.log("the last digits are : ", lastdigits)
+      let wholeThings = lastdigits.split(".")
+      let ext = wholeThings[1]
+      console.log("the exte" , ext)
+      const  url = await uploadImageAsync(this.user, result.uri, (new Date()+"."+ext))
       console.log("the url : ", url)
       this.setState({text : url})
       this.clickable()
@@ -346,28 +352,53 @@ export default class ChatList extends React.Component {
         });
     }
   }
+  
+  shareImage = async() =>{
+    // Contacts.getAll((err, contacts) => {
+    //   if (err) {
+    //     throw err;
+    //   }
+    //   // contacts returned
+    // })
+    // if (!this.importingContactInfo) {
+    //   this.importingContactInfo = true;
+    
+    //   ContactsWrapper.getPhone()
+    //   .then((email) => {
+    //     this.importingContactInfo = false;
+    //     console.log("email is", email);
+    //     })
+    //     .catch((error) => {
+    //       this.importingContactInfo = false;
+    //       console.log("ERROR CODE: ", error.code);
+    //       console.log("ERROR MESSAGE: ", error.message);
+    //       });
+    //     }
+const isAvailable = await SMS.isAvailableAsync();
+    if (isAvailable) {
+      console.log("everything is good")
+      const { result } = await SMS.sendSMSAsync("",this.state.url)
+      this.setState({visible1 : false})
 
-  saveVideo = () =>{
+    } else {
+      // misfortune... there's no SMS available on this device
+      console.log("something is wrong")
+    }
+    }
+  
 
-    // console.log("the url in the save  image is : ", this.state.url1)
-    // if (Platform.OS === 'ios'){
-    //   var promise =  CameraRoll.saveToCameraRoll(this.state.url1)
-    //   this.setState({visible1 : false})
-    // }else{
-      FileSystem.downloadAsync(
-        this.state.url1,
-        FileSystem.documentDirectory + 'small.mp4'
-      )
-        .then(({ uri }) => {
-          console.log('Finished downloading to ', uri);
-          var promise =  CameraRoll.saveToCameraRoll(uri)
-          this.setState({visible1 : false})
-        })
-        .catch(error => {
-          console.error(error);
-        });
-    // }
-  }
+  shareVideo = async() =>{
+    const isAvailable = await SMS.isAvailableAsync();
+    if (isAvailable) {
+      console.log("everything is good")
+      const { result } = await SMS.sendSMSAsync("",this.state.url1)
+      this.setState({visible1 : false})
+
+    } else {
+      // misfortune... there's no SMS available on this device
+      console.log("something is wrong")
+    }
+    }
 
 
 
@@ -429,6 +460,7 @@ export default class ChatList extends React.Component {
           </Dialog.Description>
           <Dialog.Button label="Cancel" onPress={this.changeVisible}/>
           <Dialog.Button label="Save" onPress={this.saveImage}/>
+          <Dialog.Button label="share" onPress={this.shareImage}/>
         </Dialog.Container>
 
           <Dialog.Container visible={this.state.visible1}>
@@ -438,6 +470,7 @@ export default class ChatList extends React.Component {
           </Dialog.Description>
           <Dialog.Button label="Cancel" onPress={this.changeVisible1}/>
           <Dialog.Button label="Save" onPress={this.saveVideo}/>
+          <Dialog.Button label="share" onPress={this.shareVideo}/>
         </Dialog.Container>
       </View>
       

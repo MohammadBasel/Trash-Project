@@ -64,7 +64,7 @@ export default class ChatScreen extends React.Component {
     var rand = Math.floor(1 + (Math.random() * (100-1)));
     check = false
     
-    for (i=0;i<item.Members.length;i++){
+    for (i=0; item.Members !== undefined && i<item.Members.length;i++){
       console.log("the memeers " ,item.Members[i])
         if (item.Members[i] === firebase.auth().currentUser.email){
             check = true
