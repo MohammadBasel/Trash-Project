@@ -45,6 +45,14 @@ import {
   Input,
   Icon
 } from "react-native-elements";
+import { uploadImageAsync, uploadVideoAsync } from "../ImageUtils.js";
+import { ImagePicker, Video } from "expo";
+import VideoPlayer from "@expo/videoplayer";
+
+import ImageZoom from "react-native-image-pan-zoom";
+import AntDesign from "@expo/vector-icons/AntDesign";
+const { width, height } = Dimensions.get("window");
+
 export default class ChatList extends React.Component {
   _handleVideoRef = component => {
     
@@ -60,6 +68,7 @@ export default class ChatList extends React.Component {
     password: "",
     avatar: null,
     caption: "",
+
     messages : [],
     title : "",
     otherPerson : "",
@@ -108,7 +117,6 @@ export default class ChatList extends React.Component {
           phoneNumber = doc.data().Phone;
         }
       });
-
       
       console.log("Current messages: ", this.state.messages.length)
       console.log("Current messages: ", this.state.messages)
@@ -326,6 +334,7 @@ export default class ChatList extends React.Component {
     console.log(result);
 
     if (!result.cancelled) {
+
       const  url = await uploadImageAsync(this.user, result.uri, new Date())
       console.log("the url : ", url)
       this.setState({text : url})
@@ -384,6 +393,7 @@ export default class ChatList extends React.Component {
     return (
       <View style={styles.container}>
         <Header
+
           containerStyle={{ backgroundColor: "#7a66ff" }}
           // placement="left"
           leftComponent={
@@ -456,6 +466,7 @@ export default class ChatList extends React.Component {
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
+
         <Dialog.Container visible={this.state.visible}>
           <Dialog.Title>Save Image</Dialog.Title>
           <Dialog.Description>
