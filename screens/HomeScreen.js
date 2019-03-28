@@ -63,6 +63,7 @@ export default class HomeScreen extends React.Component {
   };
 
   render() {
+
     console.log("Current usersstate: ", this.state.users);
     return (
       <View style={styles.container}>

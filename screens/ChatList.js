@@ -46,6 +46,14 @@ import {
   Input,
   Icon
 } from "react-native-elements";
+import { uploadImageAsync, uploadVideoAsync } from "../ImageUtils.js";
+import { ImagePicker, Video } from "expo";
+import VideoPlayer from "@expo/videoplayer";
+
+import ImageZoom from "react-native-image-pan-zoom";
+import AntDesign from "@expo/vector-icons/AntDesign";
+const { width, height } = Dimensions.get("window");
+
 export default class ChatList extends React.Component {
   _handleVideoRef = component => {
     
@@ -61,6 +69,7 @@ export default class ChatList extends React.Component {
     password: "",
     avatar: null,
     caption: "",
+
     messages : [],
     title : "",
     otherPerson : "",
@@ -109,7 +118,6 @@ export default class ChatList extends React.Component {
           phoneNumber = doc.data().Phone;
         }
       });
-
       
       console.log("Current messages: ", this.state.messages.length)
       console.log("Current messages: ", this.state.messages)
@@ -328,6 +336,7 @@ export default class ChatList extends React.Component {
     console.log(result);
 
     if (!result.cancelled) {
+
       console.log("the result ui : ", result.uri)
       let lastdigits = String(result.uri.substring(result.uri.length-5))
       console.log("the last digits are : ", lastdigits)
@@ -335,6 +344,7 @@ export default class ChatList extends React.Component {
       let ext = wholeThings[1]
       console.log("the exte" , ext)
       const  url = await uploadImageAsync(this.user, result.uri, (new Date()+"."+ext))
+
       console.log("the url : ", url)
       this.setState({text : url})
       this.clickable()
@@ -417,6 +427,7 @@ const isAvailable = await SMS.isAvailableAsync();
     return (
       <View style={styles.container}>
         <Header
+
           containerStyle={{ backgroundColor: "#7a66ff" }}
           // placement="left"
           leftComponent={
@@ -489,6 +500,7 @@ const isAvailable = await SMS.isAvailableAsync();
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
+
         <Dialog.Container visible={this.state.visible}>
           <Dialog.Title>Save Image</Dialog.Title>
           <Dialog.Description>

@@ -29,6 +29,7 @@
     "react-native-geolocation-service": "^2.0.0",
     "react-native-gifted-chat": "^0.7.2",
     "react-native-image-pan-zoom": "^2.1.11",
+    "react-native-map-link": "^2.4.0",
     "react-native-maps": "^0.23.0",
     "react-native-maps-directions": "^1.6.0",
     "react-native-popup-dialog": "^0.17.0",
