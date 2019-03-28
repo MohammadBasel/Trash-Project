@@ -528,7 +528,7 @@ export default class MapScreen extends React.Component {
           justifyContent: "center"
         }}
       >
-        <Overlay
+        {/* <Overlay
           isVisible={this.state.dialogIsVisiable}
           windowBackgroundColor="rgba(255, 255, 255, .5)"
           overlayBackgroundColor="red"
@@ -551,9 +551,9 @@ export default class MapScreen extends React.Component {
               {trashBin.id}
             </Text>;
           })}
-        </Overlay>
+        </Overlay> */}
         <View>
-          {/* <Dialog
+          <Dialog
             hasOverlay
             visible={this.state.dialogIsVisiable}
             onTouchOutside={() => {
@@ -562,20 +562,33 @@ export default class MapScreen extends React.Component {
             dialogTitle={
               <DialogTitle title="Please Follow These Instructions" />
             }
-            // dialogAnimation={
-            //   new SlideAnimation({
-            //     slideFrom: "bottom"
-            //   })
-            // }
+            dialogAnimation={
+              new SlideAnimation({
+                slideFrom: "bottom"
+              })
+            }
           >
-           
-            
             <DialogContent>
               <Text>Hello1</Text>
               <Text>Hello2</Text>
               <Text>Hello3</Text>
               <Text>Hello4</Text>
-             
+              {this.state.directions.map((trashBin, i) => (
+                <Text
+                  key={i}
+                  style={{ fontWeight: "bold", color: "#7a66ff" }}
+                  onPress={() =>
+                    this.setState({
+                      selectedBin: trashBin,
+                      dialogIsVisiable: false
+                    })
+                  }
+                >
+                  {/* {alert("I am inside the text teg: " + trashBin.id)}
+                  {console.log("I am inside the text teg: ", trashBin.id)} */}
+                  {trashBin.id}
+                </Text>
+              ))}
             </DialogContent>
             <DialogFooter>
               <DialogButton
@@ -585,7 +598,7 @@ export default class MapScreen extends React.Component {
                 }}
               />
             </DialogFooter>
-          </Dialog> */}
+          </Dialog>
         </View>
         <Popup
           isVisible={this.state.visiable}
@@ -755,10 +768,10 @@ export default class MapScreen extends React.Component {
                 }}
               >
                 <Image
-                  source={require("../assets/images/bin.png")}
+                  source={require("../assets/images/bin1.png")}
                   style={{
-                    width: 20,
-                    height: 20,
+                    width: 40,
+                    height: 40,
                     tintColor: [
                       bin.Status === "Damaged" ||
                       bin.Status === "Under Maintenance" ||
@@ -863,11 +876,9 @@ export default class MapScreen extends React.Component {
                     >
                       Crew:
                     </Text>
-                    {truck.Crew.map(memeber => {
-                      <Text>
-                        {/* {memeber} {console.log("Memeber is: ", memeber)} */}
-                      </Text>;
-                    })}
+                    {truck.Crew.map((memeber, i) => (
+                      <Text key={i}>{memeber}</Text>
+                    ))}
                   </View>
                 </Callout>
               </MapView.Marker>
