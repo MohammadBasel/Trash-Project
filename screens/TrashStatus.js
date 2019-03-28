@@ -6,13 +6,15 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  Dimensions
 } from "react-native";
 import firebase from "firebase";
 import functions from "firebase/functions";
 import db from "../db.js";
 import { Card, ListItem, Button, Icon, Header } from "react-native-elements";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
+const { width, height } = Dimensions.get("window");
 export default class TrashStatus extends React.Component {
   static navigationOptions = {
     header: null
@@ -61,6 +63,7 @@ export default class TrashStatus extends React.Component {
       <View style={styles.container}>
         <ScrollView>
           <Header
+            containerStyle={{ backgroundColor: "#7a66ff" }}
             placement="left"
             leftComponent={
               <Ionicons
