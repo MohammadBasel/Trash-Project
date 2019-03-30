@@ -15,6 +15,133 @@ admin.initializeApp(functions.config().firebase);
 // Start writing Firebase Functions
 // https://firebase.google.com/docs/functions/typescript
 
+export const trashBinsNotifier = functions.firestore
+  .document("Zone/{id}/Trash/{messageId}")
+  .onUpdate(async (change, context) => {
+    // Get an object with the current document value.
+    // If the document does not exist, it has been deleted.
+    const trash = change.after.exists ? change.after.data() : null;
+
+    const zoneId = change.after.ref.parent.parent.id;
+    console.log("zoneId1 is: ", zoneId);
+
+    // Get an object with the previous document value (for update or delete)
+    const oldTrash = change.before.data();
+
+    let chatId = null;
+    const messages = [];
+
+    const chats = await admin
+      .firestore()
+      .collection(`Chat`)
+      .where("Title", "==", "Public Chat")
+      .get();
+
+    console.log("Chats are: ", chats.docs);
+
+    chats.forEach(async chat => {
+      console.log("single chat is: ", chat.id);
+      const user = await admin
+        .firestore()
+        .collection("Users")
+        .doc(chat.data().Members[0])
+        .get();
+      console.log("single user is: ", user.data().Zone);
+      if (user.data().Zone === zoneId) {
+        chatId = chat.id;
+      }
+    });
+    console.log("trash = ", trash);
+    console.log("oldTrash = ", oldTrash);
+    // perform desired operations ...
+
+    // choices: user logged in, user logged out, user registered
+
+    if (
+      oldTrash !== null &&
+      trash !== null &&
+      trash.Temp - oldTrash.Temp >= 15
+    ) {
+      messages.push({
+        message:
+          "Trash bin number " +
+          change.before.id +
+          " temperature is " +
+          trash.Temp +
+          ". It might be on fire!",
+        chatId: chatId
+      });
+    }
+
+    if (
+      oldTrash !== null &&
+      trash !== null &&
+      trash.Level === 100 &&
+      oldTrash.Level !== 100
+    ) {
+      messages.push({
+        message:
+          "Trash bin number " +
+          change.before.id +
+          " is 100% and needs to be emptied now!",
+        chatId: chatId
+      });
+    }
+    if (
+      oldTrash !== null &&
+      trash !== null &&
+      trash.Level >= 90 &&
+      oldTrash.Level < 90
+    ) {
+      messages.push({
+        message:
+          "Trash bin number " +
+          change.before.id +
+          " is 90% or more and needs to be emptied soon!",
+        chatId: chatId
+      });
+    }
+    if (
+      oldTrash !== null &&
+      trash !== null &&
+      trash.Battery === 0 &&
+      oldTrash.Level !== 0
+    ) {
+      messages.push({
+        message:
+          "Trash bin number " +
+          change.before.id +
+          " battery is 0% and needs to be replaced now!",
+        chatId: chatId
+      });
+    }
+    if (
+      oldTrash !== null &&
+      trash !== null &&
+      trash.Battery === 10 &&
+      oldTrash.Level > 10
+    ) {
+      messages.push({
+        message:
+          "Trash bin number " +
+          change.before.id +
+          " battery is 10% and needs to be replaced soon!",
+        chatId: chatId
+      });
+    }
+    setTimeout(async () => {
+      console.log("messages is: ", messages);
+      if (messages.length > 0 && chatId) {
+        messages.forEach(async m => {
+          await admin
+            .firestore()
+            .collection(`Chat/${chatId}/Message`)
+            .add({ Content: m.message, Sender_Id: "Bot@", Time: new Date() });
+        });
+      }
+    }, 1000);
+  });
+
 export const addMessage = functions.https.onCall(async (data, context) => {
   const message = data.message;
   const id = data.id;
@@ -61,19 +188,10 @@ export const updateMembers = functions.https.onCall(async (data, context) => {
   }
 });
 export const moveTrucks = functions.https.onRequest(async (req, res) => {
-  // find all images (users with captions)
-  console.log("Function started!");
-  const querySnapshot = await admin
+  const zones = await admin
     .firestore()
     .collection("Zone")
     .get();
-  console.log("After Getting the zones!");
-  let zones = [];
-  querySnapshot.forEach(zone => {
-    zones.push({ id: zone.id, ...zone.data() });
-  });
-  console.log("Here are the zones :", zones);
-  console.log("No? Maybe they are here :", querySnapshot.docs);
 
   zones.forEach(async zone => {
     const trucks = await admin
@@ -104,11 +222,25 @@ export const moveTrucks = functions.https.onRequest(async (req, res) => {
 
 export const changeTrash = functions.https.onRequest(async (req, res) => {
   // find all images (users with captions)
+  // let temp = null;
+
+  // await fetch(
+  //   "https://weather.cit.api.here.com/weather/1.0/report.json?product=observation&latitude=25.381649&longitude=51.479143&oneobservation=true&app_id=PxvQ4FeG3DpNYbNZBjKH&app_code=dkAcfxUgh-PHLxJox3majw"
+  // )
+  //   .then(response => response.json())
+  //   .then(forcast => {
+  //     temp = parseInt(
+  //       forcast.observations.location[0].observation[0].temperature.split(
+  //         "."
+  //       )[0]
+  //     );
+  //   });
+
   const querySnapshot = await admin
     .firestore()
     .collection("Zone")
     .get();
-  let zones = [];
+  const zones = [];
   querySnapshot.forEach(zone => {
     zones.push({ id: zone.id, ...zone.data() });
   });
@@ -118,39 +250,91 @@ export const changeTrash = functions.https.onRequest(async (req, res) => {
       .firestore()
       .collection(`Zone/${zone.id}/Trash`)
       .get();
-    console.log("trashes ", trashes.docs);
+
     trashes.docs.forEach(async (trash, j) =>
       setTimeout(async () => {
-        console.log("Old Point: ", trash.data());
-        let newLevel = 0;
-        let newBattery = 0;
+        let newLevel = trash.data().Level + Math.floor(Math.random() * 10);
+        let newBattery = trash.data().Battery - 1;
         let newStaus = "Active";
+        // const plusOrMinus = Math.round(Math.random()) * 2 - 1;
+        // const fireChance = Math.random() < 0.9 ? true : false;
+        // const randomChange = Math.floor(Math.random() * 3);
+        // let newTemp = temp + plusOrMinus * randomChange;
+
+        // if (fireChance) {
+        //   newTemp = temp + 20;
+        // }
         if (
-          trash.data().Level < 100 &&
           trash.data().Status !== "Under Maintenance" &&
           trash.data().Status !== "Damaged"
         ) {
-          newLevel = trash.data().Level + 10;
+          if (newLevel > 100) {
+            newLevel = 100;
+          }
+        } else {
+          newLevel = trash.data().Level;
         }
         if (
-          trash.data().Battery > 0 &&
           trash.data().Status !== "Under Maintenance" &&
           trash.data().Status !== "Damaged"
         ) {
-          newBattery = trash.data().Battery - 10;
-          newStaus = "Under Maintenance";
+          if (newBattery <= 0) {
+            newBattery = 0;
+            newStaus = "Under Maintenance";
+          }
         }
-        console.log("trash is: ", trash);
         await admin
           .firestore()
           .collection(`Zone/${zone.id}/Trash`)
           .doc(trash.id)
-          .update({ Level: newLevel, Battery: newBattery, Status: newStaus });
+          .update({
+            Level: newLevel,
+            Battery: newBattery,
+            Status: newStaus
+            // Temp: newTemp
+          });
       }, j * 100)
     );
   });
   console.log("dOnE!");
   res.status(200).send();
+});
+
+export const updateBinTemp = functions.https.onCall(async (data, context) => {
+  const temp = parseInt(data.temp);
+  const querySnapshot = await admin
+    .firestore()
+    .collection("Zone")
+    .get();
+
+  querySnapshot.forEach(async zone => {
+    const trashes = await admin
+      .firestore()
+      .collection(`Zone/${zone.id}/Trash`)
+      .get();
+
+    trashes.docs.forEach(async (trash, j) =>
+      setTimeout(async () => {
+        const plusOrMinus = Math.round(Math.random()) * 2 - 1;
+        const fireChance = Math.random() < 0.2 ? true : false;
+        const randomChange = Math.floor(Math.random() * 3);
+        let newTemp = temp + plusOrMinus * randomChange;
+
+        if (fireChance) {
+          newTemp = temp + 20;
+        }
+
+        await admin
+          .firestore()
+          .collection(`Zone/${zone.id}/Trash`)
+          .doc(trash.id)
+          .update({
+            Temp: newTemp
+          });
+      }, j * 100)
+    );
+  });
+  console.log("dOnE!");
 });
 
 //return await admin.firestore().collection(`Chat/${result.id}/Message`).add({Content: message, Sender_Id :email, Time : new Date()});

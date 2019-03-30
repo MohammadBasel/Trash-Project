@@ -154,9 +154,7 @@ export default class UsersList extends React.Component {
       });
 
       this.props.navigation.navigate("Chat");
-    } else {
-      this.props.navigation.navigate("Chat");
-    }
+    };
   };
 
   renderUsers = ({ item }) => {
