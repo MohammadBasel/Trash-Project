@@ -15,7 +15,7 @@ admin.initializeApp(functions.config().firebase);
 // Start writing Firebase Functions
 // https://firebase.google.com/docs/functions/typescript
 
-export const onWriteUsers = functions.firestore
+export const trashBinsNotifier = functions.firestore
   .document("Zone/{id}/Trash/{messageId}")
   .onUpdate(async (change, context) => {
     // Get an object with the current document value.
@@ -118,7 +118,7 @@ export const onWriteUsers = functions.firestore
     if (
       oldTrash !== null &&
       trash !== null &&
-      trash.Battery <= 10 &&
+      trash.Battery === 10 &&
       oldTrash.Level > 10
     ) {
       messages.push({
@@ -298,6 +298,43 @@ export const changeTrash = functions.https.onRequest(async (req, res) => {
   });
   console.log("dOnE!");
   res.status(200).send();
+});
+
+export const updateBinTemp = functions.https.onCall(async (data, context) => {
+  const temp = parseInt(data.temp);
+  const querySnapshot = await admin
+    .firestore()
+    .collection("Zone")
+    .get();
+
+  querySnapshot.forEach(async zone => {
+    const trashes = await admin
+      .firestore()
+      .collection(`Zone/${zone.id}/Trash`)
+      .get();
+
+    trashes.docs.forEach(async (trash, j) =>
+      setTimeout(async () => {
+        const plusOrMinus = Math.round(Math.random()) * 2 - 1;
+        const fireChance = Math.random() < 0.2 ? true : false;
+        const randomChange = Math.floor(Math.random() * 3);
+        let newTemp = temp + plusOrMinus * randomChange;
+
+        if (fireChance) {
+          newTemp = temp + 20;
+        }
+
+        await admin
+          .firestore()
+          .collection(`Zone/${zone.id}/Trash`)
+          .doc(trash.id)
+          .update({
+            Temp: newTemp
+          });
+      }, j * 100)
+    );
+  });
+  console.log("dOnE!");
 });
 
 //return await admin.firestore().collection(`Chat/${result.id}/Message`).add({Content: message, Sender_Id :email, Time : new Date()});
