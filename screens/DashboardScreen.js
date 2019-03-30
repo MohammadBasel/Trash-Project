@@ -135,7 +135,7 @@ export default class DashboardScreen extends React.Component {
     return (
       <View style={styles.container}>
         {this.av === 0 && this.countUser()}
-        {this.countTrash()}
+        {this.low == 0 && this.countTrash()}
 
         <Header
           containerStyle={{ backgroundColor: "#7a66ff" }}
@@ -145,7 +145,13 @@ export default class DashboardScreen extends React.Component {
           }}
           rightComponent={
             this.state.switch && (
-              <Button onPress={this.saveChange} title="Emergency" />
+              <Button
+                onPress={this.saveChange}
+                title="Emergency"
+                type="clear"
+                titleStyle={{ color: "white" }}
+                containerStyle={{ width: 100 }}
+              />
             )
           }
         />
@@ -158,15 +164,21 @@ export default class DashboardScreen extends React.Component {
             <Card
               title="Trash Status"
               containerStyle={{
-                backgroundColor: "red"
+                backgroundColor: "#2980B9"
               }}
+              titleStyle={{ color: "white" }}
             >
-              <View style={{ alignItems: "center" }}>
-                <Text style={{ fontSize: 20, padding: 10 }}>
-                  Full: {this.full}
-                  {"    "}Medium: {this.medium}
-                  {"    "}Low: {this.low}
-                </Text>
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexDirection: "row",
+                  padding: 10
+                }}
+              >
+                <Text style={{ fontSize: 20 }}>Full: {this.full}</Text>
+                <Text style={{ fontSize: 20 }}>Medium: {this.medium}</Text>
+                <Text style={{ fontSize: 20 }}>Low: {this.low}</Text>
               </View>
             </Card>
           </TouchableOpacity>
@@ -176,15 +188,21 @@ export default class DashboardScreen extends React.Component {
             <Card
               title="Employee Attendance"
               containerStyle={{
-                backgroundColor: "green"
+                backgroundColor: "#1F618D"
               }}
+              titleStyle={{ color: "white" }}
             >
-              <View style={{ alignItems: "center" }}>
-                <Text style={{ fontSize: 20, padding: 10 }}>
-                  Present: {this.av}
-                  {"    "}Absent: {this.ab}
-                  {"    "}Excused: {this.ex}
-                </Text>
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexDirection: "row",
+                  padding: 10
+                }}
+              >
+                <Text style={{ fontSize: 20 }}>Present: {this.av}</Text>
+                <Text style={{ fontSize: 20 }}>Absent: {this.ab}</Text>
+                <Text style={{ fontSize: 20 }}> Excused: {this.ex}</Text>
               </View>
             </Card>
           </TouchableOpacity>
@@ -195,8 +213,9 @@ export default class DashboardScreen extends React.Component {
               containerStyle={{
                 paddingTop: 40,
                 paddingBottom: 40,
-                backgroundColor: "yellow"
+                backgroundColor: "#1A5276 "
               }}
+              titleStyle={{ color: "white" }}
             >
               <View style={{ alignItems: "center" }}>
                 <Text style={{ fontSize: 20, padding: 10, fontWeight: "bold" }}>

@@ -73,6 +73,9 @@ export default class PointsScreen extends React.Component {
     if (this.state.switch == false) this.setState({ switch: true });
     else this.setState({ switch: false });
   };
+  avatarURL = email => {
+    return email.replace("@", "%40");
+  };
   list = item => {
     let point = 0;
     return (
@@ -86,9 +89,12 @@ export default class PointsScreen extends React.Component {
             subtitle={item.Phone}
             leftAvatar={
               <Avatar
+                size="small"
                 rounded
                 source={{
-                  uri: "../assets/images/bin.png"
+                  uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/${this.avatarURL(
+                    item.id
+                  )}%2Favatar.png?alt=media`
                 }}
               />
             }
@@ -168,7 +174,13 @@ export default class PointsScreen extends React.Component {
           }}
           rightComponent={
             this.state.switch && (
-              <Button onPress={this.saveChange} title="Save changes" />
+              <Button
+                onPress={this.saveChange}
+                title="Save changes"
+                type="clear"
+                titleStyle={{ color: "white" }}
+                containerStyle={{ width: 100 }}
+              />
             )
           }
         />

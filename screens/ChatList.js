@@ -36,6 +36,10 @@ import {
   Icon,
   Overlay
 } from "react-native-elements";
+
+import { ImagePicker, Video, SMS } from "expo";
+// import Dialog, { DialogFooter,DialogButton,DialogTitle, DialogContent } from 'react-native-popup-dialog';
+import Dialog from "react-native-dialog";
 import { uploadImageAsync, uploadVideoAsync } from "../ImageUtils.js";
 import { ImagePicker, Video, SMS } from "expo";
 import VideoPlayer from "@expo/videoplayer";

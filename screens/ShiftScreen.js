@@ -105,7 +105,13 @@ export default class ShiftScreen extends React.Component {
           : null
       );
       changed = [...this.state.changed];
-      changed.push({ user_id: userid, oldid: shift, newid: shiftNew });
+      let shifted = changed.find(u => u.oldid.id === shiftid);
+      console.log("SHIFTED", shifted);
+      if (shifted == undefined) {
+        {
+          changed.push({ user_id: userid, oldid: shift, newid: shiftNew });
+        }
+      }
       this.setState({ changed });
       console.log("new id is, ", changed);
     }
@@ -143,7 +149,7 @@ export default class ShiftScreen extends React.Component {
   };
   undo = async () => {
     changed = [...this.state.changed];
-    changed.splice(this.state.changed[this.state.changed.length - 1], 1);
+    changed.splice(this.state.changed.length - 1, 1);
     await this.setState({ changed });
     console.log("Changed", this.state.changed);
   };
@@ -166,7 +172,13 @@ export default class ShiftScreen extends React.Component {
           }}
           rightComponent={
             this.state.switch && (
-              <Button onPress={this.saveChange} title="Save changes" />
+              <Button
+                onPress={this.saveChange}
+                title="Save changes"
+                titleStyle={{ color: "white" }}
+                containerStyle={{ width: 100 }}
+                type="clear"
+              />
             )
           }
         />
@@ -211,10 +223,12 @@ export default class ShiftScreen extends React.Component {
                 shif =>
                   shif.Users.includes(user.id) && (
                     <View
-                      style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between"
-                      }}
+                      style={
+                        {
+                          // flexDirection: "row",
+                          // justifyContent: "space-between"
+                        }
+                      }
                     >
                       <TouchableOpacity
                         onPress={() => this.change(shif.id, user.id)}
@@ -223,15 +237,10 @@ export default class ShiftScreen extends React.Component {
                         <Text>{shif.Day}</Text>
                         <Text>{shif.End_Time}</Text>
                         <Text>
-                          {shif.Start_Time} {"\n"}
+                          {shif.Start_Time}
                           {"\n"}
                         </Text>
                       </TouchableOpacity>
-
-                      <Text>
-                        {"\n"}
-                        {"\n"}
-                      </Text>
                     </View>
                   )
               )}
