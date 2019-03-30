@@ -149,7 +149,7 @@ export default class ShiftScreen extends React.Component {
   };
   undo = async () => {
     changed = [...this.state.changed];
-    changed.splice(changed[changed.length - 1], 1);
+    changed.splice(this.state.changed.length - 1, 1);
     await this.setState({ changed });
     console.log("Changed", this.state.changed);
   };
