@@ -9,7 +9,8 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Dimensions
+  Dimensions,
+  ImageBackground
 } from "react-native";
 import HomeScreen from "./navigation/MainTabNavigator";
 import AppNavigator from "./navigation/AppNavigator";
@@ -37,6 +38,7 @@ export default class Login extends React.Component {
     phone: "",
     disable: true
   };
+  image = require("./assets/images/park.jpg");
   count = 6;
   login = async () => {
     this.count = this.count + 1;
@@ -73,58 +75,65 @@ export default class Login extends React.Component {
     }
     return (
       <View style={styles.container}>
-        {this.state.flag == false ? (
-          <View style={styles.contentContainer}>
-            <View style={styles.welcomeContainer}>
-              <Image
-                style={{ width: 150, height: 150 }}
-                source={{
-                  uri:
-                    "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/logo.png?alt=media&token=3a5446d6-2998-46b5-8cef-7f1c1afda0d3"
-                }}
-              />
-              {/* <TextInput
+        <ImageBackground
+          source={this.image}
+          style={{ width: "100%", height: "100%" }}
+        >
+          <View style={styles.container}>
+            {this.state.flag == false ? (
+              <View style={styles.contentContainer}>
+                <View style={styles.welcomeContainer}>
+                  <Image
+                    style={{ width: 150, height: 150 }}
+                    source={{
+                      uri:
+                        "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/logo.png?alt=media&token=3a5446d6-2998-46b5-8cef-7f1c1afda0d3"
+                    }}
+                  />
+                  {/* <TextInput
               autoCapitalize="none"
               placeholder="Name"
               onChangeText={name => this.setState({ name })}
               value={this.state.name}
             /> */}
 
-              <TextInput
-                style={{ paddingTop: 20 }}
-                autoCapitalize="none"
-                placeholder="Email"
-                onChangeText={email => this.setState({ email })}
-                value={this.state.email}
-              />
+                  <TextInput
+                    style={{ paddingTop: 20 }}
+                    autoCapitalize="none"
+                    placeholder="Email"
+                    onChangeText={email => this.setState({ email })}
+                    value={this.state.email}
+                  />
 
-              <TextInput
-                secureTextEntry={true}
-                style={{ paddingTop: 20 }}
-                autoCapitalize="none"
-                placeholder="Password"
-                onChangeText={password => this.setState({ password })}
-                value={this.state.password}
-              />
-              <Text style={{ color: "red" }}>{this.state.error}</Text>
+                  <TextInput
+                    secureTextEntry={true}
+                    style={{ paddingTop: 20 }}
+                    autoCapitalize="none"
+                    placeholder="Password"
+                    onChangeText={password => this.setState({ password })}
+                    value={this.state.password}
+                  />
+                  <Text style={{ color: "red" }}>{this.state.error}</Text>
 
-              <TouchableOpacity
-                disabled={this.state.flag1 ? true : false}
-                onPress={this.login}
-                style={{ color: "lightblue" }}
-              >
-                {/* <Text>Login</Text> */}
-              </TouchableOpacity>
-              <Button
-                onPress={this.login}
-                title="Login"
-                style={{ width: 100, paddingTop: 50 }}
-              />
-            </View>
+                  <TouchableOpacity
+                    disabled={this.state.flag1 ? true : false}
+                    onPress={this.login}
+                    style={{ color: "lightblue" }}
+                  >
+                    {/* <Text>Login</Text> */}
+                  </TouchableOpacity>
+                  <Button
+                    onPress={this.login}
+                    title="Login"
+                    style={{ width: 100, paddingTop: 50 }}
+                  />
+                </View>
+              </View>
+            ) : (
+              <AppNavigator />
+            )}
           </View>
-        ) : (
-          <AppNavigator />
-        )}
+        </ImageBackground>
       </View>
     );
   }
@@ -168,7 +177,9 @@ export default class Login extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff"
+    // backgroundColor: "#fff",
+    //alignItems: "center"
+    justifyContent: "center"
   },
   developmentModeText: {
     marginBottom: 20,
