@@ -421,12 +421,20 @@ export default class Employee extends React.Component {
         </View>
 
         {this.state.filteredItems.map(log => (
-          <View>
-            {/* {console.log("LOGS", log)} */}
-            <Text>{log.Desc}</Text>
-            <Text>{log.Trash_Id}</Text>
-            <Text>{log.Truck_Id}</Text>
-          </View>
+          <Card title={log.Desc} width={width * 0.95}>
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            >
+              <Text style={{ fontWeight: "bold" }}>Trash ID:</Text>
+              <Text>{log.Trash_Id.substring(33)}</Text>
+            </View>
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            >
+              <Text style={{ fontWeight: "bold" }}>Truck ID:</Text>
+              <Text>{log.Truck_Id.substring(33)}</Text>
+            </View>
+          </Card>
         ))}
       </View>
     );

@@ -15,7 +15,7 @@ import { ExpoConfigView } from "@expo/samples";
 import MapView, { Callout, PROVIDER_GOOGLE } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import firebase from "firebase";
-import { Permissions, ImagePicker } from "expo";
+import { Permissions, ImagePicker, Notifications } from "expo";
 import db from "../db";
 import Polyline from "@mapbox/polyline";
 import { Popup } from "react-native-map-link";
@@ -78,15 +78,21 @@ export default class MapScreen extends React.Component {
     countDown: 30,
     visiable: false,
     directions: [],
-    bestRoutePoints: []
+    bestRoutePoints: [],
+    token: null,
+    notification: null,
+    title: "Hello World",
+    body: "Say something!"
   };
   fontSize = 16;
   timer = null;
   mapView = null;
   bestRoutePoints = [];
+
   async componentDidMount() {
     //this.getDirections();
-    this.getWhether();
+    //this.getWhether();
+    setInterval(this.tempUpdater, 30000);
     await Permissions.askAsync(Permissions.LOCATION);
     const email = firebase.auth().currentUser.email;
     await navigator.geolocation.watchPosition(
@@ -143,6 +149,21 @@ export default class MapScreen extends React.Component {
       this.setState({ trucks });
     });
   }
+
+  tempUpdater = async () => {
+    let data = null;
+    const result = await fetch(
+      "https://weather.cit.api.here.com/weather/1.0/report.json?product=observation&latitude=25.381649&longitude=51.479143&oneobservation=true&app_id=PxvQ4FeG3DpNYbNZBjKH&app_code=dkAcfxUgh-PHLxJox3majw"
+    )
+      .then(response => response.json())
+      .then(forcast => {
+        data = forcast.observations.location[0].observation[0].temperature.split(
+          "."
+        )[0];
+      });
+    const updateBinTemp = firebase.functions().httpsCallable("updateBinTemp");
+    await updateBinTemp({ temp: data });
+  };
 
   startTimer = () => {
     this.setState({ countDown: this.state.countDown - 1 }, () => {
@@ -223,19 +244,7 @@ export default class MapScreen extends React.Component {
               const sequence = data.route.locationSequence;
               for (let i = 0; i < sequence.length; i++) {
                 directions.push(this.state.bestRoutePoints[sequence[i]]);
-                // if (i == 0) {
-                //   directions +=
-                //     "Go to trash bin number " +
-                //     this.state.bestRoutePoints[sequence[i]].id +
-                //     ".\n";
-                // } else {
-                //   directions +=
-                //     "Then, go to trash bin number " +
-                //     this.state.bestRoutePoints[sequence[i]].id +
-                //     ".\n";
-                // }
               }
-              // console.log("Route is:", data);
               console.log("directions are:", directions);
               this.setState({ directions, dialogIsVisiable: true });
             });
@@ -528,7 +537,7 @@ export default class MapScreen extends React.Component {
           justifyContent: "center"
         }}
       >
-        <Overlay
+        {/* <Overlay
           isVisible={this.state.dialogIsVisiable}
           windowBackgroundColor="rgba(255, 255, 255, .5)"
           overlayBackgroundColor="red"
@@ -551,9 +560,9 @@ export default class MapScreen extends React.Component {
               {trashBin.id}
             </Text>;
           })}
-        </Overlay>
+        </Overlay> */}
         <View>
-          {/* <Dialog
+          <Dialog
             hasOverlay
             visible={this.state.dialogIsVisiable}
             onTouchOutside={() => {
@@ -562,20 +571,29 @@ export default class MapScreen extends React.Component {
             dialogTitle={
               <DialogTitle title="Please Follow These Instructions" />
             }
-            // dialogAnimation={
-            //   new SlideAnimation({
-            //     slideFrom: "bottom"
-            //   })
-            // }
+            dialogAnimation={
+              new SlideAnimation({
+                slideFrom: "bottom"
+              })
+            }
           >
-           
-            
             <DialogContent>
-              <Text>Hello1</Text>
-              <Text>Hello2</Text>
-              <Text>Hello3</Text>
-              <Text>Hello4</Text>
-             
+              {this.state.directions.map((trashBin, i) => (
+                <Text
+                  key={i}
+                  style={{ fontWeight: "bold", color: "#7a66ff" }}
+                  onPress={() =>
+                    this.setState({
+                      selectedBin: trashBin,
+                      dialogIsVisiable: false
+                    })
+                  }
+                >
+                  {/* {alert("I am inside the text teg: " + trashBin.id)}
+                  {console.log("I am inside the text teg: ", trashBin.id)} */}
+                  {trashBin.id}
+                </Text>
+              ))}
             </DialogContent>
             <DialogFooter>
               <DialogButton
@@ -585,7 +603,7 @@ export default class MapScreen extends React.Component {
                 }}
               />
             </DialogFooter>
-          </Dialog> */}
+          </Dialog>
         </View>
         <Popup
           isVisible={this.state.visiable}
@@ -755,10 +773,10 @@ export default class MapScreen extends React.Component {
                 }}
               >
                 <Image
-                  source={require("../assets/images/bin.png")}
+                  source={require("../assets/images/bin1.png")}
                   style={{
-                    width: 20,
-                    height: 20,
+                    width: 40,
+                    height: 40,
                     tintColor: [
                       bin.Status === "Damaged" ||
                       bin.Status === "Under Maintenance" ||
@@ -863,11 +881,9 @@ export default class MapScreen extends React.Component {
                     >
                       Crew:
                     </Text>
-                    {truck.Crew.map(memeber => {
-                      <Text>
-                        {/* {memeber} {console.log("Memeber is: ", memeber)} */}
-                      </Text>;
-                    })}
+                    {truck.Crew.map((memeber, i) => (
+                      <Text key={i}>{memeber}</Text>
+                    ))}
                   </View>
                 </Callout>
               </MapView.Marker>

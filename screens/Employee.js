@@ -20,7 +20,8 @@ import {
   Button,
   Icon,
   Header,
-  Divider
+  Divider,
+  Avatar
 } from "react-native-elements";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 const { width, height } = Dimensions.get("window");
@@ -82,7 +83,12 @@ export default class Employee extends React.Component {
     await this.setState({ filteredItems: itemFilter });
     console.log("Lastestst", itemFilter);
   };
-
+  avatarURL = id => {
+    console.log("IDDDD", id);
+    if (id != null) {
+      return id.replace("@", "%40");
+    }
+  };
   list = item => {
     return (
       <View>
@@ -92,20 +98,21 @@ export default class Employee extends React.Component {
             key={item.id}
             title={item.Name}
             subtitle={item.Status}
-            leftAvatar={{ source: { uri: "item.picture.thumbnail" } }}
-            // leftAvatar={
-            //   <Avatar
-            //     rounded
-            //     source={{
-            //       uri: item.picture.thumbnail
-            //     }}
-            //   />
-            // }
-
+            leftAvatar={
+              <Avatar
+                size="small"
+                rounded
+                source={{
+                  uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/${this.avatarURL(
+                    item.id
+                  )}%2Favatar.png?alt=media`
+                }}
+              />
+            }
             subtitleStyle={{ textAlign: "left" }}
             titleStyle={{ textAlign: "left" }}
-            // onPress={() => this.props.navigation.navigate("Info")}
           />
+
           <Divider style={{ backgroundColor: "blue" }} />
         </TouchableOpacity>
       </View>

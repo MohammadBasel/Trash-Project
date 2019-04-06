@@ -96,7 +96,7 @@ export default class TrashStatus extends React.Component {
                       </Text>
                       <Text>
                         <Text style={{ fontWeight: "bold" }}>Trash Level:</Text>
-                        {u.Level}
+                        {u.Level.toFixed(2)}
                       </Text>
                     </View>
                     <View
@@ -141,7 +141,7 @@ export default class TrashStatus extends React.Component {
                     </Text>
                     <Text>
                       <Text style={{ fontWeight: "bold" }}>Trash Level:</Text>
-                      {u.Level}
+                      {u.Level.toFixed(2)}
                     </Text>
                   </View>
                   <View
@@ -185,7 +185,7 @@ export default class TrashStatus extends React.Component {
                       </Text>
                       <Text>
                         <Text style={{ fontWeight: "bold" }}>Trash Level:</Text>
-                        {u.Level}
+                        {u.Level.toFixed(2)}
                       </Text>
                     </View>
                     <View
