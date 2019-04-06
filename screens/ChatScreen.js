@@ -14,19 +14,13 @@ import {
 } from "react-native";
 import { WebBrowser } from "expo";
 
-import { MonoText } from "../components/StyledText";
-import firebase, { auth, FirebaseAuth } from "firebase";
-import db from "../db.js";
-import {
-  Header,
-  ListItem,
-  Badge,
-  Slider,
-  Divider,
-  Avatar
-} from "react-native-elements";
-import { Ionicons, FontAwesome, MaterialIcons } from "@expo/vector-icons";
-import ImageZoom from "react-native-image-pan-zoom";
+import { MonoText } from '../components/StyledText';
+import firebase, { auth,FirebaseAuth } from 'firebase';
+import db from '../db.js';
+import { Header,ListItem,Badge,Slider,Divider ,Avatar } from 'react-native-elements';
+import { Ionicons,FontAwesome,MaterialIcons } from '@expo/vector-icons';
+import ImageZoom from 'react-native-image-pan-zoom';
+
 
 export default class ChatScreen extends React.Component {
   static navigationOptions = {

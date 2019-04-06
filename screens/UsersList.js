@@ -103,9 +103,11 @@ export default class UsersList extends React.Component {
       if (oldmembers[i] == this.state.members) {
         check = true;
       }
-      return check;
+      
     }
-  };
+    return check;
+  }
+
 
   addChat = async () => {
     console.log("the check is : ", this.check());

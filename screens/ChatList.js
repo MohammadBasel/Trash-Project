@@ -165,7 +165,9 @@ export default class ChatList extends React.Component {
       ext = questionMark[0]
 
     }
+    if(item.Sender_Id === firebase.auth().currentUser.email ){
 
+    
     return(
 
     <View>
@@ -236,7 +238,7 @@ export default class ChatList extends React.Component {
             this.setState({ visible: true });
             
           }}
-          style={{width: "100%", height : "100%"}}/>
+          style={this.state.resize ? styles.imagesize1:styles.imagesize2 }/>
           </TouchableOpacity>
           </View>
 :
@@ -407,7 +409,7 @@ const isAvailable = await SMS.isAvailableAsync();
       console.log("something is wrong")
     }
     }
-  };
+  
 
   saveVideo = () => {
     // console.log("the url in the save  image is : ", this.state.url1)
@@ -714,12 +716,14 @@ const styles = StyleSheet.create({
     height: 19.21,
     width: 100
   },
-  imagesize1: {
-    width: width * 1,
-    height: height * 1
+  imagesize1 :{
+    width : width * 1,
+    height : height *1,
+    resizeMode: 'cover'
   },
-  imagesize2: {
-    width: "100%",
-    height: "100%"
-  }
+  imagesize2 : {
+    width : "100%",
+    height : "100%",
+    resizeMode: 'cover'
+ }
 });
