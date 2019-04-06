@@ -7,11 +7,17 @@ import {
 
 import TabBarIcon from "../components/TabBarIcon";
 import HomeScreen from "../screens/HomeScreen";
-
+// import LinksScreen from "../screens/LinksScreen";
 import MapScreen from "../screens/MapScreen";
 import MaintenanceScreen from "../screens/MaintenanceScreen";
 import Battery from "../screens/Battery";
 import Trash from "../screens/Trash";
+import AdminDashboard from "../screens/AdminDashboard";
+import CreateUser from "../screens/CreateUser";
+import CreateShift from "../screens/CreateShift";
+import CreateZone from "../screens/CreateZone";
+import CreateTrash from "../screens/CreateTrash";
+import CreateTruck from "../screens/CreateTruck";
 
 import DashboardScreen from "../screens/DashboardScreen";
 import TrashStatus from "../screens/TrashStatus";
@@ -23,6 +29,26 @@ import ChatScreen from "../screens/ChatScreen";
 import ChatList from "../screens/ChatList";
 import UsersList from "../screens/UsersList";
 import MyUsersList from "../screens/MyUsersList";
+
+import firebase, { firestore } from 'firebase';
+
+role = ""
+ export class Role extends React.Component 
+ {
+    async componentDidMount(){
+      // let user = firebase.auth().currentUser.email
+      // const userObj = await db.collection("Users").doc(user).get();
+      // this.role = userObj.Role
+      // console.log("Roleeeeeeeeee", userObj.Role)
+      await db.collection("Users")
+    .onSnapshot(querySnapshot => {
+      querySnapshot.forEach(doc => {   
+      })
+    })
+ }
+}
+
+
 const HomeStack = createStackNavigator({
   Home: HomeScreen
 });
@@ -58,6 +84,8 @@ ChatStack.navigationOptions = {
   )
 };
 
+
+
 const MapStack = createStackNavigator({
   Map: MapScreen
 });
@@ -88,6 +116,26 @@ MaintenanceStack.navigationOptions = {
   )
 };
 
+const AdminStack = createStackNavigator({
+  Admin: AdminDashboard,
+  CreateUser: CreateUser,
+  CreateShift: CreateShift,
+  CreateZone: CreateZone,
+  CreateTrash: CreateTrash,
+  CreateTruck: CreateTruck
+});
+
+AdminStack.navigationOptions = {
+  tabBarLabel: "Admin Dashboard",
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon
+      focused={focused}
+      name={Platform.OS === "ios" ? "ios-link" : "md-link"}
+    />
+  )
+};
+
+
 const DashboardStack = createStackNavigator({
   Dashboard: DashboardScreen,
   TrashStatus: TrashStatus,
@@ -106,11 +154,31 @@ DashboardStack.navigationOptions = {
     />
   )
 };
-export default createBottomTabNavigator({
-  HomeStack,
 
+let nav = null
+let user = firebase.auth().currentUser
+if(user != null){
+  let user = user.email
+  const userObj = db.collection("Users").doc(user).get();
+  this.role = userObj.Role
+}
+
+
+console.log("Role is: ", this.role)
+if(this.role === "Employee"){
+  nav =  createBottomTabNavigator({
+    HomeStack,
+    MapStack,
+    ChatStack
+  });
+}else{
+  nav = createBottomTabNavigator({
+  HomeStack,
   MapStack,
   MaintenanceStack,
+  AdminStack,
   DashboardStack,
   ChatStack
 });
+}
+export default nav

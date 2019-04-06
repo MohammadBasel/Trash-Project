@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  AsyncStorage,
   ImageBackground
 } from "react-native";
 import HomeScreen from "./navigation/MainTabNavigator";
@@ -32,18 +33,39 @@ export default class Login extends React.Component {
     password: "",
     avatar: null,
     caption: "",
-    flag: false,
-    flag1: true,
+    Online: false,
     error: "",
     phone: "",
-    disable: true
+    disable: true,
+    user: null
   };
   image = require("./assets/images/park.jpg");
   count = 6;
+  async componentDidMount(){
+    firebase.auth().onAuthStateChanged = (user) => {
+      console.log("login page", user)
+      if (user) {
+        this.setState({Online: true})
+      } else {
+        this.setState({Online: false})
+      }
+    }
+    await db.collection("Users")
+    .onSnapshot(querySnapshot => {
+      querySnapshot.forEach(doc => {   
+         if (firebase.auth().currentUser == null){
+            this.setState({Online: false})
+           console.log("Online", this.state.Online)
+       }else{
+          this.setState({Online: true})
+       }
+      })
+    })
+  }
   login = async () => {
     this.count = this.count + 1;
     console.log("the count", this.count);
-
+    let user = firebase.auth().currentUser;
     try {
       await firebase
         .auth()
@@ -53,14 +75,14 @@ export default class Login extends React.Component {
         .doc(this.state.email)
         .update({ Online: true });
       this.push;
-      this.setState({ flag: true });
+      this.setState({ Online: true, user });
     } catch (error) {
       // Handle Errors here.
       var errorCode = error.code;
       var errorMessage = error.message;
       // ...
       console.log(errorMessage);
-      this.setState({ flag: false });
+      this.setState({ Online: false });
       if (error.message == "The email address is badly formatted.") {
         this.setState({ error: error.message });
       } else {
@@ -71,26 +93,25 @@ export default class Login extends React.Component {
 
   render() {
     {
-      console.log("the flag", this.state.flag);
+      console.log("the Online", this.state.Online);
     }
     return (
       <View style={styles.container}>
-        <ImageBackground
+      <ImageBackground
           source={this.image}
           style={{ width: "100%", height: "100%" }}
         >
-          <View style={styles.container}>
-            {this.state.flag == false ? (
-              <View style={styles.contentContainer}>
-                <View style={styles.welcomeContainer}>
-                  <Image
-                    style={{ width: 150, height: 150 }}
-                    source={{
-                      uri:
-                        "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/logo.png?alt=media&token=3a5446d6-2998-46b5-8cef-7f1c1afda0d3"
-                    }}
-                  />
-                  {/* <TextInput
+        {this.state.Online === false ? (
+          <View style={styles.contentContainer}>
+            <View style={styles.welcomeContainer}>
+              <Image
+                style={{ width: 150, height: 150 }}
+                source={{
+                  uri:
+                    "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/logo.png?alt=media&token=3a5446d6-2998-46b5-8cef-7f1c1afda0d3"
+                }}
+              />
+              {/* <TextInput
               autoCapitalize="none"
               placeholder="Name"
               onChangeText={name => this.setState({ name })}
@@ -122,7 +143,6 @@ export default class Login extends React.Component {
                     value={this.state.password}
                   />
                   <Text style={{ color: "red" }}>{this.state.error}</Text>
-
                   <TouchableOpacity
                     disabled={this.state.flag1 ? true : false}
                     onPress={this.login}

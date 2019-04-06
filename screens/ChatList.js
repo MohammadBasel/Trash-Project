@@ -16,6 +16,7 @@ import {
   Dimensions,
   Animated,
   CameraRoll,
+
   TouchableWithoutFeedback ,
 } from 'react-native';
 import { WebBrowser,FileSystem   } from 'expo';
@@ -52,6 +53,7 @@ import { ImagePicker, Video, SMS } from "expo";
 // import Dialog, { DialogFooter,DialogButton,DialogTitle, DialogContent } from 'react-native-popup-dialog';
 import Dialog from "react-native-dialog";
 import { uploadImageAsync, uploadVideoAsync } from "../ImageUtils.js";
+
 import { ImagePicker, Video, SMS } from "expo";
 import VideoPlayer from "@expo/videoplayer";
 // import Dialog, { DialogFooter,DialogButton,DialogTitle, DialogContent } from 'react-native-popup-dialog';
@@ -125,7 +127,6 @@ export default class ChatList extends React.Component {
     })
     
     console.log("Current messages after method: ", this.state.messages)
-
   }
 
   clickable = async () => {
@@ -328,6 +329,7 @@ export default class ChatList extends React.Component {
     console.log(result);
 
     if (!result.cancelled) {
+
       console.log("the result ui : ", result.uri)
       let lastdigits = String(result.uri.substring(result.uri.length-5))
       console.log("the last digits are : ", lastdigits)
@@ -339,7 +341,6 @@ export default class ChatList extends React.Component {
       console.log("the url : ", url)
       this.setState({text : url})
       this.clickable()
-
     }
   };
   saveImage = () => {
@@ -518,6 +519,7 @@ const isAvailable = await SMS.isAvailableAsync();
           <Dialog.Description>
             Do you want to save the picture to the gallery?
           </Dialog.Description>
+
           <Dialog.Button label="Cancel" onPress={this.changeVisible}/>
           <Dialog.Button label="Save" onPress={this.saveImage}/>
           <Dialog.Button label="share" onPress={this.shareImage}/>
@@ -529,6 +531,7 @@ const isAvailable = await SMS.isAvailableAsync();
           <Dialog.Description>
             Do you want to save the Video to the gallery?
           </Dialog.Description>
+
           <Dialog.Button label="Cancel" onPress={this.changeVisible1}/>
           <Dialog.Button label="Save" onPress={this.saveVideo}/>
           <Dialog.Button label="share" onPress={this.shareVideo}/>
