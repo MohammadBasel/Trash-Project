@@ -59,10 +59,18 @@ export default class ChatScreen extends React.Component {
   keyExtractor = (item, index) => index;
 
   renderChats = ({ item }) => {
-    console.log("the item : ", item);
-    console.log("i'm getting inside");
-    var rand = Math.floor(1 + Math.random() * (100 - 1));
-    check = false;
+    console.log("the item : ",item)
+      console.log("i'm getting inside")
+    var rand = Math.floor(1 + (Math.random() * (100-1)));
+    check = false
+    
+    for (i=0; item.Members !== undefined && i<item.Members.length;i++){
+      console.log("the memeers " ,item.Members[i])
+        if (item.Members[i] === firebase.auth().currentUser.email){
+            check = true
+           
+        }
+
 
     for (i = 0; i < item.Members.length; i++) {
       console.log("the memeers ", item.Members[i]);

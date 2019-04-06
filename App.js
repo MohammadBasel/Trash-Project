@@ -25,6 +25,10 @@ export default class App extends React.Component {
     console.log("Camera permission 1: ", prompt2);
     const result3 = await Permissions.getAsync(Permissions.AUDIO_RECORDING);
     console.log("Camera permission 2: ", result3);
+    const prompt3 = await Permissions.askAsync(Permissions.CONTACTS);
+    console.log("Camera permission 1: ", prompt3);
+    const result4 = await Permissions.getAsync(Permissions.CONTACTS);
+    console.log("Camera permission 2: ", result4);
   }
 
   render() {
