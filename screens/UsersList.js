@@ -105,7 +105,7 @@ for (let i=0; i<oldmembers.length; i++){
 
     }
     return check;
-  };
+  };}
 
   addChat = async () =>{
     console.log("the check is : ", this.check())
@@ -162,17 +162,7 @@ for (let i=0; i<oldmembers.length; i++){
         this.props.navigation.navigate("Chat")
       }
 
-      const addChat = firebase.functions().httpsCallable("addChat");
-
-      const result = await addChat({
-        Members: this.state.members,
-        Title: title
-      });
-
-      this.props.navigation.navigate("Chat");
-    } else {
-      this.props.navigation.navigate("Chat");
-    }
+     
   };
 
   renderUsers = ({ item }) => {

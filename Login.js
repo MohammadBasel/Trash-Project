@@ -9,7 +9,8 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Dimensions
+  Dimensions,
+  AsyncStorage
 } from "react-native";
 import HomeScreen from "./navigation/MainTabNavigator";
 import AppNavigator from "./navigation/AppNavigator";
@@ -31,17 +32,38 @@ export default class Login extends React.Component {
     password: "",
     avatar: null,
     caption: "",
-    flag: false,
-    flag1: true,
+    Online: true,
     error: "",
     phone: "",
-    disable: true
+    disable: true,
+    user: null
   };
   count = 6;
+  async componentDidMount(){
+    firebase.auth().onAuthStateChanged = (user) => {
+      console.log("login page", user)
+      if (user) {
+        this.setState({Online: true})
+      } else {
+        this.setState({Online: false})
+      }
+    }
+    await db.collection("Users")
+    .onSnapshot(querySnapshot => {
+      querySnapshot.forEach(doc => {   
+      //   if (firebase.auth().currentUser == null){
+      //      this.setState({Online: false})
+      //     console.log("Online", this.state.Online)
+      // }else{
+      //    this.setState({Online: true})
+      // }
+      })
+    })
+  }
   login = async () => {
     this.count = this.count + 1;
     console.log("the count", this.count);
-
+    let user = firebase.auth().currentUser;
     try {
       await firebase
         .auth()
@@ -51,14 +73,14 @@ export default class Login extends React.Component {
         .doc(this.state.email)
         .update({ Online: true });
       this.push;
-      this.setState({ flag: true });
+      this.setState({ Online: true, user });
     } catch (error) {
       // Handle Errors here.
       var errorCode = error.code;
       var errorMessage = error.message;
       // ...
       console.log(errorMessage);
-      this.setState({ flag: false });
+      this.setState({ Online: false });
       if (error.message == "The email address is badly formatted.") {
         this.setState({ error: error.message });
       } else {
@@ -69,11 +91,11 @@ export default class Login extends React.Component {
 
   render() {
     {
-      console.log("the flag", this.state.flag);
+      console.log("the Online", this.state.Online);
     }
     return (
       <View style={styles.container}>
-        {this.state.flag == false ? (
+        {this.state.Online == false ? (
           <View style={styles.contentContainer}>
             <View style={styles.welcomeContainer}>
               <Image
@@ -108,13 +130,6 @@ export default class Login extends React.Component {
               />
               <Text style={{ color: "red" }}>{this.state.error}</Text>
 
-              <TouchableOpacity
-                disabled={this.state.flag1 ? true : false}
-                onPress={this.login}
-                style={{ color: "lightblue" }}
-              >
-                {/* <Text>Login</Text> */}
-              </TouchableOpacity>
               <Button
                 onPress={this.login}
                 title="Login"
