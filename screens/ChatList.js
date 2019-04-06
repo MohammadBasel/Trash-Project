@@ -35,24 +35,6 @@ import Dialog from "react-native-dialog";
 import ImageZoom from 'react-native-image-pan-zoom';
 import AntDesign from '@expo/vector-icons/AntDesign';
 const { width,height } = Dimensions.get('window');
-import {
-  Header,
-  ListItem,
-  Badge,
-  Slider,
-  Divider,
-  Avatar,
-  Card,
-  Input,
-  Icon
-} from "react-native-elements";
-import { uploadImageAsync, uploadVideoAsync } from "../ImageUtils.js";
-import { ImagePicker, Video } from "expo";
-import VideoPlayer from "@expo/videoplayer";
-
-import ImageZoom from "react-native-image-pan-zoom";
-import AntDesign from "@expo/vector-icons/AntDesign";
-const { width, height } = Dimensions.get("window");
 
 export default class ChatList extends React.Component {
   _handleVideoRef = component => {
@@ -246,7 +228,7 @@ export default class ChatList extends React.Component {
             this.setState({ visible: true });
             
           }}
-          style={{width: "100%", height : "100%"}}/>
+          style={this.state.resize ? styles.imagesize1:styles.imagesize2 }/>
           </TouchableOpacity>
           </View>
 :
@@ -704,10 +686,12 @@ const styles = StyleSheet.create({
   },
   imagesize1 :{
     width : width * 1,
-    height : height *1
+    height : height *1,
+    resizeMode: 'cover'
   },
   imagesize2 : {
     width : "100%",
-    height : "100%"
+    height : "100%",
+    resizeMode: 'cover'
  }
 });
