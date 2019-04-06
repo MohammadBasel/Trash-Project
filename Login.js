@@ -10,7 +10,8 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
-  AsyncStorage
+  AsyncStorage,
+  ImageBackground
 } from "react-native";
 import HomeScreen from "./navigation/MainTabNavigator";
 import AppNavigator from "./navigation/AppNavigator";
@@ -32,12 +33,13 @@ export default class Login extends React.Component {
     password: "",
     avatar: null,
     caption: "",
-    Online: true,
+    Online: false,
     error: "",
     phone: "",
     disable: true,
     user: null
   };
+  image = require("./assets/images/park.jpg");
   count = 6;
   async componentDidMount(){
     firebase.auth().onAuthStateChanged = (user) => {
@@ -51,12 +53,12 @@ export default class Login extends React.Component {
     await db.collection("Users")
     .onSnapshot(querySnapshot => {
       querySnapshot.forEach(doc => {   
-      //   if (firebase.auth().currentUser == null){
-      //      this.setState({Online: false})
-      //     console.log("Online", this.state.Online)
-      // }else{
-      //    this.setState({Online: true})
-      // }
+         if (firebase.auth().currentUser == null){
+            this.setState({Online: false})
+           console.log("Online", this.state.Online)
+       }else{
+          this.setState({Online: true})
+       }
       })
     })
   }
@@ -95,7 +97,11 @@ export default class Login extends React.Component {
     }
     return (
       <View style={styles.container}>
-        {this.state.Online == false ? (
+      <ImageBackground
+          source={this.image}
+          style={{ width: "100%", height: "100%" }}
+        >
+        {this.state.Online === false ? (
           <View style={styles.contentContainer}>
             <View style={styles.welcomeContainer}>
               <Image
@@ -112,34 +118,50 @@ export default class Login extends React.Component {
               value={this.state.name}
             /> */}
 
-              <TextInput
-                style={{ paddingTop: 20 }}
-                autoCapitalize="none"
-                placeholder="Email"
-                onChangeText={email => this.setState({ email })}
-                value={this.state.email}
-              />
+                  <TextInput
+                    style={{
+                      paddingTop: 20,
+                      borderColor: "black",
+                      borderWidth: 2
+                    }}
+                    autoCapitalize="none"
+                    placeholder="Email"
+                    onChangeText={email => this.setState({ email })}
+                    value={this.state.email}
+                  />
 
-              <TextInput
-                secureTextEntry={true}
-                style={{ paddingTop: 20 }}
-                autoCapitalize="none"
-                placeholder="Password"
-                onChangeText={password => this.setState({ password })}
-                value={this.state.password}
-              />
-              <Text style={{ color: "red" }}>{this.state.error}</Text>
-
-              <Button
-                onPress={this.login}
-                title="Login"
-                style={{ width: 100, paddingTop: 50 }}
-              />
-            </View>
+                  <TextInput
+                    secureTextEntry={true}
+                    style={{
+                      paddingTop: 20,
+                      borderColor: "black",
+                      borderWidth: 2
+                    }}
+                    autoCapitalize="none"
+                    placeholder="Password"
+                    onChangeText={password => this.setState({ password })}
+                    value={this.state.password}
+                  />
+                  <Text style={{ color: "red" }}>{this.state.error}</Text>
+                  <TouchableOpacity
+                    disabled={this.state.flag1 ? true : false}
+                    onPress={this.login}
+                    style={{ color: "lightblue" }}
+                  >
+                    {/* <Text>Login</Text> */}
+                  </TouchableOpacity>
+                  <Button
+                    onPress={this.login}
+                    title="Login"
+                    style={{ width: 100, paddingTop: 50 }}
+                  />
+                </View>
+              </View>
+            ) : (
+              <AppNavigator />
+            )}
           </View>
-        ) : (
-          <AppNavigator />
-        )}
+        </ImageBackground>
       </View>
     );
   }
@@ -183,7 +205,9 @@ export default class Login extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff"
+    // backgroundColor: "#fff",
+    //alignItems: "center"
+    justifyContent: "center"
   },
   developmentModeText: {
     marginBottom: 20,

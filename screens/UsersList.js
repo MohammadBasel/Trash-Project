@@ -98,71 +98,66 @@ export default class UsersList extends React.Component {
       });
     });
 
-for (let i=0; i<oldmembers.length; i++){
-  console.log("the memebers in old is : ", oldmembers[i])
-    if (oldmembers[i] == this.state.members){
-        check = true
-
+    for (let i = 0; i < oldmembers.length; i++) {
+      console.log("the memebers in old is : ", oldmembers[i]);
+      if (oldmembers[i] == this.state.members) {
+        check = true;
+      }
+      
     }
     return check;
-  };}
 
-  addChat = async () =>{
-    console.log("the check is : ", this.check())
-    check = false
-      oldmembers = []
-    await db.collection(`Chat`)
-  .onSnapshot(querySnapshot => {
-    querySnapshot.forEach(doc => {
-        
-           oldmembers.push(doc.data().members)
-        
-        
-        console.log("the zone is : ", zoneId)
-    })
-})
+  }
 
-for (let i=0; i<oldmembers.length; i++){
-  console.log("the memebers in old is : ", oldmembers[i])
-    if (oldmembers[i] == this.state.members){
-        check = true
-    }
-}
-      if(check === false){
-        const { navigation } = this.props;
-        let title = ""
-        // const id = navigation.getParam('data');
-        // console.log("the on press if working a nd this is the text : ", this.state.text)
-        //  await db.collection(`Chat/${id}/Message`).doc().set({Content: this.state.text, Sender_Id :this.user, Time : new Date()})
-        if (this.state.members.length > 2){
-            myId = firebase.auth().currentUser.email
-            email = String(myId).split("@")
-            myname =email[0]
-            title = myname + " 's Group"
-        }else{
-            if(this.state.members[0] != firebase.auth().currentUser.email){
-                title = this.state.members[0]
-            }else{
-                title = this.state.members[1]
-            }
-            
-        }
-        finalTitle = title.split("@")
-        name = finalTitle[0]
-    
-    
-        
-          const addChat = firebase.functions().httpsCallable('addChat')
-    
-          const result = await addChat({ Members: this.state.members , Title: name})
-    
-          this.props.navigation.navigate("Chat")
-        
-      }else{
-        this.props.navigation.navigate("Chat")
+
+  addChat = async () => {
+    console.log("the check is : ", this.check());
+    check = false;
+    oldmembers = [];
+    await db.collection(`Chat`).onSnapshot(querySnapshot => {
+      querySnapshot.forEach(doc => {
+        oldmembers.push(doc.data().members);
+
+        console.log("the zone is : ", zoneId);
+      });
+    });
+
+    for (let i = 0; i < oldmembers.length; i++) {
+      console.log("the memebers in old is : ", oldmembers[i]);
+      if (oldmembers[i] == this.state.members) {
+        check = true;
       }
+    }
+    if (check === false) {
+      const { navigation } = this.props;
+      let title = "";
+      // const id = navigation.getParam('data');
+      // console.log("the on press if working a nd this is the text : ", this.state.text)
+      //  await db.collection(`Chat/${id}/Message`).doc().set({Content: this.state.text, Sender_Id :this.user, Time : new Date()})
+      if (this.state.members.length > 2) {
+        myId = firebase.auth().currentUser.email;
+        email = String(myId).split("@");
+        myname = email[0];
+        title = myname + " 's Group";
+      } else {
+        if (this.state.members[0] != firebase.auth().currentUser.email) {
+          title = this.state.members[0];
+        } else {
+          title = this.state.members[1];
+        }
+      }
+      finalTitle = title.split("@");
+      name = finalTitle[0];
 
-     
+      const addChat = firebase.functions().httpsCallable("addChat");
+
+      const result = await addChat({
+        Members: this.state.members,
+        Title: name
+      });
+
+      this.props.navigation.navigate("Chat");
+    };
   };
 
   renderUsers = ({ item }) => {
