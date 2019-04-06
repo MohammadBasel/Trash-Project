@@ -166,6 +166,20 @@ export const addChat = functions.https.onCall(async (data, context) => {
   //return await admin.firestore().collection(`Chat/${result.id}/Message`).add({Content: message, Sender_Id :email, Time : new Date()});
 });
 
+export const deleteChat = functions.https.onCall(async (data, context) => {
+  const id = data.id
+  // const email = context.auth.token.email || null
+
+  return await admin
+    .firestore()
+    .collection(`Chat`)
+    .doc(id).delete()
+  //return await admin.firestore().collection(`Chat/${result.id}/Message`).add({Content: message, Sender_Id :email, Time : new Date()});
+});
+
+
+
+
 export const updateMembers = functions.https.onCall(async (data, context) => {
   const id = data.id;
   console.log("the id : ", id);
