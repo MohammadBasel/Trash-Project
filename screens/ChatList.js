@@ -13,11 +13,10 @@ import {
   KeyboardAvoidingView,
   Linking,
   StatusBar,
-  Dimensions ,
+  Dimensions,
   Animated,
   CameraRoll,
   TouchableWithoutFeedback ,
-
 } from 'react-native';
 import { WebBrowser,FileSystem   } from 'expo';
 import ContactsWrapper from 'react-native-contacts-wrapper';
@@ -36,10 +35,33 @@ import ImageZoom from 'react-native-image-pan-zoom';
 import AntDesign from '@expo/vector-icons/AntDesign';
 const { width,height } = Dimensions.get('window');
 
+import {
+  Header,
+  ListItem,
+  Badge,
+  Slider,
+  Divider,
+  Avatar,
+  Card,
+  Input,
+  Icon,
+  Overlay
+} from "react-native-elements";
+
+import { ImagePicker, Video, SMS } from "expo";
+// import Dialog, { DialogFooter,DialogButton,DialogTitle, DialogContent } from 'react-native-popup-dialog';
+import Dialog from "react-native-dialog";
+import { uploadImageAsync, uploadVideoAsync } from "../ImageUtils.js";
+import { ImagePicker, Video, SMS } from "expo";
+import VideoPlayer from "@expo/videoplayer";
+// import Dialog, { DialogFooter,DialogButton,DialogTitle, DialogContent } from 'react-native-popup-dialog';
+import Dialog from "react-native-dialog";
+import ImageZoom from "react-native-image-pan-zoom";
+import AntDesign from "@expo/vector-icons/AntDesign";
+const { width, height } = Dimensions.get("window");
+
 export default class ChatList extends React.Component {
-  _handleVideoRef = component => {
-    
-  }
+  _handleVideoRef = component => {};
   static navigationOptions = {
     header: null,
     text: ""
@@ -52,23 +74,20 @@ export default class ChatList extends React.Component {
     avatar: null,
     caption: "",
 
-    messages : [],
-    title : "",
-    otherPerson : "",
-    phoneNumber:"",
+    messages: [],
+    title: "",
+    otherPerson: "",
+    phoneNumber: "",
     fadeAnim: new Animated.Value(0),
-    visible : false,
-    visible1 : false,
-    resize : false,
-    url : "",
-    url1 : ""
-    
-  }
-  user = ""
-  
-  
-  async componentDidMount(){
+    visible: false,
+    visible1: false,
+    resize: false,
+    url: "",
+    url1: ""
+  };
+  user = "";
 
+  async componentDidMount() {
     const { navigation } = this.props;
     const id = navigation.getParam("data");
     const members = navigation.getParam("Members");
@@ -99,16 +118,13 @@ export default class ChatList extends React.Component {
         if (doc.id == this.user) {
           phoneNumber = doc.data().Phone;
         }
-      });
-      
+      });      
       console.log("Current messages: ", this.state.messages.length)
       console.log("Current messages: ", this.state.messages)
       this.setState({phoneNumber})
     })
     
     console.log("Current messages after method: ", this.state.messages)
-
-      
 
   }
 
@@ -139,8 +155,7 @@ export default class ChatList extends React.Component {
   renderChats = ({ item }) => {
     const converting = String(item.Content);
     console.log("the content : ", converting);
-    const first = String(item.Content).substring(0, 4);
-  
+    const first = String(item.Content).substring(0, 4);  
     console.log("first is : ", first)
     let ext = ""
     if(first == "http"){
@@ -148,16 +163,11 @@ export default class ChatList extends React.Component {
       let bracket = String(item.Content).split(")")
       let questionMark = bracket[1].split("?")
       ext = questionMark[0]
-      
+
     }
-    
-  
-   if (item.Sender_Id == this.user){
-    
-    
-    
+    if(item.Sender_Id === firebase.auth().currentUser.email ){
 
-
+    
     return(
 
     <View>
@@ -318,7 +328,6 @@ export default class ChatList extends React.Component {
     console.log(result);
 
     if (!result.cancelled) {
-
       console.log("the result ui : ", result.uri)
       let lastdigits = String(result.uri.substring(result.uri.length-5))
       console.log("the last digits are : ", lastdigits)
@@ -330,23 +339,23 @@ export default class ChatList extends React.Component {
       console.log("the url : ", url)
       this.setState({text : url})
       this.clickable()
+
     }
   };
-  saveImage = () =>{
-
-    console.log("the url in the save  image is : ", this.state.url)
-    if (Platform.OS === 'ios'){
-      var promise =  CameraRoll.saveToCameraRoll(this.state.url)
-      this.setState({visible : false})
-    }else{
+  saveImage = () => {
+    console.log("the url in the save  image is : ", this.state.url);
+    if (Platform.OS === "ios") {
+      var promise = CameraRoll.saveToCameraRoll(this.state.url);
+      this.setState({ visible: false });
+    } else {
       FileSystem.downloadAsync(
         this.state.url,
-        FileSystem.documentDirectory + 'small.png'
+        FileSystem.documentDirectory + "small.png"
       )
         .then(({ uri }) => {
-          console.log('Finished downloading to ', uri);
-          var promise =  CameraRoll.saveToCameraRoll(uri)
-          this.setState({visible : false})
+          console.log("Finished downloading to ", uri);
+          var promise = CameraRoll.saveToCameraRoll(uri);
+          this.setState({ visible: false });
         })
         .catch(error => {
           console.error(error);
@@ -400,6 +409,28 @@ const isAvailable = await SMS.isAvailableAsync();
       console.log("something is wrong")
     }
     }
+  
+
+  saveVideo = () => {
+    // console.log("the url in the save  image is : ", this.state.url1)
+    // if (Platform.OS === 'ios'){
+    //   var promise =  CameraRoll.saveToCameraRoll(this.state.url1)
+    //   this.setState({visible1 : false})
+    // }else{
+    FileSystem.downloadAsync(
+      this.state.url1,
+      FileSystem.documentDirectory + "small.mp4"
+    )
+      .then(({ uri }) => {
+        console.log("Finished downloading to ", uri);
+        var promise = CameraRoll.saveToCameraRoll(uri);
+        this.setState({ visible1: false });
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    // }
+  };
 
   render() {
     const { goBack } = this.props.navigation;
@@ -409,7 +440,6 @@ const isAvailable = await SMS.isAvailableAsync();
     return (
       <View style={styles.container}>
         <Header
-
           containerStyle={{ backgroundColor: "#7a66ff" }}
           // placement="left"
           leftComponent={
@@ -491,9 +521,10 @@ const isAvailable = await SMS.isAvailableAsync();
           <Dialog.Button label="Cancel" onPress={this.changeVisible}/>
           <Dialog.Button label="Save" onPress={this.saveImage}/>
           <Dialog.Button label="share" onPress={this.shareImage}/>
+
         </Dialog.Container>
 
-          <Dialog.Container visible={this.state.visible1}>
+        <Dialog.Container visible={this.state.visible1}>
           <Dialog.Title>Save Video</Dialog.Title>
           <Dialog.Description>
             Do you want to save the Video to the gallery?
@@ -501,6 +532,7 @@ const isAvailable = await SMS.isAvailableAsync();
           <Dialog.Button label="Cancel" onPress={this.changeVisible1}/>
           <Dialog.Button label="Save" onPress={this.saveVideo}/>
           <Dialog.Button label="share" onPress={this.shareVideo}/>
+
         </Dialog.Container>
       </View>
     );

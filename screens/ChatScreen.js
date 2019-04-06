@@ -10,9 +10,9 @@ import {
   TouchableOpacity,
   View,
   FlatList,
-  Dimensions 
-} from 'react-native';
-import { WebBrowser } from 'expo';
+  Dimensions
+} from "react-native";
+import { WebBrowser } from "expo";
 
 import { MonoText } from '../components/StyledText';
 import firebase, { auth,FirebaseAuth } from 'firebase';
@@ -65,6 +65,12 @@ export default class ChatScreen extends React.Component {
            
         }
 
+
+    for (i = 0; i < item.Members.length; i++) {
+      console.log("the memeers ", item.Members[i]);
+      if (item.Members[i] === firebase.auth().currentUser.email) {
+        check = true;
+      }
     }
 
     if (check == true) {
@@ -107,28 +113,35 @@ export default class ChatScreen extends React.Component {
   render() {
     console.log("the data inside the render : ", this.state.chat);
     return (
-      <View style={styles.container}>      
-       
-      <Header
-        containerStyle={{backgroundColor:'#7a66ff'}}
-        placement="left"   
-      //  leftComponent= {<Ionicons name='md-arrow-round-back'  size={25} color='#fff' onPress={()=>this.props.navigation.navigate('Chat')}/>}
-       centerComponent={{ text: "My Chats", style: { color: '#fff' } }}
-       rightComponent={ <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-        <View >
-         <MaterialIcons style={{marginRight:40}} name='add'  size={25} color='#fff' onPress={()=>this.props.navigation.navigate('UsersList')}/>
-       </View>
-      </View> }
-   />
-         
+      <View style={styles.container}>
+        <Header
+          containerStyle={{ backgroundColor: "#7a66ff" }}
+          placement="left"
+          //  leftComponent= {<Ionicons name='md-arrow-round-back'  size={25} color='#fff' onPress={()=>this.props.navigation.navigate('Chat')}/>}
+          centerComponent={{ text: "My Chats", style: { color: "#fff" } }}
+          rightComponent={
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            >
+              <View>
+                <MaterialIcons
+                  style={{ marginRight: 40 }}
+                  name="add"
+                  size={25}
+                  color="#fff"
+                  onPress={() => this.props.navigation.navigate("UsersList")}
+                />
+              </View>
+            </View>
+          }
+        />
 
-
- <FlatList
-        data={this.state.chat}
-        extraData={this.state}
-        keyExtractor={this.keyExtractor}
-        renderItem={this.renderChats}
-      /> 
+        <FlatList
+          data={this.state.chat}
+          extraData={this.state}
+          keyExtractor={this.keyExtractor}
+          renderItem={this.renderChats}
+        />
 
         {/* <ImageZoom cropWidth={Dimensions.get('window').width}
                        cropHeight={Dimensions.get('window').height}
@@ -137,8 +150,7 @@ export default class ChatScreen extends React.Component {
                 <Image style={{width:200, height:200}}
                        source={{uri:'http://v1.qzone.cc/avatar/201407/07/00/24/53b9782c444ca987.jpg!200x200.jpg'}}/>
             </ImageZoom> */}
-          </View>
-
+      </View>
     );
   }
 }
