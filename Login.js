@@ -111,6 +111,7 @@ export default class Login extends React.Component {
         {this.state.Online === false ? (
           <View style={styles.contentContainer}>
             <View style={styles.welcomeContainer}>
+            <View style={{paddingTop : "50%"}}>
               <Image
                 style={{ width: wp(40), height: hp(21) }}
                 source={{
@@ -118,6 +119,7 @@ export default class Login extends React.Component {
                     "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/logo.png?alt=media&token=3a5446d6-2998-46b5-8cef-7f1c1afda0d3"
                 }}
               />
+
               <Text>{"  "}</Text>
                   <Input
                     leftIcon={
@@ -133,6 +135,7 @@ export default class Login extends React.Component {
                     onChangeText={(email)=>this.setState({email})}
                     placeholderTextColor="#567D46"
                   />
+
                   <Text>{""}</Text>
                   <Input
                   leftIcon={
@@ -149,6 +152,7 @@ export default class Login extends React.Component {
                     secureTextEntry={true}
                     placeholderTextColor="#567D46"
                   />
+
                   <Text>{""}</Text>
                   <Text style={{ color: "red", fontWeight: 'bold',fontSize: wp('5%') }}>{this.state.error}</Text>
                   <Text>{""}</Text>
@@ -157,10 +161,11 @@ export default class Login extends React.Component {
                     <Text style={{color: "white",fontWeight: "bold" }}>LOGIN</Text> 
                   </TouchableOpacity>
                 </View>
-              </View>
+             
             ) : (
               <AppNavigator />
             )}
+
              </KeyboardAvoidingView>
         </ImageBackground>
       </View>
