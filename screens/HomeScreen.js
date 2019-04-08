@@ -40,9 +40,9 @@ export default class HomeScreen extends React.Component {
   state = {
     users: {},
     shifts: [],
-    // user: firebase.auth().currentUser.email,
+    user: firebase.auth().currentUser.email,
     zone: "",
-    user: "asma@asma.com",
+    // user: "asma@asma.com",
     switch1Value: false,
     isDialogVisible: false,
     tableHead: ['Sunday', 'Monday', 'Tuesday', 'Wednesday','Thursday', 'Friday', 'Saturday'],
