@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { WebBrowser } from "expo";
 
+
 import { MonoText } from '../components/StyledText';
 import firebase, { auth,FirebaseAuth } from 'firebase';
 import db from '../db.js';
@@ -57,6 +58,7 @@ export default class ChatScreen extends React.Component {
   keyExtractor = (item, index) => index;
 
   renderChats = ({ item }) => {
+
     console.log("the item : ",item)
       console.log("i'm getting inside")
     var rand = Math.floor(1 + (Math.random() * (100-1)));
@@ -69,8 +71,6 @@ export default class ChatScreen extends React.Component {
         }
            
         }
-
-
     for (i = 0; i < item.Members.length; i++) {
       console.log("the memeers ", item.Members[i]);
       if (item.Members[i] === firebase.auth().currentUser.email) {

@@ -4,32 +4,37 @@ import { AppLoading, Asset, Font, Icon } from "expo";
 import AppNavigator from "./navigation/AppNavigator";
 import Login from "./Login.js";
 import { Permissions } from "expo";
+import firebase, { firestore } from 'firebase';
 // import PushNotification from "react-native-push-notification";
 import { PushNotificationIOS } from "react-native";
 console.disableYellowBox = true;
 export default class App extends React.Component {
   state = {
-    isLoadingComplete: false
+    isLoadingComplete: false,
+    online: false,
+    // logged:false
   };
   async componentWillMount() {
     const prompt = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-    console.log("Camera roll permission 1: ", prompt);
+    // console.log("Camera roll permission 1: ", prompt);
     const result = await Permissions.getAsync(Permissions.CAMERA_ROLL);
-    console.log("Camera roll permission 2: ", result);
+    // console.log("Camera roll permission 2: ", result);
 
     const prompt1 = await Permissions.askAsync(Permissions.CAMERA);
-    console.log("Camera permission 1: ", prompt1);
+    // console.log("Camera permission 1: ", prompt1);
     const result2 = await Permissions.getAsync(Permissions.CAMERA);
-    console.log("Camera permission 2: ", result2);
+    // console.log("Camera permission 2: ", result2);
     const prompt2 = await Permissions.askAsync(Permissions.AUDIO_RECORDING);
-    console.log("Camera permission 1: ", prompt2);
+    // console.log("Camera permission 1: ", prompt2);
     const result3 = await Permissions.getAsync(Permissions.AUDIO_RECORDING);
+
     console.log("Camera permission 2: ", result3);
     const prompt3 = await Permissions.askAsync(Permissions.CONTACTS);
     console.log("Camera permission 1: ", prompt3);
     const result4 = await Permissions.getAsync(Permissions.CONTACTS);
     console.log("Camera permission 2: ", result4);
   }
+
 
   render() {
     if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
@@ -44,6 +49,7 @@ export default class App extends React.Component {
       return (
         <View style={styles.container}>
           {Platform.OS === "ios" && <StatusBar barStyle="default" />}
+          {/* {this.state.logged == true ? (<AppNavigator />): (<Login />)} */}
           {/* <AppNavigator /> */}
           <Login />
         </View>

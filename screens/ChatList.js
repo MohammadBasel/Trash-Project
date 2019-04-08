@@ -16,6 +16,7 @@ import {
   Dimensions,
   Animated,
   CameraRoll,
+
   TouchableWithoutFeedback ,
   Alert
 } from 'react-native';
@@ -35,7 +36,6 @@ import Dialog from "react-native-dialog";
 import ImageZoom from 'react-native-image-pan-zoom';
 import AntDesign from '@expo/vector-icons/AntDesign';
 const { width,height } = Dimensions.get('window');
-
 
 export default class ChatList extends React.Component {
   _handleVideoRef = component => {};
@@ -102,7 +102,6 @@ export default class ChatList extends React.Component {
     })
     
     console.log("Current messages after method: ", this.state.messages)
-
   }
 
   clickable = async () => {
@@ -310,6 +309,7 @@ export default class ChatList extends React.Component {
     console.log(result);
 
     if (!result.cancelled) {
+
       console.log("the result ui : ", result.uri)
       let lastdigits = String(result.uri.substring(result.uri.length-5))
       console.log("the last digits are : ", lastdigits)
@@ -321,7 +321,6 @@ export default class ChatList extends React.Component {
       console.log("the url : ", url)
       this.setState({text : url})
       this.clickable()
-
     }
   };
   saveImage = () => {
@@ -537,6 +536,7 @@ const isAvailable = await SMS.isAvailableAsync();
           <Dialog.Description>
             Do you want to save the picture to the gallery?
           </Dialog.Description>
+
           <Dialog.Button label="Cancel" onPress={this.changeVisible}/>
           <Dialog.Button label="Save" onPress={this.saveImage}/>
           <Dialog.Button label="share" onPress={this.shareImage}/>
@@ -548,6 +548,7 @@ const isAvailable = await SMS.isAvailableAsync();
           <Dialog.Description>
             Do you want to save the Video to the gallery?
           </Dialog.Description>
+
           <Dialog.Button label="Cancel" onPress={this.changeVisible1}/>
           <Dialog.Button label="Save" onPress={this.saveVideo}/>
           <Dialog.Button label="share" onPress={this.shareVideo}/>
