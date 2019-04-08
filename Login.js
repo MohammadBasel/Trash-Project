@@ -111,7 +111,7 @@ export default class Login extends React.Component {
         {this.state.Online === false ? (
           <View style={styles.contentContainer}>
             <View style={styles.welcomeContainer}>
-            <View style={{paddingTop : "50%"}}>
+            {/* <View style={{paddingTop : "50%"}}> */}
               <Image
                 style={{ width: wp(40), height: hp(21) }}
                 source={{
@@ -160,6 +160,7 @@ export default class Login extends React.Component {
                   <TouchableOpacity style={styles.buttonContainer} onPress={() => {this.login()}}>
                     <Text style={{color: "white",fontWeight: "bold" }}>LOGIN</Text> 
                   </TouchableOpacity>
+                </View>
                 </View>
              
             ) : (

@@ -16,7 +16,7 @@ import {
   Dimensions
 } from "react-native";
 import { WebBrowser } from "expo";
-import { Ionicons, FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, FontAwesome, MaterialIcons,AntDesign } from "@expo/vector-icons";
 import functions from "firebase/functions";
 import { MonoText } from "../components/StyledText";
 import firebase, { auth, FirebaseAuth } from "firebase";
@@ -245,9 +245,12 @@ export default class UsersList extends React.Component {
                   style={{ color: "black" }}
                   onPress={this.updateMembers}
                 >
-                  <Text style={{ color: "black", fontWeight: "bold" }}>
-                    updateMembers
-                  </Text>
+                    <AntDesign
+              name="checkcircleo"
+              size={25}
+              color="black"
+             
+            />
                 </TouchableOpacity>
               </View>
             </View>
