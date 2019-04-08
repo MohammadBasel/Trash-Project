@@ -146,14 +146,16 @@ export default class UsersList extends React.Component {
 
   renderUsers = ({ item }) => {
     const match = this.searchForMatch(item.id);
+    {console.log("the user id inside : ", item.id)}
     if (match) {
       return (
         <View>
           <ListItem
             // onPress= { this.addChat(item.id,item.Name)}
+            
             leftAvatar={{
               source: {
-                uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(item.Sender_Id)}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`,
+                uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(item.id)}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`,
                 activeOpacity: 0.9
               }
             }}

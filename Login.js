@@ -104,6 +104,7 @@ export default class Login extends React.Component {
         {this.state.Online === false ? (
           <View style={styles.contentContainer}>
             <View style={styles.welcomeContainer}>
+            <View style={{paddingTop : "50%"}}>
               <Image
                 style={{ width: 150, height: 150 }}
                 source={{
@@ -111,56 +112,59 @@ export default class Login extends React.Component {
                     "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/logo.png?alt=media&token=3a5446d6-2998-46b5-8cef-7f1c1afda0d3"
                 }}
               />
+              </View>
               {/* <TextInput
               autoCapitalize="none"
               placeholder="Name"
               onChangeText={name => this.setState({ name })}
               value={this.state.name}
             /> */}
-
+                  
+                  <View style={{paddingTop : "5%"}}>
                   <TextInput
-                    style={{
-                      paddingTop: 20,
-                      borderColor: "black",
-                      borderWidth: 2
-                    }}
+                    style={{backgroundColor : "white"}}
                     autoCapitalize="none"
-                    placeholder="Email"
+                    placeholder="Enter Your Email "
                     onChangeText={email => this.setState({ email })}
                     value={this.state.email}
                   />
-
+                  </View>
+                  <View style={{paddingTop : "5%"}}>
                   <TextInput
                     secureTextEntry={true}
                     style={{
-                      paddingTop: 20,
+                      
                       borderColor: "black",
-                      borderWidth: 2
+                      
+                      backgroundColor : "white"
                     }}
                     autoCapitalize="none"
-                    placeholder="Password"
+                    placeholder="Enter Your Password"
                     onChangeText={password => this.setState({ password })}
                     value={this.state.password}
                   />
+                  </View>
                   <Text style={{ color: "red" }}>{this.state.error}</Text>
-                  <TouchableOpacity
+                  {/* <TouchableOpacity
                     disabled={this.state.flag1 ? true : false}
                     onPress={this.login}
                     style={{ color: "lightblue" }}
                   >
-                    {/* <Text>Login</Text> */}
-                  </TouchableOpacity>
+                    <Text>Login</Text>
+                   </TouchableOpacity> */}
+                  
                   <Button
                     onPress={this.login}
                     title="Login"
                     style={{ width: 100, paddingTop: 50 }}
                   />
+                  </View>
                 </View>
-              </View>
+             
             ) : (
               <AppNavigator />
             )}
-          </View>
+          
         </ImageBackground>
       </View>
     );
