@@ -45,6 +45,7 @@ export default class Login extends React.Component {
   };
   image = require("./assets/images/park.jpg");
   count = 6;
+
   async componentDidMount(){
     // firebase.auth().onAuthStateChanged = (user) => {
     //   console.log("login page", user)
@@ -102,7 +103,7 @@ export default class Login extends React.Component {
     return (
       
       <View style={styles.container}>
-      <ImageBackground
+        <ImageBackground
           source={this.image}
           style={{ width: wp("100%"), height: hp("100%") }}
         >
