@@ -50,6 +50,10 @@ export default class ChatScreen extends React.Component {
     });
     console.log("Current chat after method: ", this.state.chat);
   }
+  avatarURL = (email) => {
+    console.log("the email : ", email)
+    return  email.replace("@","%40")
+  }
 
   keyExtractor = (item, index) => index;
 
@@ -64,6 +68,7 @@ export default class ChatScreen extends React.Component {
       console.log("the memeers " ,item.Members[i])
         if (item.Members[i] === firebase.auth().currentUser.email){
             check = true
+        }
            
         }
     for (i = 0; i < item.Members.length; i++) {
@@ -87,7 +92,7 @@ export default class ChatScreen extends React.Component {
             leftAvatar={{
               source: {
                 uri:
-                  "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2Favatar.png?alt=media&token=f45c29e5-2487-49e5-915b-dedc985c297d",
+                  `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(item.Sender_Id)}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`,
                 activeOpacity: 0.9
               }
             }}

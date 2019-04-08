@@ -159,6 +159,10 @@ export default class UsersList extends React.Component {
       this.props.navigation.navigate("Chat");
     };
   };
+  avatarURL = (email) => {
+    console.log("the email : ", email)
+    return  email.replace("@","%40")
+  }
 
   renderUsers = ({ item }) => {
     const match = this.searchForMatch(item.id);
@@ -169,7 +173,7 @@ export default class UsersList extends React.Component {
             // onPress= { this.addChat(item.id,item.Name)}
             leftAvatar={{
               source: {
-                uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2Favatar.png?alt=media&token=f45c29e5-2487-49e5-915b-dedc985c297d`,
+                uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(item.Sender_Id)}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`,
                 activeOpacity: 0.9
               }
             }}
