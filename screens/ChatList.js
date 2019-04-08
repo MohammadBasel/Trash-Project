@@ -18,6 +18,7 @@ import {
   CameraRoll,
 
   TouchableWithoutFeedback ,
+  Alert
 } from 'react-native';
 import { WebBrowser,FileSystem   } from 'expo';
 import ContactsWrapper from 'react-native-contacts-wrapper';
@@ -35,7 +36,6 @@ import Dialog from "react-native-dialog";
 import ImageZoom from 'react-native-image-pan-zoom';
 import AntDesign from '@expo/vector-icons/AntDesign';
 const { width,height } = Dimensions.get('window');
-
 
 export default class ChatList extends React.Component {
   _handleVideoRef = component => {};
@@ -128,6 +128,10 @@ export default class ChatList extends React.Component {
   callingMethod = () => {
     Linking.openURL(`tel:${parseInt(this.state.phoneNumber)}`);
   };
+  avatarURL = (email) => {
+    console.log("the email : ", email)
+    return  email.replace("@","%40")
+  }
   renderChats = ({ item }) => {
     const converting = String(item.Content);
     console.log("the content : ", converting);
@@ -149,7 +153,8 @@ export default class ChatList extends React.Component {
     <View>
     <ListItem
    
-    rightAvatar= {{ source: { uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2Favatar.png?alt=media&token=f45c29e5-2487-49e5-915b-dedc985c297d` ,activeOpacity:0.9 }}}
+    rightAvatar= {{ source: { uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(item.Sender_Id)}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`
+                                      ,activeOpacity:0.9 }}}
     title={"me"}
     titleStyle = {{textAlign : "right"}}
     subtitleStyle = { styles.Sender }
@@ -197,7 +202,7 @@ export default class ChatList extends React.Component {
     <View>
     <ListItem
    
-    leftAvatar={{  source: {uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2Favatar.png?alt=media&token=f45c29e5-2487-49e5-915b-dedc985c297d` ,activeOpacity:0.9 }}}
+    leftAvatar={{  source: {uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/${this.avatarURL(item.Sender_Id)}?alt=media&token=f45c29e5-2487-49e5-915b-dedc985c297d` ,activeOpacity:0.9 }}}
     title={name[0]}
     
     titleStyle = {{textAlign : "left"}}
@@ -407,6 +412,20 @@ const isAvailable = await SMS.isAvailableAsync();
       });
     // }
   };
+  
+  deleteChat = async (givenId) => {
+    const id = givenId
+
+    const deleteChat = firebase.functions().httpsCallable("deleteChat");
+
+      const result = await deleteChat({
+        id: id,
+        
+      });
+
+      this.props.navigation.navigate("Chat");
+    }
+  
 
   render() {
     const { goBack } = this.props.navigation;
@@ -427,11 +446,34 @@ const isAvailable = await SMS.isAvailableAsync();
             />
           }
           centerComponent={{ text: this.state.title, style: { color: "#fff" } }}
-          rightComponent={
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
-            >
+          rightComponent={ <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+
               <View>
+
+                <AntDesign
+                  // style={{ marginRight: 40 }}
+                  name="deleteusergroup"
+                  size={25}
+                  color="#fff"
+                  onPress={() =>
+                    Alert.alert(
+                      'Alert',
+                      'Are you sure you want to delete chat',
+                      [
+                        {
+                          text: 'Cancel',
+                          onPress: () => console.log('Cancel Pressed'),
+                          style: 'cancel',
+                        },
+                        {text: 'Yes', onPress: () => this.deleteChat(id)},
+                      ],
+                      {cancelable: false},
+                    )
+                  }
+                />
+              </View>
+              <View>
+
                 <AntDesign
                   style={{ marginRight: 40 }}
                   name="bars"
