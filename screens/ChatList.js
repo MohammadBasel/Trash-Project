@@ -36,31 +36,6 @@ import ImageZoom from 'react-native-image-pan-zoom';
 import AntDesign from '@expo/vector-icons/AntDesign';
 const { width,height } = Dimensions.get('window');
 
-import {
-  Header,
-  ListItem,
-  Badge,
-  Slider,
-  Divider,
-  Avatar,
-  Card,
-  Input,
-  Icon,
-  Overlay
-} from "react-native-elements";
-
-import { ImagePicker, Video, SMS } from "expo";
-// import Dialog, { DialogFooter,DialogButton,DialogTitle, DialogContent } from 'react-native-popup-dialog';
-import Dialog from "react-native-dialog";
-import { uploadImageAsync, uploadVideoAsync } from "../ImageUtils.js";
-
-import { ImagePicker, Video, SMS } from "expo";
-import VideoPlayer from "@expo/videoplayer";
-// import Dialog, { DialogFooter,DialogButton,DialogTitle, DialogContent } from 'react-native-popup-dialog';
-import Dialog from "react-native-dialog";
-import ImageZoom from "react-native-image-pan-zoom";
-import AntDesign from "@expo/vector-icons/AntDesign";
-const { width, height } = Dimensions.get("window");
 
 export default class ChatList extends React.Component {
   _handleVideoRef = component => {};

@@ -4,6 +4,7 @@ import { Header, ListItem, Divider, Badge, Avatar, Card, Button, Icon, CheckBox 
 import { ExpoLinksView } from '@expo/samples';
 import db from "../db.js"
 import firebase, { firestore } from 'firebase';
+import DialogInput from 'react-native-dialog-input';
 // import * as admin from "firebase-admin";
 
 import {Entypo} from "@expo/vector-icons";
@@ -30,7 +31,11 @@ export default class CreateZone extends React.Component {
       zoneUsers: [],
       latitude: "",
       longitude: "",
-      checked: []
+      checked: [],
+      value: "",
+      index: 0,
+      valueOf: "",
+      isDialogVisible: false
 
 
     }
@@ -63,6 +68,7 @@ export default class CreateZone extends React.Component {
 
     getZone = async () => {
       let zone = this.state.zone
+      if (zone != ""){
       console.log("updated zone", this.state.zone)
       let zoneobj = {}
       // await this.setState({email})
@@ -77,11 +83,28 @@ export default class CreateZone extends React.Component {
           this.userZone()
         })
       })
+    }else {
+      Alert.alert("Please select the zone first")
+    }
     }
     addCoordinate = async () => {
       let coordinates = [...this.state.coordinates]
       let GeoPoint = new admin.firestore.GeoPoint(lat = this.state.latitude, long = this.state.longitude)
       coordinates.push(GeoPoint)
+      await this.setState({coordinates}) 
+    }
+    showDialog = async (isShow, value, index, valueOf) => {
+      await this.setState({isDialogVisible: isShow, value, index, valueOf});
+      console.log("value of the thing", this.state.value)
+    }
+    editCoordinate = async (value) => {
+      let coordinates = [...this.state.coordinates]
+      let valueint = parseFloat(value)
+      if(this.state.valueOf == "_lat"){
+        coordinates[this.state.index]._lat = valueint
+      }else{
+        coordinates[this.state.index]._long = valueint
+      }
       await this.setState({coordinates}) 
     }
 
@@ -135,12 +158,21 @@ export default class CreateZone extends React.Component {
       console.log("the user after splice : ", users);
       await this.setState({ checked, zoneUsers: zoneUsers });
     };
+
+
     Updatesubmit = async () => {
-      // await db.collection("Zone").doc(this.state.zone).update({Coordinate: , Users: this.state.zoneUsers });
+      let coordinates = [...this.state.coordinates]
+      await db.collection("Zone").doc(this.state.zone).update({Coordinate: coordinates, Users: this.state.zoneUsers });
       Alert.alert("The Zone is Updated")
     }
     Createsubmit = async () => {
-      // await db.collection("Zone").add({Coordinate: , Users: this.state.zoneUsers });
+      let coordinates = [...this.state.coordinates]
+      if (coordinates.length < 3){
+        Alert.alert("There are " + coordinates.length + ". There should be atleast 3 coordinates to create a zone")
+      }else{
+        await db.collection("Zone").add({Coordinate: coordinates , Users: this.state.zoneUsers });
+      }
+      
       Alert.alert("The Zone is Created")
     }
     
@@ -161,16 +193,8 @@ export default class CreateZone extends React.Component {
                     color="blue"
                   />
                 </View>
-                <Text style={{fontWeight: 'bold', fontSize: 20}}>Enter the Zone:</Text>
                   {this.state.button == false ? (
                     <View>
-                      <TextInput
-                      style={{ paddingTop: 20 }}
-                      autoCapitalize="none"
-                      placeholder="Enter the Zone"
-                      onChangeText={zone => this.setState({ zone })}
-                      value={this.state.zone}
-                    />
                     <Text style={{fontWeight: 'bold', fontSize: 20}}>Enter the Latitude:</Text>
                     <TextInput
                       style={{ paddingTop: 20 }}
@@ -186,11 +210,6 @@ export default class CreateZone extends React.Component {
                       placeholder="Enter the Longitude"
                       onChangeText={zone => this.setState({ longitude })}
                       value={this.state.longitude}
-                    />
-                    <Button
-                      onPress={() => {this.addCoordinate()}}
-                      title="Add Coordinate"
-                      color="blue"
                     />
                   </View>
                 ):
@@ -228,22 +247,22 @@ export default class CreateZone extends React.Component {
                             value={coordinate._lat.toString()}
                             // onChangeText={zone => this.setState({ zone })}
                           />
+                          <Text style={{color: "blue", textDecorationLine: 'underline', paddingTop: 23, paddingRight: 10}} onPress={()=>{this.showDialog(true, coordinate._lat.toString(), coordinate, "_lat")}}>Edit</Text>
                           <TextInput
                             style={{ paddingTop: 20 }}
                             autoCapitalize="none"
                             placeholder="Enter the Longitude"
                             value={coordinate._long.toString()}
                           />
+                          <Text style={{color: "blue", textDecorationLine: 'underline', paddingTop: 23, paddingRight: 10}} onPress={()=>{this.showDialog(true, coordinate, "_long")}}>Edit</Text>
                           <Button
                             onPress={() => {this.editCoordinate()}}
-                            title="Edit"
+                            title="Add"
                             color="blue"
                           />
                         </View>
                       </View>
                     )}
-                  
-                  {/* </View> */}
                 </View>
                 
                 <Text style={{fontWeight: 'bold', fontSize: 20}}>Choose the Users:</Text>
@@ -258,6 +277,26 @@ export default class CreateZone extends React.Component {
                       />
                     )}
                   </View>
+                  {this.state.button == false ? (
+                    <Button
+                    onPress={() => {this.Createsubmit()}}
+                    title="SUBMIT"
+                    color="blue"
+                  />
+                  ):(
+                    <Button
+                    onPress={() => {this.Updatesubmit()}}
+                    title="SUBMIT"
+                    color="blue"
+                  />
+                  )}
+                  <DialogInput isDialogVisible={this.state.isDialogVisible}
+                    title={"Add the Value"}
+                    message={"Enter the Value"}
+                    hintInput ={"Input Value"}
+                    submitInput={ (value) => {this.editCoordinate(value)} }
+                    closeDialog={ () => {this.showDialog(false)}}>
+                  </DialogInput>
               </View>
 
             </ScrollView>

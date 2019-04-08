@@ -11,7 +11,8 @@ import {
   View,
   Dimensions,
   AsyncStorage,
-  ImageBackground
+  ImageBackground,
+  KeyboardAvoidingView
 } from "react-native";
 import HomeScreen from "./navigation/MainTabNavigator";
 import AppNavigator from "./navigation/AppNavigator";
@@ -19,6 +20,9 @@ import { MonoText } from "./components/StyledText";
 import { WebBrowser } from "expo";
 import firebase from "firebase";
 import db from "./db";
+import { Input } from "react-native-elements"
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import {AntDesign} from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -42,14 +46,14 @@ export default class Login extends React.Component {
   image = require("./assets/images/park.jpg");
   count = 6;
   async componentDidMount(){
-    firebase.auth().onAuthStateChanged = (user) => {
-      console.log("login page", user)
-      if (user) {
-        this.setState({Online: true})
-      } else {
-        this.setState({Online: false})
-      }
-    }
+    // firebase.auth().onAuthStateChanged = (user) => {
+    //   console.log("login page", user)
+    //   if (user) {
+    //     this.setState({Online: true})
+    //   } else {
+    //     this.setState({Online: false})
+    //   }
+    // }
     await db.collection("Users")
     .onSnapshot(querySnapshot => {
       querySnapshot.forEach(doc => {   
@@ -96,73 +100,70 @@ export default class Login extends React.Component {
       console.log("the Online", this.state.Online);
     }
     return (
+      
       <View style={styles.container}>
       <ImageBackground
           source={this.image}
-          style={{ width: "100%", height: "100%" }}
+          style={{ width: wp("100%"), height: hp("100%") }}
         >
+        <KeyboardAvoidingView style={styles.container} behavior="padding" >
         {this.state.Online === false ? (
           <View style={styles.contentContainer}>
             <View style={styles.welcomeContainer}>
               <Image
-                style={{ width: 150, height: 150 }}
+                style={{ width: wp(40), height: hp(21) }}
                 source={{
                   uri:
                     "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/logo.png?alt=media&token=3a5446d6-2998-46b5-8cef-7f1c1afda0d3"
                 }}
               />
-              {/* <TextInput
-              autoCapitalize="none"
-              placeholder="Name"
-              onChangeText={name => this.setState({ name })}
-              value={this.state.name}
-            /> */}
-
-                  <TextInput
-                    style={{
-                      paddingTop: 20,
-                      borderColor: "black",
-                      borderWidth: 2
-                    }}
-                    autoCapitalize="none"
-                    placeholder="Email"
-                    onChangeText={email => this.setState({ email })}
+              <Text>{"  "}</Text>
+                  <Input
+                    leftIcon={
+                      <AntDesign
+                        name='user'
+                        size={20}
+                        color='#567D46'
+                      />
+                    }
+                    containerStyle={styles.Input}
+                    placeholder='Email'
                     value={this.state.email}
+                    onChangeText={(email)=>this.setState({email})}
+                    placeholderTextColor="#567D46"
                   />
-
-                  <TextInput
-                    secureTextEntry={true}
-                    style={{
-                      paddingTop: 20,
-                      borderColor: "black",
-                      borderWidth: 2
-                    }}
-                    autoCapitalize="none"
-                    placeholder="Password"
-                    onChangeText={password => this.setState({ password })}
+                  <Text>{""}</Text>
+                  <Input
+                  leftIcon={
+                    <AntDesign
+                      name='lock'
+                      size={20}
+                      color='#567D46'
+                    />
+                  } 
+                    placeholder='password'
+                    containerStyle={styles.Input}
+                    onChangeText={(password)=>this.setState({password})}
                     value={this.state.password}
+                    secureTextEntry={true}
+                    placeholderTextColor="#567D46"
                   />
-                  <Text style={{ color: "red" }}>{this.state.error}</Text>
-                  <TouchableOpacity
-                    disabled={this.state.flag1 ? true : false}
-                    onPress={this.login}
-                    style={{ color: "lightblue" }}
-                  >
-                    {/* <Text>Login</Text> */}
+                  <Text>{""}</Text>
+                  <Text style={{ color: "red", fontWeight: 'bold',fontSize: wp('5%') }}>{this.state.error}</Text>
+                  <Text>{""}</Text>
+                  
+                  <TouchableOpacity style={styles.buttonContainer} onPress={() => {this.login()}}>
+                    <Text style={{color: "white",fontWeight: "bold" }}>LOGIN</Text> 
                   </TouchableOpacity>
-                  <Button
-                    onPress={this.login}
-                    title="Login"
-                    style={{ width: 100, paddingTop: 50 }}
-                  />
                 </View>
               </View>
             ) : (
               <AppNavigator />
             )}
-          </View>
+             </KeyboardAvoidingView>
         </ImageBackground>
       </View>
+     
     );
   }
 
@@ -209,6 +210,24 @@ const styles = StyleSheet.create({
     //alignItems: "center"
     justifyContent: "center"
   },
+  Input: { 
+    backgroundColor: '#fff',
+    width:wp("80%"),
+    borderWidth:1,
+    borderColor:"black",
+    borderRadius:15
+  },
+  buttonContainer: {
+    // marginTop:hp(3),
+    height:hp(5),
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    // marginBottom:hp(3),
+    width:wp(30),
+    borderRadius:30,
+    backgroundColor: "blue",
+  },
   developmentModeText: {
     marginBottom: 20,
     color: "rgba(0,0,0,0.4)",
@@ -217,19 +236,19 @@ const styles = StyleSheet.create({
     textAlign: "center"
   },
   contentContainer: {
-    paddingTop: 30
+    paddingTop: hp("20%")
   },
   welcomeContainer: {
     alignItems: "center",
-    marginTop: 10,
-    marginBottom: 20
+    marginTop: hp(10),
+    marginBottom: hp(20)
   },
   welcomeImage: {
-    width: 100,
-    height: 80,
+    width: wp(100),
+    height: hp(80),
     resizeMode: "contain",
-    marginTop: 3,
-    marginLeft: -10
+    marginTop: hp(3),
+    marginLeft: wp(-10)
   },
   getStartedContainer: {
     alignItems: "center",
