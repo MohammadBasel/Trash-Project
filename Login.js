@@ -20,9 +20,12 @@ import { MonoText } from "./components/StyledText";
 import { WebBrowser } from "expo";
 import firebase from "firebase";
 import db from "./db";
-import { Input } from "react-native-elements"
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
-import {AntDesign} from "@expo/vector-icons";
+import { Input } from "react-native-elements";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp
+} from "react-native-responsive-screen";
+import { AntDesign } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -46,7 +49,7 @@ export default class Login extends React.Component {
   image = require("./assets/images/park.jpg");
   count = 6;
 
-  async componentDidMount(){
+  async componentDidMount() {
     // firebase.auth().onAuthStateChanged = (user) => {
     //   console.log("login page", user)
     //   if (user) {
@@ -55,17 +58,16 @@ export default class Login extends React.Component {
     //     this.setState({Online: false})
     //   }
     // }
-    await db.collection("Users")
-    .onSnapshot(querySnapshot => {
-      querySnapshot.forEach(doc => {   
-         if (firebase.auth().currentUser == null){
-            this.setState({Online: false})
-           console.log("Online", this.state.Online)
-       }else{
-          this.setState({Online: true})
-       }
-      })
-    })
+    await db.collection("Users").onSnapshot(querySnapshot => {
+      querySnapshot.forEach(doc => {
+        if (firebase.auth().currentUser == null) {
+          this.setState({ Online: false });
+          console.log("Online", this.state.Online);
+        } else {
+          this.setState({ Online: true });
+        }
+      });
+    });
   }
   login = async () => {
     this.count = this.count + 1;
@@ -101,75 +103,78 @@ export default class Login extends React.Component {
       console.log("the Online", this.state.Online);
     }
     return (
-      
       <View style={styles.container}>
         <ImageBackground
           source={this.image}
           style={{ width: wp("100%"), height: hp("100%") }}
         >
-        <KeyboardAvoidingView style={styles.container} behavior="padding" >
-        {this.state.Online === false ? (
-          <View style={styles.contentContainer}>
-            <View style={styles.welcomeContainer}>
-            <View style={{paddingTop : "50%"}}>
-              <Image
-                style={{ width: wp(40), height: hp(21) }}
-                source={{
-                  uri:
-                    "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/logo.png?alt=media&token=3a5446d6-2998-46b5-8cef-7f1c1afda0d3"
-                }}
-              />
+          <KeyboardAvoidingView style={styles.container} behavior="padding">
+            {this.state.Online === false ? (
+              <View style={styles.contentContainer}>
+                <View style={styles.welcomeContainer}>
+                  <Image
+                    style={{ width: wp(40), height: hp(21) }}
+                    source={{
+                      uri:
+                        "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/logo.png?alt=media&token=3a5446d6-2998-46b5-8cef-7f1c1afda0d3"
+                    }}
+                  />
 
-              <Text>{"  "}</Text>
+                  <Text>{"  "}</Text>
                   <Input
                     leftIcon={
-                      <AntDesign
-                        name='user'
-                        size={20}
-                        color='#567D46'
-                      />
+                      <AntDesign name="user" size={20} color="#567D46" />
                     }
                     containerStyle={styles.Input}
-                    placeholder='Email'
+                    placeholder="Email"
                     value={this.state.email}
-                    onChangeText={(email)=>this.setState({email})}
+                    onChangeText={email => this.setState({ email })}
                     placeholderTextColor="#567D46"
                   />
 
                   <Text>{""}</Text>
                   <Input
-                  leftIcon={
-                    <AntDesign
-                      name='lock'
-                      size={20}
-                      color='#567D46'
-                    />
-                  } 
-                    placeholder='password'
+                    leftIcon={
+                      <AntDesign name="lock" size={20} color="#567D46" />
+                    }
+                    placeholder="password"
                     containerStyle={styles.Input}
-                    onChangeText={(password)=>this.setState({password})}
+                    onChangeText={password => this.setState({ password })}
                     value={this.state.password}
                     secureTextEntry={true}
                     placeholderTextColor="#567D46"
                   />
 
                   <Text>{""}</Text>
-                  <Text style={{ color: "red", fontWeight: 'bold',fontSize: wp('5%') }}>{this.state.error}</Text>
+                  <Text
+                    style={{
+                      color: "red",
+                      fontWeight: "bold",
+                      fontSize: wp("5%")
+                    }}
+                  >
+                    {this.state.error}
+                  </Text>
                   <Text>{""}</Text>
-                  
-                  <TouchableOpacity style={styles.buttonContainer} onPress={() => {this.login()}}>
-                    <Text style={{color: "white",fontWeight: "bold" }}>LOGIN</Text> 
+
+                  <TouchableOpacity
+                    style={styles.buttonContainer}
+                    onPress={() => {
+                      this.login();
+                    }}
+                  >
+                    <Text style={{ color: "white", fontWeight: "bold" }}>
+                      LOGIN
+                    </Text>
                   </TouchableOpacity>
                 </View>
-             
+              </View>
             ) : (
               <AppNavigator />
             )}
-
-             </KeyboardAvoidingView>
+          </KeyboardAvoidingView>
         </ImageBackground>
       </View>
-     
     );
   }
 
@@ -216,23 +221,23 @@ const styles = StyleSheet.create({
     //alignItems: "center"
     justifyContent: "center"
   },
-  Input: { 
-    backgroundColor: '#fff',
-    width:wp("80%"),
-    borderWidth:1,
-    borderColor:"black",
-    borderRadius:15
+  Input: {
+    backgroundColor: "#fff",
+    width: wp("80%"),
+    borderWidth: 1,
+    borderColor: "black",
+    borderRadius: 15
   },
   buttonContainer: {
     // marginTop:hp(3),
-    height:hp(5),
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: hp(5),
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     // marginBottom:hp(3),
-    width:wp(30),
-    borderRadius:30,
-    backgroundColor: "blue",
+    width: wp(30),
+    borderRadius: 30,
+    backgroundColor: "blue"
   },
   developmentModeText: {
     marginBottom: 20,

@@ -29,7 +29,7 @@ import {
 } from "react-native-elements";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import SwitchToggle from "react-native-switch-toggle";
-const { width, height } = Dimensions.get("window");
+const { width, height, fontScale } = Dimensions.get("window");
 
 export default class PointsScreen extends React.Component {
   static navigationOptions = {
@@ -155,7 +155,7 @@ export default class PointsScreen extends React.Component {
       this.setState({ users: changes });
     }
   };
-
+  fontSize = 13;
   render() {
     console.log("USERS", this.state.users);
     return (
@@ -180,14 +180,17 @@ export default class PointsScreen extends React.Component {
                 onPress={this.saveChange}
                 title="Save changes"
                 type="clear"
-                titleStyle={{ color: "white" }}
+                titleStyle={{
+                  color: "white",
+                  fontSize: this.fontSize / fontScale
+                }}
                 containerStyle={{ width: 100 }}
               />
             )
           }
         />
 
-        <Switch onValueChange={this.turnOn} value={this.state.switch} />
+        {/* <Switch onValueChange={this.turnOn} value={this.state.switch} /> */}
         <FlatList
           data={this.state.users}
           keyExtractor={item => item.id}
@@ -197,6 +200,25 @@ export default class PointsScreen extends React.Component {
             //console.log("items", item);
           }
         />
+        <TouchableOpacity
+          onPress={this.turnOn}
+          style={{
+            backgroundColor: "#7a66ff",
+            opacity: 1,
+            borderRadius: 10,
+            border: "1px solid #7a66ff",
+            //  padding: "15%",
+            width: width * 0.2,
+            height: height * 0.06,
+            alignItems: "center",
+            justifyContent: "center"
+            // position: "absolute",
+            // top: height * 0.87,
+            // left: width * 0.4
+          }}
+        >
+          <Text>{!this.state.switch ? "Start Edit" : "Stop Edit"}</Text>
+        </TouchableOpacity>
       </View>
     );
   }
