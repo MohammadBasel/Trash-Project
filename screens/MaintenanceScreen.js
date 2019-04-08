@@ -9,13 +9,14 @@ export default class MaintenanceScreen extends React.Component {
     static navigationOptions = {
         title: 'Maintenance Dashboard',
         headerTintColor: 'white',
-        headerStyle: { backgroundColor: 'blue', borderWidth: 1, borderBottomColor: 'white' },
+        headerStyle: { backgroundColor: '#7a66ff', borderWidth: 1, borderBottomColor: 'white' },
         headerTitleStyle: { color: 'white' }
     };
     state = {
         zones: []
     }
     componentDidMount() {
+        
         // await this.getdata()
         db.collection("Zone")
         .onSnapshot(querySnapshot => {
@@ -43,8 +44,6 @@ export default class MaintenanceScreen extends React.Component {
                                 this.setState({zones})
                                 console.log("if wala last")
                             });
-                            // zones.push({id: zoneId, trashs})
-                            // this.setState({zones})
                         }
                     }
                     
@@ -162,6 +161,7 @@ export default class MaintenanceScreen extends React.Component {
     }
 
     render() {
+        console.log("final msaiuvbhfg",this.state)
         return (
             <ScrollView style={styles.container}>
                 <View>

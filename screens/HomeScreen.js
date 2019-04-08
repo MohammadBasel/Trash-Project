@@ -18,6 +18,7 @@ import {
   Foundation
 } from "@expo/vector-icons";
 import { Header, Slider, Card, Avatar, Divider } from "react-native-elements"
+import { Table, Row, Rows } from 'react-native-table-component';
 
 import { WebBrowser, ImagePicker } from 'expo';
 import { uploadImageAsync, uploadVideoAsync } from "../ImageUtils.js";
@@ -45,15 +46,14 @@ export default class HomeScreen extends React.Component {
     // user: "asma@asma.com",
     switch1Value: false,
     isDialogVisible: false,
-    tableHead: ['Sunday', 'Monday', 'Tuesday', 'Wednesday','Thursday', 'Friday', 'Saturday'],
-    tableData: [
- 
-    ]
+    tableHead: ['Shifts', 'Sunday', 'Monday', 'Tuesday', 'Wednesday','Thursday', 'Friday', 'Saturday'],
+    tableData: [['Morning Shift'],['Evening Shift']]
   }
   users = {}
 
 async componentDidMount() {
  await this.getData()  
+ await this.createCalandar()
 }
 
 getData = async () => {
@@ -111,7 +111,6 @@ pickImage = async () => {
 
 
 avatarURL = (email) => {
-  console.log("the email : ", email)
   return email.replace("@", "%40")
 }
 toggleSwitch1 = (value) => {
@@ -153,8 +152,34 @@ emergency = () => {
 
   Alert.alert("The Emergency Call is made")
 }
-createCalandar = () =>{
-    
+createCalandar = async () =>{
+    let header = [...this.state.tableHead]
+    let shifts = [...this.state.shifts]
+    let tableData = [...this.state.tableData]
+    for (let i = 0; i < header.length; i++){
+      for(let j = 0; j < shifts.length; j++){
+        if(header[i] == shifts[j].Day){
+          if(shifts[j].Start_Time.includes("am")){
+            if(shifts[j].Users.contains(this.state.user)){
+              let time = shifts[j].Start_Time + " - " + shifts[j].End_Time
+              tableData[0].push(time)
+            }else{
+              let time = "Off Shift"
+              tableData[0].push(time)
+            }
+          }else if (shifts[j].Start_Time.includes("pm")){
+            if(shifts[j].Users.contains(this.state.user)){
+              let time = shifts[j].Start_Time + " - " + shifts[j].End_Time
+              tableData[1].push(time)
+            }else {
+              let time = "Off Shift"
+              tableData[1].push(time)
+            }
+          }
+        }
+      }
+    }
+    this.setState(tableData)
   }
 
 
@@ -189,6 +214,10 @@ createCalandar = () =>{
                 <Text style={styles.info}>Points earn: {this.state.users.Points}</Text>
               </View> 
               <View>
+              <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
+                <Row data={state.tableHead} style={styles.head} textStyle={styles.text}/>
+                <Rows data={state.tableData} textStyle={styles.text}/>
+              </Table>
 
               </View>
               <View style={styles.bodyContent}>
@@ -200,10 +229,10 @@ createCalandar = () =>{
                     <Text style={{color: "white"}}>EMERGENCY</Text> 
                   </TouchableOpacity>
                 )}
-                <View style = {{paddingLeft: '12%',paddingTop:"5%" ,alignSelf: 'center',width: wp('50%')}}>
-                <TouchableOpacity onPress={()=>{this.showDialog(true)}}>
-                  <Text style={{color: 'blue', textDecorationLine: 'underline'}}>Change Password</Text>
-                </TouchableOpacity>
+                <View style = {{paddingLeft: '15%',paddingTop:"5%" ,alignSelf: 'center',width: wp('50%')}}>
+                  <TouchableOpacity onPress={()=>{this.showDialog(true)}}>
+                    <Text style={{color: 'blue', textDecorationLine: 'underline'}}>Change Password</Text>
+                  </TouchableOpacity>
                 </View>
                 <DialogInput isDialogVisible={this.state.isDialogVisible}
                   title={"Change Passowrd"}
@@ -234,6 +263,8 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: 'cover', // or 'stretch'
   },
+  head: { height: 40, backgroundColor: '#f1f8ff' },
+  text: { margin: 6 },
 
   avatar: {
     width: 130,

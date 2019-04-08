@@ -10,7 +10,7 @@ export default class Battery extends React.Component {
     static navigationOptions = {
         title: 'Battery',
         headerTintColor: 'white',
-        headerStyle: { backgroundColor: 'blue', borderWidth: 1, borderBottomColor: 'white' },
+        headerStyle: { backgroundColor: '#7a66ff', borderWidth: 1, borderBottomColor: 'white' },
         headerTitleStyle: { color: 'white' }
     };
     state = {
@@ -21,24 +21,28 @@ export default class Battery extends React.Component {
     // zones = []
     
     async componentDidMount() {
+        console.log("final 1",this.state)
+
         await this.getZoneData()
-        
+        console.log("final 2",this.state)
+
     }
     getZoneData = async () => {
         db.collection("Zone")
             .onSnapshot(querySnapshot => {
                 let zones = []
                 let zoneId = 0
-                querySnapshot.forEach(doc => {db.collection(`Zone/${doc.id}/Trash`).onSnapshot(querySnapshot => {
-                  let trashs = []
-                  zoneId = doc.id
-                    querySnapshot.forEach(doc => {                    
+                querySnapshot.forEach(doc => {
+                    let trashs = []
+                    db.collection(`Zone/${doc.id}/Trash`).onSnapshot(querySnapshot => {
+                    zoneId = doc.id
+                    querySnapshot.forEach(doc => {
                         trashs.push({ id: doc.id, ...doc.data() })
-                    });
-                    zones.push({id: zoneId, trashs})
-                    this.setState({zones})
-                })   
+                    });  
+                    }) 
+                    zones.push({id: zoneId, trashs})  
                 });
+                this.setState({zones})
             })
     }
 
@@ -67,18 +71,19 @@ export default class Battery extends React.Component {
 
     }
     render() {
-        // // console.log("zone length : ", this.state.zones.length)
-        // // console.log("zone id1 : ", this.state.zones[0])
-        // // console.log("zone id last : ", this.state.zones[this.state.zones.length -1])
-        // console.log("final",this.state)
-        // console.log("final this",this.trash)
+        // console.log("zone length : ", this.state.zones.length)
+        // console.log("zone id1 : ", this.state.zones[0])
+        // console.log("zone id last : ", this.state.zones[this.state.zones.length -1])
+        console.log("final this",this.state.trash)
         return (
             <ScrollView style={styles.container}>
+             {console.log("zones is", this.state.zones)}
             <View >
                  {
                     this.state.zones.map((item, i) => ( 
                       item.trashs.map((trash, j) => (
-                        trash.Battery < 30 && (       
+                        trash.Battery < 30 && (
+                                   
                             <ListItem
                                 key={j}
                                 title={`Battery Level: ${trash.Battery} Low`}
@@ -87,6 +92,7 @@ export default class Battery extends React.Component {
                                 rightElement={<Text onPress={() => this.Update(trash.id, "fix")} style={{color: "blue"}}>Fix</Text>}
                                 
                             />
+                           
                         )
                     ))
                   ))

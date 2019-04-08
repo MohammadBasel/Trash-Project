@@ -10,7 +10,7 @@ export default class Trash extends React.Component {
     static navigationOptions = {
         title: 'Damaged Trash',
         headerTintColor: 'white',
-        headerStyle: { backgroundColor: 'blue', borderWidth: 1, borderBottomColor: 'white' },
+        headerStyle: { backgroundColor: '#7a66ff', borderWidth: 1, borderBottomColor: 'white' },
         headerTitleStyle: { color: 'white' }
     };
     state = {

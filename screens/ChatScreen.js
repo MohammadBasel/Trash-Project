@@ -110,7 +110,6 @@ export default class ChatScreen extends React.Component {
       );
     }
   };
-}
   _renderItem = ({ item }) => (
     <ListItem
       id={item.id}

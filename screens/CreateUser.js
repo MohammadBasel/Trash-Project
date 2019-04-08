@@ -14,9 +14,9 @@ import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-nativ
 
 export default class CreateUser extends React.Component {
     static navigationOptions = {
-        title: 'Admin Dashboard',
+        title: 'Create User',
         headerTintColor: 'white',
-        headerStyle: { backgroundColor: 'blue', borderWidth: 1, borderBottomColor: 'white' },
+        headerStyle: { backgroundColor: '#7a66ff', borderWidth: 1, borderBottomColor: 'white' },
         headerTitleStyle: { color: 'white' }
     };
     state = {
@@ -130,18 +130,15 @@ export default class CreateUser extends React.Component {
     render() {
         return (
             <ScrollView style={styles.container}>
-              <View style={{alignItems: 'center', justifyContent: "center", borderWidth: 0.5}}>
-              <View style= {{flexDirection: "row"}}>
-                <Button
-                    onPress={() => {this.onCreatebuttonChange()}}
-                    title="Create User"
-                    color="blue"
-                  />
-                  <Button
-                    onPress={() => {this.onUpdatebuttonChange()}}
-                    title="Update User"
-                    color="blue"
-                  />
+              <View style={{alignItems: 'center', justifyContent: "center", alignItems: "center"}}>
+              <View style= {{flexDirection: "row", justifyContent: 'space-between', flexWrap: "wrap", alignItems: "center"}}>
+
+                  <TouchableOpacity style={styles.buttonContainer} onPress={() => {this.onCreatebuttonChange()}}>
+                    <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>Create User</Text> 
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.buttonContainer} onPress={() => {this.onUpdatebuttonChange()}}>
+                    <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%") }}>Update User</Text> 
+                  </TouchableOpacity>
                 </View>
                   <Text style={{fontWeight: 'bold', fontSize: 20}}>Enter the Email:</Text>
                   {this.state.button == false ? (
@@ -223,19 +220,14 @@ export default class CreateUser extends React.Component {
                 </Picker>
                 <Text style={{ color: "red" }}>{this.state.error}</Text>
                 {this.state.button == false ? (
-                    <Button
-                    onPress={() => {this.createUser()}}
-                    title="SUBMIT"
-                    color="red"
-                    accessibilityLabel="SUBMIT"
-                    />
+                  <TouchableOpacity style={styles.buttonContainer}  onPress={() => {this.createUser()}}>
+                    <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>SUBMIT</Text> 
+                  </TouchableOpacity>
+                    
                 ) : (
-                  <Button
-                  onPress={() => {this.updateUser()}}
-                  title="SUBMIT"
-                  color="red"
-                  accessibilityLabel="SUBMIT"
-                />
+                  <TouchableOpacity style={styles.buttonContainer}  onPress={() => {this.updateUser()}}>
+                    <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>SUBMIT</Text> 
+                  </TouchableOpacity>
                 )}
                  
               </View>
@@ -250,6 +242,18 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop: 15,
         backgroundColor: '#fff',
+    },
+    buttonContainer: {
+      // marginTop:hp(3),
+      height:hp("5%"),
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      // marginBottom:hp(3),
+      width:wp("15%"),
+      borderRadius:10,
+      backgroundColor: "#7a66ff",
+      padding: wp("3%")
     },
 });
 
