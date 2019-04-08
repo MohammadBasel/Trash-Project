@@ -74,6 +74,7 @@ export default class PointsScreen extends React.Component {
     else this.setState({ switch: false });
   };
   avatarURL = email => {
+    console.log("EMAIL", email);
     return email.replace("@", "%40");
   };
   list = item => {
@@ -92,9 +93,9 @@ export default class PointsScreen extends React.Component {
                 size="small"
                 rounded
                 source={{
-                  uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/${this.avatarURL(
+                  uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(
                     item.id
-                  )}%2Favatar.png?alt=media`
+                  )}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`
                 }}
               />
             }
@@ -139,6 +140,7 @@ export default class PointsScreen extends React.Component {
         .doc(this.state.users[i].id)
         .update({ Points: this.state.users[i].Points });
     }
+    this.setState({ switch: false });
     // );
   };
   getValue = (value, id) => {

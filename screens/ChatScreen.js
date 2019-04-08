@@ -14,14 +14,19 @@ import {
 } from "react-native";
 import { WebBrowser } from "expo";
 
-
-import { MonoText } from '../components/StyledText';
-import firebase, { auth,FirebaseAuth } from 'firebase';
-import db from '../db.js';
-import { Header,ListItem,Badge,Slider,Divider ,Avatar } from 'react-native-elements';
-import { Ionicons,FontAwesome,MaterialIcons } from '@expo/vector-icons';
-import ImageZoom from 'react-native-image-pan-zoom';
-
+import { MonoText } from "../components/StyledText";
+import firebase, { auth, FirebaseAuth } from "firebase";
+import db from "../db.js";
+import {
+  Header,
+  ListItem,
+  Badge,
+  Slider,
+  Divider,
+  Avatar
+} from "react-native-elements";
+import { Ionicons, FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import ImageZoom from "react-native-image-pan-zoom";
 
 export default class ChatScreen extends React.Component {
   static navigationOptions = {
@@ -56,9 +61,14 @@ export default class ChatScreen extends React.Component {
     return  email.replace("@","%40")
   }
 
+
   keyExtractor = (item, index) => index;
 
   renderChats = ({ item }) => {
+    console.log("the item : ", item);
+    console.log("i'm getting inside");
+    var rand = Math.floor(1 + Math.random() * (100 - 1));
+    check = false;
 
     console.log("the item : ",item)
       console.log("i'm getting inside")
@@ -73,6 +83,7 @@ export default class ChatScreen extends React.Component {
         }
            
         }
+
     for (i = 0; i < item.Members.length; i++) {
       console.log("the memeers ", item.Members[i]);
       if (item.Members[i] === firebase.auth().currentUser.email) {
@@ -135,6 +146,7 @@ export default class ChatScreen extends React.Component {
                 uri:
                 
                   `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(item.Title)}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`,
+
                 activeOpacity: 0.9
               }
             }}
@@ -149,6 +161,7 @@ export default class ChatScreen extends React.Component {
     }
   }
   };
+}
   _renderItem = ({ item }) => (
     <ListItem
       id={item.id}

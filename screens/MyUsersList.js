@@ -101,10 +101,10 @@ export default class UsersList extends React.Component {
     console.log("Current chat after method: ", this.state.users);
     console.log("the checked : ", this.state.checked);
   }
-  avatarURL = (email) => {
-    console.log("the email : ", email)
-    return  email.replace("@","%40")
-  }
+  avatarURL = email => {
+    console.log("the email : ", email);
+    return email.replace("@", "%40");
+  };
 
   updateMembers = async () => {
     ///sssss
@@ -156,6 +156,7 @@ export default class UsersList extends React.Component {
             leftAvatar={{
               source: {
                 uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(item.id)}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`,
+
                 activeOpacity: 0.9
               }
             }}
