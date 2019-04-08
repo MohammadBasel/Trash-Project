@@ -55,12 +55,10 @@ export default class ChatScreen extends React.Component {
     });
     console.log("Current chat after method: ", this.state.chat);
   }
-  avatarURL = (email) => {
-
-    console.log("the email : ", email)
-    return  email.replace("@","%40")
-  }
-
+  avatarURL = email => {
+    console.log("the email : ", email);
+    return email.replace("@", "%40");
+  };
 
   keyExtractor = (item, index) => index;
 
@@ -70,36 +68,35 @@ export default class ChatScreen extends React.Component {
     var rand = Math.floor(1 + Math.random() * (100 - 1));
     check = false;
 
-    console.log("the item : ",item)
-      console.log("i'm getting inside")
-    var rand = Math.floor(1 + (Math.random() * (100-1)));
-    check = false
-    length = false
-    
-    for (i=0; item.Members !== undefined && i<item.Members.length;i++){
-      console.log("the memeers " ,item.Members[i])
-        if (item.Members[i] === firebase.auth().currentUser.email){
-            check = true
-        }
-           
-        }
+    console.log("the item : ", item);
+    console.log("i'm getting inside");
+    var rand = Math.floor(1 + Math.random() * (100 - 1));
+    check = false;
+    length = false;
+
+    for (i = 0; item.Members !== undefined && i < item.Members.length; i++) {
+      console.log("the memeers ", item.Members[i]);
+      if (item.Members[i] === firebase.auth().currentUser.email) {
+        check = true;
+      }
+    }
 
     for (i = 0; i < item.Members.length; i++) {
       console.log("the memeers ", item.Members[i]);
       if (item.Members[i] === firebase.auth().currentUser.email) {
-        if(item.Members.length >2){
-          length = true
+        if (item.Members.length > 2) {
+          length = true;
         }
         check = true;
       }
     }
 
     if (check == true) {
-      if(length == true){
+      if (length == true) {
         return (
           <View>
             <ListItem
-            {...console.log("the sender id :",item.Sender_Id )}
+              {...console.log("the sender id :", item.Sender_Id)}
               onPress={() =>
                 this.props.navigation.navigate("ChatList", {
                   data: item.id,
@@ -107,13 +104,11 @@ export default class ChatScreen extends React.Component {
                   title: item.Title
                 })
               }
-              
               leftAvatar={{
                 source: {
-                  
-                  uri:
-                  
-                    `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(item.Title)}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`,
+                  uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(
+                    item.Title
+                  )}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`,
                   activeOpacity: 0.9
                 }
               }}
@@ -125,43 +120,39 @@ export default class ChatScreen extends React.Component {
             <Divider style={{ backgroundColor: "black" }} />
           </View>
         );
-      }else{
-
-      
-      return (
-        <View>
-          <ListItem
-          {...console.log("the sender id :",item.Sender_Id )}
-            onPress={() =>
-              this.props.navigation.navigate("ChatList", {
-                data: item.id,
-                Members: item.Members,
-                title: item.Title
-              })
-            }
-            
-            leftAvatar={{
-              source: {
-                
-                uri:
-                
-                  `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(item.Title)}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`,
-
-                activeOpacity: 0.9
+      } else {
+        return (
+          <View>
+            <ListItem
+              {...console.log("the sender id :", item.Sender_Id)}
+              onPress={() =>
+                this.props.navigation.navigate("ChatList", {
+                  data: item.id,
+                  Members: item.Members,
+                  title: item.Title
+                })
               }
-            }}
-            title={item.Title}
-            titleStyle={{ textAlign: "left" }}
-            // subtitleStyle = {{textAlign : "left"}}
-            // subtitle={item.Title}
-          />
-          <Divider style={{ backgroundColor: "black" }} />
-        </View>
-      );
+              leftAvatar={{
+                source: {
+                  uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(
+                    item.Title
+                  )}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`,
+
+                  activeOpacity: 0.9
+                }
+              }}
+              title={item.Title}
+              titleStyle={{ textAlign: "left" }}
+              // subtitleStyle = {{textAlign : "left"}}
+              // subtitle={item.Title}
+            />
+            <Divider style={{ backgroundColor: "black" }} />
+          </View>
+        );
+      }
     }
-  }
   };
-}
+
   _renderItem = ({ item }) => (
     <ListItem
       id={item.id}

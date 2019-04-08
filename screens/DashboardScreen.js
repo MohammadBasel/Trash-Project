@@ -31,7 +31,8 @@ export default class DashboardScreen extends React.Component {
     zones: [],
     trash: [],
     zone: "",
-    switch: false
+    switch: false,
+    flag: true
   };
   zone = "";
   async componentWillMount() {
@@ -116,26 +117,34 @@ export default class DashboardScreen extends React.Component {
   };
   saveChange = async () => {
     // this.state.users.map(
-    if (this.state.trash[0].Status == "Active") {
+    console.log("SWITCH", this.state.trash);
+    if (this.state.flag) {
+      console.log("I am in");
       for (i = 0; i < this.state.trash.length; i++) {
-        await db
-          .collection(`Zone/${this.state.zone}/Trash`)
-          .doc(this.state.trash[i].id)
-          .update({ Status: "Disabled" });
+        if (this.state.trash[i].Status === "Active") {
+          await db
+            .collection(`Zone/${this.state.zone}/Trash`)
+            .doc(this.state.trash[i].id)
+            .update({ Status: "Disabled" });
+        }
       }
-    } else {
+      this.setState({ flag: false });
+    } else if (!this.state.flag) {
       for (i = 0; i < this.state.trash.length; i++) {
-        await db
-          .collection(`Zone/${this.state.zone}/Trash`)
-          .doc(this.state.trash[i].id)
-          .update({ Status: "Active" });
+        if (this.state.trash[i].Status === "Disabled") {
+          await db
+            .collection(`Zone/${this.state.zone}/Trash`)
+            .doc(this.state.trash[i].id)
+            .update({ Status: "Active" });
+        }
       }
+      this.setState({ flag: true });
     }
 
     // );
   };
   render() {
-    console.log("SWITCH", this.state.switch);
+    console.log("flag", this.state.flag);
     return (
       <View style={styles.container}>
         {this.av === 0 && this.countUser()}

@@ -9,7 +9,8 @@ import {
   View,
   Picker,
   FlatList,
-  Dimensions
+  Dimensions,
+  Linking
 } from "react-native";
 import firebase from "firebase";
 import functions from "firebase/functions";
@@ -103,9 +104,9 @@ export default class Employee extends React.Component {
                 size="small"
                 rounded
                 source={{
-                  uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/${this.avatarURL(
+                  uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(
                     item.id
-                  )}%2Favatar.png?alt=media`
+                  )}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`
                 }}
               />
             }
@@ -137,7 +138,13 @@ export default class Employee extends React.Component {
             style: { color: "#fff", marginLeft: 20 }
           }}
         />
-        <Picker
+        {/* <Text>
+          {"\n"}
+          {"\n"}
+          {"\n"}
+          {"\n"}
+        </Text> */}
+        {/* <Picker
           selectedValue={this.state.available}
           style={{ height: 50, width: 150 }}
           onValueChange={(itemValue, itemIndex) => this.handlePicker(itemValue)}
@@ -146,7 +153,29 @@ export default class Employee extends React.Component {
           <Picker.Item label="Absent" value="absent" />
           <Picker.Item label="Available" value="available" />
           <Picker.Item label="Excused" value="excused" />
-        </Picker>
+        </Picker> */}
+        <View
+          style={{
+            height: height * 0.15,
+            width: width * 1,
+            alignContent: "center",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <Picker
+            selectedValue={this.state.available}
+            style={{ paddingLeft: 20, height: 50, width: 200 }}
+            onValueChange={(itemValue, itemIndex) =>
+              this.handlePicker(itemValue)
+            }
+          >
+            <Picker.Item label="All" value="0" />
+            <Picker.Item label="Absent" value="absent" />
+            <Picker.Item label="Available" value="available" />
+            <Picker.Item label="Excused" value="excused" />
+          </Picker>
+        </View>
         {console.log(this.state.available)}
         <FlatList
           data={
@@ -156,6 +185,7 @@ export default class Employee extends React.Component {
           }
           extraData={this.state}
           keyExtractor={item => item.id}
+          style={{ height: height * 0.8 }}
           renderItem={({ item }) => <View>{this.list(item)}</View>}
         />
       </View>
@@ -165,7 +195,8 @@ export default class Employee extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    //
+    //flex: 1
     //alignItems: "center"
     //justifyContent: "space-evenly"
   },
