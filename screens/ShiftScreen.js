@@ -27,7 +27,7 @@ import {
   Cell
 } from "react-native-table-component";
 import SwitchToggle from "react-native-switch-toggle";
-const { width, height } = Dimensions.get("window");
+const { width, height, fontScale } = Dimensions.get("window");
 export default class ShiftScreen extends React.Component {
   static navigationOptions = {
     header: null
@@ -75,16 +75,6 @@ export default class ShiftScreen extends React.Component {
     if (this.state.switch == false) this.setState({ switch: true });
     else this.setState({ switch: false });
   };
-  saveChange = async () => {
-    // this.state.users.map(
-    for (i = 0; i < this.state.users.length; i++) {
-      await db
-        .collection("Users")
-        .doc(this.state.users[i].id)
-        .update({ Points: this.state.users[i].Points });
-    }
-    // );
-  };
 
   handlePicker = async value => {
     await this.setState({ schedule: value });
@@ -121,9 +111,13 @@ export default class ShiftScreen extends React.Component {
     let tempOld = [];
     for (i = 0; i < this.state.changed.length; i++) {
       tempNew = this.state.changed[i].newid.Users;
+
       tempNew.push(this.state.changed[i].user_id);
+      console.log("tempNew", tempNew);
       tempOld = this.state.changed[i].oldid.Users;
-      tempOld.splice(this.state.changed[i].user_id, 1);
+
+      tempOld.splice(tempOld.indexOf(this.state.changed[i].user_id), 1);
+      console.log("tempOld", tempOld);
       await db
         .collection("Shift")
         .doc(this.state.changed[i].newid.id)
@@ -135,17 +129,6 @@ export default class ShiftScreen extends React.Component {
         .update({ Users: tempOld });
       //console.log("TEMPORARY ARRAY", temp);
     }
-    // for (i = 0; i < this.state.changed.length; i++) {
-    //   await db
-    //     .collection("Shift")
-    //     .doc(this.state.changed[i].newid)
-    //     .update({ Users: Users.push(this.state.changed[i].user_id) });
-
-    // await db
-    //   .collection("Shift")
-    //   .doc(this.state.changed[i].oldid)
-    //   .update({ Users: Users.remove(this.state.changed[i].user_id) });
-    // }
   };
   undo = async () => {
     changed = [...this.state.changed];

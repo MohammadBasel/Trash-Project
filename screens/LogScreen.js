@@ -419,23 +419,34 @@ export default class Employee extends React.Component {
             </Picker>
           </View>
         </View>
-
-        {this.state.filteredItems.map(log => (
-          <Card title={log.Desc} width={width * 0.95}>
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
-            >
-              <Text style={{ fontWeight: "bold" }}>Trash ID:</Text>
-              <Text>{log.Trash_Id.substring(33)}</Text>
-            </View>
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
-            >
-              <Text style={{ fontWeight: "bold" }}>Truck ID:</Text>
-              <Text>{log.Truck_Id.substring(33)}</Text>
-            </View>
-          </Card>
-        ))}
+        {this.state.filteredItems.length === 0 ? (
+          <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+            Sorry, Logs for this condition not available
+          </Text>
+        ) : (
+          this.state.filteredItems.map(log => (
+            <Card title={log.Desc} width={width * 0.95}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between"
+                }}
+              >
+                <Text style={{ fontWeight: "bold" }}>Trash ID:</Text>
+                <Text>{log.Trash_Id.substring(33)}</Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between"
+                }}
+              >
+                <Text style={{ fontWeight: "bold" }}>Truck ID:</Text>
+                <Text>{log.Truck_Id.substring(33)}</Text>
+              </View>
+            </Card>
+          ))
+        )}
       </View>
     );
   }

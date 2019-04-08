@@ -7,7 +7,8 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Switch
+  Switch,
+  Dimensions
 } from "react-native";
 import firebase from "firebase";
 import functions from "firebase/functions";
@@ -19,6 +20,8 @@ import {
   AntDesign,
   MaterialCommunityIcons
 } from "@expo/vector-icons";
+const { width, height, fontScale } = Dimensions.get("window");
+fontSize = 15;
 export default class DashboardScreen extends React.Component {
   static navigationOptions = {
     header: null
@@ -132,10 +135,11 @@ export default class DashboardScreen extends React.Component {
     // );
   };
   render() {
+    console.log("SWITCH", this.state.switch);
     return (
       <View style={styles.container}>
         {this.av === 0 && this.countUser()}
-        {this.low == 0 && this.countTrash()}
+        {this.low === 0 && this.countTrash()}
 
         <Header
           containerStyle={{ backgroundColor: "#7a66ff" }}
@@ -149,13 +153,16 @@ export default class DashboardScreen extends React.Component {
                 onPress={this.saveChange}
                 title="Emergency"
                 type="clear"
-                titleStyle={{ color: "white" }}
+                titleStyle={{
+                  color: "white",
+                  fontSize: this.fontSize / fontScale
+                }}
                 containerStyle={{ width: 100 }}
               />
             )
           }
         />
-        <Switch onValueChange={this.turnOn} value={this.state.switch} />
+        {/* <Switch onValueChange={this.turnOn} value={this.state.switch} /> */}
 
         <View style={{ flex: 1, justifyContent: "space-evenly" }}>
           <TouchableOpacity
@@ -232,6 +239,15 @@ export default class DashboardScreen extends React.Component {
               size={45}
               color="black"
               onPress={() => this.props.navigation.navigate("ShiftScreen")}
+            />
+
+            <AntDesign
+              name="warning"
+              size={45}
+              color="red"
+              onPress={this.turnOn}
+              //onValueChange={this.turnOn}
+              value={this.state.switch}
             />
             <MaterialCommunityIcons
               name="star-four-points"
