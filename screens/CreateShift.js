@@ -14,9 +14,9 @@ import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-nativ
 
 export default class CreateShift extends React.Component {
     static navigationOptions = {
-        title: 'Admin Dashboard',
+        title: 'Create Shift',
         headerTintColor: 'white',
-        headerStyle: { backgroundColor: 'blue', borderWidth: 1, borderBottomColor: 'white' },
+        headerStyle: { backgroundColor: '#7a66ff', borderWidth: 1, borderBottomColor: 'white' },
         headerTitleStyle: { color: 'white' }
     };
     state = {

@@ -113,7 +113,7 @@ export default class Login extends React.Component {
             <View style={styles.welcomeContainer}>
             {/* <View style={{paddingTop : "50%"}}> */}
               <Image
-                style={{ width: wp(40), height: hp(21) }}
+                style={{ width: wp(28), height: hp(18) }}
                 source={{
                   uri:
                     "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/logo.png?alt=media&token=3a5446d6-2998-46b5-8cef-7f1c1afda0d3"
@@ -237,9 +237,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     // marginBottom:hp(3),
-    width: wp(30),
-    borderRadius: 30,
-    backgroundColor: "blue"
+    width:wp(30),
+    borderRadius:30,
+    backgroundColor: "#7a66ff",
   },
   developmentModeText: {
     marginBottom: 20,

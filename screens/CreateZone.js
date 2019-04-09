@@ -15,9 +15,9 @@ import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-nativ
 
 export default class CreateZone extends React.Component {
     static navigationOptions = {
-        title: 'Admin Dashboard',
+        title: 'Create Zone',
         headerTintColor: 'white',
-        headerStyle: { backgroundColor: 'blue', borderWidth: 1, borderBottomColor: 'white' },
+        headerStyle: { backgroundColor: '#7a66ff', borderWidth: 1, borderBottomColor: 'white' },
         headerTitleStyle: { color: 'white' }
     };
     state = {
@@ -182,16 +182,12 @@ export default class CreateZone extends React.Component {
             <ScrollView style={styles.container}>
               <View style={{alignItems: 'center', justifyContent: "center", borderWidth: 0.5}}>
               <View style= {{flexDirection: "row"}}>
-                <Button
-                    onPress={() => {this.onCreatebuttonChange()}}
-                    title="Create Zone"
-                    color="blue"
-                  />
-                  <Button
-                    onPress={() => {this.onUpdatebuttonChange()}}
-                    title="Update Zone"
-                    color="blue"
-                  />
+              <TouchableOpacity style={styles.buttonContainer} onPress={() => {this.onCreatebuttonChange()}}>
+                    <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>Create User</Text> 
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.buttonContainer} onPress={() => {this.onUpdatebuttonChange()}}>
+                    <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%") }}>Update User</Text> 
+                  </TouchableOpacity>
                 </View>
                   {this.state.button == false ? (
                     <View>
@@ -309,6 +305,18 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop: 15,
         backgroundColor: '#fff',
+    },
+    buttonContainer: {
+      // marginTop:hp(3),
+      height:hp("5%"),
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      // marginBottom:hp(3),
+      width:wp("15%"),
+      borderRadius:10,
+      backgroundColor: "#7a66ff",
+      padding: wp("3%")
     },
 });
 

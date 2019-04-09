@@ -23,23 +23,41 @@ import {
 
 let bins = [];
 export default class Trash extends React.Component {
-  static navigationOptions = {
-    title: "Damaged Trash",
-    headerTintColor: "white",
-    headerStyle: {
-      backgroundColor: "blue",
-      borderWidth: 1,
-      borderBottomColor: "white"
-    },
-    headerTitleStyle: { color: "white" }
-  };
-  state = {
-    trashs: [],
-    zones: [],
-    filter: "All"
-  };
-  // trashs = []
-  // zones = []
+    static navigationOptions = {
+        title: 'Damaged Trash',
+        headerTintColor: 'white',
+        headerStyle: { backgroundColor: '#7a66ff', borderWidth: 1, borderBottomColor: 'white' },
+        headerTitleStyle: { color: 'white' }
+    };
+    state = {
+        trashs: [],
+        zones: [],
+        filter: "All"
+    }
+    // trashs = []
+    // zones = []
+    
+    async componentDidMount() {
+        await this.getZoneData()   
+    }
+
+    getZoneData = async () => { 
+        db.collection("Zone")
+            .onSnapshot(querySnapshot => {
+                let zones = []
+                let zoneId = 0
+                querySnapshot.forEach(doc => {db.collection(`Zone/${doc.id}/Trash`).onSnapshot(querySnapshot => {
+                  let trashs = []
+                  zoneId = doc.id
+                    querySnapshot.forEach(doc => {                    
+                        trashs.push({ id: doc.id, ...doc.data() })
+                    });
+                    zones.push({id: zoneId, trashs})
+                    this.setState({zones})
+                })   
+                });
+            })
+    }
 
   async componentDidMount() {
     await this.getZoneData();

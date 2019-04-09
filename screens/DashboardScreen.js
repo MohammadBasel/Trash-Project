@@ -172,7 +172,7 @@ export default class DashboardScreen extends React.Component {
           }
         />
         {/* <Switch onValueChange={this.turnOn} value={this.state.switch} /> */}
-
+        {this.state.zones == "" ? (<View style={{paddingTop: "50%",paddingLeft: "50%", alignItems: "center" ,justifyContent: "center", width: "50%", heigth: "50%" }}><Image source={require('../assets/images/loading.gif')} /></View>) :(
         <View style={{ flex: 1, justifyContent: "space-evenly" }}>
           <TouchableOpacity
             onPress={() => this.props.navigation.navigate("TrashStatus")}
@@ -266,7 +266,9 @@ export default class DashboardScreen extends React.Component {
             />
           </View>
         </View>
+        )}
       </View>
+    
     );
   }
 }

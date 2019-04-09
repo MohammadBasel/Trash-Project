@@ -203,8 +203,8 @@ export default class ChatScreen extends React.Component {
       );
     }
   }
-  
 }
+
 
 
   render() {
