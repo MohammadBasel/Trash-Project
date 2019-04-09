@@ -21,8 +21,8 @@ import {
   FontAwesome,
   Foundation
 } from "@expo/vector-icons";
-import { Header, Slider, Card, Avatar, Divider } from "react-native-elements"
-import { Table, Row, Rows } from 'react-native-table-component';
+import { Header, Slider, Card, Avatar, Divider } from "react-native-elements";
+import { Table, Row, Rows } from "react-native-table-component";
 
 import { WebBrowser, ImagePicker } from "expo";
 import { uploadImageAsync, uploadVideoAsync } from "../ImageUtils.js";
@@ -53,6 +53,7 @@ export default class HomeScreen extends React.Component {
     // user: "asma@asma.com",
     switch1Value: false,
     isDialogVisible: false,
+
     tableHead: ['Shifts/Days', 'Sunday', 'Monday', 'Tuesday', 'Wednesday','Thursday'],
     tableData: [['Morning Shift'],['Evening Shift']]
   }
@@ -91,6 +92,7 @@ getData = async () => {
     console.log("shifts calendar", shifts)
 }
 
+
   pickAvatar = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
@@ -108,18 +110,18 @@ getData = async () => {
     }
   };
 
- pickImage = async () => {
+  pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       aspect: [4, 3],
       mediaTypes: "All"
     });
-avatarURL = (email) => {
-  return email.replace("@", "%40")
-}
-toggleSwitch1 = (value) => {
-  this.setState({switch1Value: value})
-}
+    avatarURL = email => {
+      return email.replace("@", "%40");
+    };
+    toggleSwitch1 = value => {
+      this.setState({ switch1Value: value });
+    };
 
     console.log(result);
     if (!result.cancelled) {
@@ -181,6 +183,7 @@ toggleSwitch1 = (value) => {
     db.collection("Users")
       .doc(this.state.user)
       .update({ Emergency: true });
+
   Alert.alert("The Emergency Call is made")
 }
 createCalandar = async () =>{
@@ -217,6 +220,7 @@ createCalandar = async () =>{
         }
       }
     }
+
     this.setState(tableData)
   }
 
@@ -269,6 +273,7 @@ createCalandar = async () =>{
                 <Text style={styles.info}>Phone: {this.state.users.Phone}</Text>
                 <Text style={styles.info}>Role: {this.state.users.Role}</Text>
 
+
                 <Text style={styles.info}>Points earn: {this.state.users.Points}</Text>
                 {this.state.users.Role === "Admin" ? (
                   <TouchableOpacity style={styles.buttonContainer}  onPress={()=>{this.props.navigation.navigate("Admin")}}>
@@ -297,6 +302,7 @@ createCalandar = async () =>{
               </Table>
 
               </View> */}
+
               <View />
               <View style={styles.bodyContent}>
                 <Switch
@@ -314,9 +320,24 @@ createCalandar = async () =>{
                   </TouchableOpacity>
                 )}
 
-                <View style = {{paddingLeft: '15%',paddingTop:"5%" ,alignSelf: 'center',width: wp('50%')}}>
-                  <TouchableOpacity onPress={()=>{this.showDialog(true)}}>
-                    <Text style={{color: 'blue', textDecorationLine: 'underline'}}>Change Password</Text>
+                <View
+                  style={{
+                    paddingLeft: "15%",
+                    paddingTop: "5%",
+                    alignSelf: "center",
+                    width: wp("50%")
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.showDialog(true);
+                    }}
+                  >
+                    <Text
+                      style={{ color: "blue", textDecorationLine: "underline" }}
+                    >
+                      Change Password
+                    </Text>
                   </TouchableOpacity>
                 </View>
                 <DialogInput
@@ -353,7 +374,7 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: "cover" // or 'stretch'
   },
-  head: { height: 40, backgroundColor: '#f1f8ff' },
+  head: { height: 40, backgroundColor: "#f1f8ff" },
   text: { margin: 6 },
 
   avatar: {

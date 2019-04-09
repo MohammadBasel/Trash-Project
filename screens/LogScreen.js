@@ -104,21 +104,21 @@ export default class Employee extends React.Component {
           itemfilter = this.state.logs;
         } else {
           for (let i = 0; i < this.state.logs.length; i++) {
-            this.state.logs[i].Truck_Id.substring(32) == this.state.truckid &&
+            this.state.logs[i].Truck_Id == this.state.truckid &&
               itemfilter.push(this.state.logs[i]);
             console.log("logs", this.state.logs[i]);
           }
         }
       } else if (this.state.truckid === "0") {
         for (let i = 0; i < this.state.logs.length; i++) {
-          this.state.logs[i].Trash_Id.substring(32) == this.state.trashid &&
+          this.state.logs[i].Trash_Id == this.state.trashid &&
             itemfilter.push(this.state.logs[i]);
           console.log("logs", this.state.logs[i]);
         }
       } else {
         for (let i = 0; i < this.state.logs.length; i++) {
-          this.state.logs[i].Trash_Id.substring(32) == this.state.trashid &&
-            this.state.logs[i].Truck_Id.substring(32) == this.state.truckid &&
+          this.state.logs[i].Trash_Id == this.state.trashid &&
+            this.state.logs[i].Truck_Id == this.state.truckid &&
             itemfilter.push(this.state.logs[i]);
           console.log("logs", this.state.logs[i]);
         }
@@ -157,7 +157,7 @@ export default class Employee extends React.Component {
             if (
               date >= startdates &&
               date <= enddates &&
-              this.state.logs[i].Truck_Id.substring(32) == this.state.truckid
+              this.state.logs[i].Truck_Id == this.state.truckid
             )
               itemfilter.push(this.state.logs[i]);
           }
@@ -178,7 +178,7 @@ export default class Employee extends React.Component {
           if (
             date >= startdates &&
             date <= enddates &&
-            this.state.logs[i].Trash_Id.substring(32) == this.state.trashid
+            this.state.logs[i].Trash_Id == this.state.trashid
           )
             itemfilter.push(this.state.logs[i]);
         }
@@ -198,8 +198,8 @@ export default class Employee extends React.Component {
           if (
             date >= startdates &&
             date <= enddates &&
-            this.state.logs[i].Trash_Id.substring(32) == this.state.trashid &&
-            this.state.logs[i].Truck_Id.substring(32) == this.state.truckid
+            this.state.logs[i].Trash_Id == this.state.trashid &&
+            this.state.logs[i].Truck_Id == this.state.truckid
           )
             itemfilter.push(this.state.logs[i]);
         }
@@ -238,7 +238,7 @@ export default class Employee extends React.Component {
             if (
               date >= startdates &&
               date <= enddates &&
-              this.state.logs[i].Truck_Id.substring(32) == this.state.truckid
+              this.state.logs[i].Truck_Id == this.state.truckid
             )
               itemfilter.push(this.state.logs[i]);
           }
@@ -260,7 +260,7 @@ export default class Employee extends React.Component {
           if (
             date >= startdates &&
             date <= enddates &&
-            this.state.logs[i].Trash_Id.substring(32) == this.state.trashid
+            this.state.logs[i].Trash_Id == this.state.trashid
           )
             itemfilter.push(this.state.logs[i]);
         }
@@ -281,8 +281,8 @@ export default class Employee extends React.Component {
           if (
             date >= startdates &&
             date <= enddates &&
-            this.state.logs[i].Trash_Id.substring(32) == this.state.trashid &&
-            this.state.logs[i].Truck_Id.substring(32) == this.state.truckid
+            this.state.logs[i].Trash_Id == this.state.trashid &&
+            this.state.logs[i].Truck_Id == this.state.truckid
           )
             itemfilter.push(this.state.logs[i]);
         }
@@ -392,7 +392,11 @@ export default class Employee extends React.Component {
           {"\n"}
         </Text>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <View style={{ height: height * 0.2 }}>
+          <View
+            style={{
+              height: Platform.OS == "ios" ? height * 0.2 : height * 0.025
+            }}
+          >
             <Text>Choose a Trash</Text>
             <Picker
               selectedValue={this.state.trashid}
@@ -407,7 +411,11 @@ export default class Employee extends React.Component {
               ))}
             </Picker>
           </View>
-          <View style={{ height: height * 0.2 }}>
+          <View
+            style={{
+              height: Platform.OS == "ios" ? height * 0.2 : height * 0.1
+            }}
+          >
             <Text>Choose a Truck</Text>
             <Picker
               selectedValue={this.state.truckid}
@@ -439,7 +447,7 @@ export default class Employee extends React.Component {
                     }}
                   >
                     <Text style={{ fontWeight: "bold" }}>Trash ID:</Text>
-                    <Text>{log.Trash_Id.substring(32)}</Text>
+                    <Text>{log.Trash_Id}</Text>
                   </View>
                   <View
                     style={{
@@ -448,7 +456,7 @@ export default class Employee extends React.Component {
                     }}
                   >
                     <Text style={{ fontWeight: "bold" }}>Truck ID:</Text>
-                    <Text>{log.Truck_Id.substring(32)}</Text>
+                    <Text>{log.Truck_Id}</Text>
                   </View>
                 </Card>
               ))

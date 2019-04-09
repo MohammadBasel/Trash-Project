@@ -177,17 +177,19 @@ export default class Employee extends React.Component {
           </Picker>
         </View>
         {console.log(this.state.available)}
-        <FlatList
-          data={
-            this.state.available == "0"
-              ? this.state.users
-              : this.state.filteredItems
-          }
-          extraData={this.state}
-          keyExtractor={item => item.id}
-          style={{ height: height * 0.8 }}
-          renderItem={({ item }) => <View>{this.list(item)}</View>}
-        />
+        <ScrollView>
+          <FlatList
+            data={
+              this.state.available == "0"
+                ? this.state.users
+                : this.state.filteredItems
+            }
+            extraData={this.state}
+            keyExtractor={item => item.id}
+            style={{ height: height * 0.8 }}
+            renderItem={({ item }) => <View>{this.list(item)}</View>}
+          />
+        </ScrollView>
       </View>
     );
   }

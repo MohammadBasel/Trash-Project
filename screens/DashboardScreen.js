@@ -172,103 +172,130 @@ export default class DashboardScreen extends React.Component {
           }
         />
         {/* <Switch onValueChange={this.turnOn} value={this.state.switch} /> */}
-        {this.state.zones == "" ? (<View style={{paddingTop: "50%",paddingLeft: "50%", alignItems: "center" ,justifyContent: "center", width: "50%", heigth: "50%" }}><Image source={require('../assets/images/loading.gif')} /></View>) :(
-        <View style={{ flex: 1, justifyContent: "space-evenly" }}>
-          <TouchableOpacity
-            onPress={() => this.props.navigation.navigate("TrashStatus")}
-          >
-            <Card
-              title="Trash Status"
-              containerStyle={{
-                backgroundColor: "#2980B9"
-              }}
-              titleStyle={{ color: "white" }}
-            >
-              <View
-                style={{
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  flexDirection: "row",
-                  padding: 10
-                }}
-              >
-                <Text style={{ fontSize: 20 }}>Full: {this.full}</Text>
-                <Text style={{ fontSize: 20 }}>Medium: {this.medium}</Text>
-                <Text style={{ fontSize: 20 }}>Low: {this.low}</Text>
-              </View>
-            </Card>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => this.props.navigation.navigate("Employee")}
-          >
-            <Card
-              title="Employee Attendance"
-              containerStyle={{
-                backgroundColor: "#1F618D"
-              }}
-              titleStyle={{ color: "white" }}
-            >
-              <View
-                style={{
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  flexDirection: "row",
-                  padding: 10
-                }}
-              >
-                <Text style={{ fontSize: 20 }}>Present: {this.av}</Text>
-                <Text style={{ fontSize: 20 }}>Absent: {this.ab}</Text>
-                <Text style={{ fontSize: 20 }}> Excused: {this.ex}</Text>
-              </View>
-            </Card>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => this.props.navigation.navigate("Log")}
-          >
-            <Card
-              containerStyle={{
-                paddingTop: 40,
-                paddingBottom: 40,
-                backgroundColor: "#1A5276 "
-              }}
-              titleStyle={{ color: "white" }}
-            >
-              <View style={{ alignItems: "center" }}>
-                <Text style={{ fontSize: 20, padding: 10, fontWeight: "bold" }}>
-                  View Logs
-                </Text>
-              </View>
-            </Card>
-          </TouchableOpacity>
+        {this.state.zones == "" ? (
           <View
-            style={{ flexDirection: "row", justifyContent: "space-evenly" }}
+            style={{
+              paddingTop: "50%",
+              paddingLeft: "50%",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "50%",
+              heigth: "50%"
+            }}
           >
-            <AntDesign
-              name="table"
-              size={45}
-              color="black"
-              onPress={() => this.props.navigation.navigate("ShiftScreen")}
-            />
-
-            <AntDesign
-              name="warning"
-              size={45}
-              color="red"
-              onPress={this.turnOn}
-              //onValueChange={this.turnOn}
-              value={this.state.switch}
-            />
-            <MaterialCommunityIcons
-              name="star-four-points"
-              size={45}
-              color="black"
-              onPress={() => this.props.navigation.navigate("PointsScreen")}
-            />
+            <Image source={require("../assets/images/loading.gif")} />
           </View>
-        </View>
+        ) : (
+          <View style={{ flex: 1, justifyContent: "space-evenly" }}>
+            <TouchableOpacity
+              onPress={() => this.props.navigation.navigate("TrashStatus")}
+            >
+              <Card
+                title="Trash Status"
+                containerStyle={{
+                  backgroundColor: "#7300e6"
+                }}
+                titleStyle={{ color: "white" }}
+              >
+                <View
+                  style={{
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexDirection: "row",
+                    padding: 10
+                  }}
+                >
+                  <Text style={{ fontSize: 20, color: "white" }}>
+                    Full: {this.full}
+                  </Text>
+                  <Text style={{ fontSize: 20, color: "white" }}>
+                    Medium: {this.medium}
+                  </Text>
+                  <Text style={{ fontSize: 20, color: "white" }}>
+                    Low: {this.low}
+                  </Text>
+                </View>
+              </Card>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => this.props.navigation.navigate("Employee")}
+            >
+              <Card
+                title="Employee Attendance"
+                containerStyle={{
+                  backgroundColor: "#9933ff"
+                }}
+                titleStyle={{ color: "white" }}
+              >
+                <View
+                  style={{
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexDirection: "row",
+                    padding: 10
+                  }}
+                >
+                  <Text style={{ fontSize: 20, color: "white" }}>
+                    Present: {this.av}
+                  </Text>
+                  <Text style={{ fontSize: 20, color: "white" }}>
+                    Absent: {this.ab}
+                  </Text>
+                  <Text style={{ fontSize: 20, color: "white" }}>
+                    {" "}
+                    Excused: {this.ex}
+                  </Text>
+                </View>
+              </Card>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => this.props.navigation.navigate("Log")}
+            >
+              <Card
+                containerStyle={{
+                  paddingTop: 40,
+                  paddingBottom: 40,
+                  backgroundColor: "#bf80ff"
+                }}
+                titleStyle={{ color: "white" }}
+              >
+                <View style={{ alignItems: "center" }}>
+                  <Text
+                    style={{ fontSize: 20, padding: 10, fontWeight: "bold" }}
+                  >
+                    View Logs
+                  </Text>
+                </View>
+              </Card>
+            </TouchableOpacity>
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-evenly" }}
+            >
+              <AntDesign
+                name="table"
+                size={45}
+                color="black"
+                onPress={() => this.props.navigation.navigate("ShiftScreen")}
+              />
+
+              <AntDesign
+                name="warning"
+                size={45}
+                color="red"
+                onPress={this.turnOn}
+                //onValueChange={this.turnOn}
+                value={this.state.switch}
+              />
+              <MaterialCommunityIcons
+                name="star-four-points"
+                size={45}
+                color="black"
+                onPress={() => this.props.navigation.navigate("PointsScreen")}
+              />
+            </View>
+          </View>
         )}
       </View>
-    
     );
   }
 }

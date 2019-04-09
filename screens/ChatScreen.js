@@ -55,11 +55,11 @@ export default class ChatScreen extends React.Component {
     });
     console.log("Current chat after method: ", this.state.chat);
   }
-  avatarURL = (email) => {
-    email.replace(" ", "")
-    console.log("the email : ", email)
-    return  email.replace("@","%40")
-  }
+  avatarURL = email => {
+    email.replace(" ", "");
+    console.log("the email : ", email);
+    return email.replace("@", "%40");
+  };
 
   keyExtractor = (item, index) => index;
 
@@ -73,20 +73,19 @@ export default class ChatScreen extends React.Component {
     var rand = Math.floor(1 + Math.random() * (100 - 1));
     check = false;
     length = false;
-    console.log("the item : ",item)
-      console.log("i'm getting inside")
-    var rand = Math.floor(1 + (Math.random() * (100-1)));
-    check = false
-    length = false
+    console.log("the item : ", item);
+    console.log("i'm getting inside");
+    var rand = Math.floor(1 + Math.random() * (100 - 1));
+    check = false;
+    length = false;
     let groupTitle = "";
-    
-    for (i=0; item.Members !== undefined && i<item.Members.length;i++){
-      console.log("the memeers " ,item.Members[i])
-        if (item.Members[i] === firebase.auth().currentUser.email){
-            check = true
-        }
-           
-        }
+
+    for (i = 0; item.Members !== undefined && i < item.Members.length; i++) {
+      console.log("the memeers ", item.Members[i]);
+      if (item.Members[i] === firebase.auth().currentUser.email) {
+        check = true;
+      }
+    }
 
     for (i = 0; i < item.Members.length; i++) {
       console.log("the memeers ", item.Members[i]);
@@ -97,20 +96,20 @@ export default class ChatScreen extends React.Component {
         check = true;
       }
     }
-    if(length == true){
-      let title = item.Title
-      let split = title.split(" ")
-      groupTitle = split[0]
+    if (length == true) {
+      let title = item.Title;
+      let split = title.split(" ");
+      groupTitle = split[0];
     }
-    console.log("group Title : ", groupTitle)
+    console.log("group Title : ", groupTitle);
 
-    if (check == true) {
-      if(length == true){
+
+    if (check === true) {
+      if (length === true) {
         return (
           <View>
             <ListItem
-            {...console.log("the title  :",item.Sender_Id )}
-
+              {...console.log("the title  :", item.Sender_Id)}
               onPress={() =>
                 this.props.navigation.navigate("ChatList", {
                   data: item.id,
@@ -119,10 +118,10 @@ export default class ChatScreen extends React.Component {
                 })
               }
               leftAvatar={{
-                source: {                  
-                  uri:
-                  
-                    `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(groupTitle + "@" + groupTitle + ".com")}?alt=media&token=c0215a0c-740e-4494-b893-f56e2b3cb091`,
+                source: {
+                  uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(
+                    groupTitle + "@" + groupTitle + ".com"
+                  )}?alt=media&token=c0215a0c-740e-4494-b893-f56e2b3cb091`,
 
                   activeOpacity: 0.9
                 }
@@ -135,45 +134,39 @@ export default class ChatScreen extends React.Component {
             <Divider style={{ backgroundColor: "black" }} />
           </View>
         );
-        
-      
-        
-      }else{
-      return (
-        <View>
-          <ListItem
-          {...console.log("the sender id :",item.Sender_Id )}
-            onPress={() =>
-              this.props.navigation.navigate("ChatList", {
-                data: item.id,
-                Members: item.Members,
-                title: item.Title
-              })
-            }
-            
-            leftAvatar={{
-              source: {
-                
-                uri:
-                
-                  `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(item.Title + "@" + item.Title + ".com")}?alt=media&token=c0215a0c-740e-4494-b893-f56e2b3cb091`,
-
-                activeOpacity: 0.9
+      } else {
+        return (
+          <View>
+            <ListItem
+              {...console.log("the sender id :", item.Sender_Id)}
+              onPress={() =>
+                this.props.navigation.navigate("ChatList", {
+                  data: item.id,
+                  Members: item.Members,
+                  title: item.Title
+                })
               }
-            }}
-            title={item.Title}
-            titleStyle={{ textAlign: "left" }}
-            // subtitleStyle = {{textAlign : "left"}}
-            // subtitle={item.Title}
-          />
-          <Divider style={{ backgroundColor: "black" }} />
-        </View>
-      );
+              leftAvatar={{
+                source: {
+                  uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(
+                    item.Title + "@" + item.Title + ".com"
+                  )}?alt=media&token=c0215a0c-740e-4494-b893-f56e2b3cb091`,
+
+                  activeOpacity: 0.9
+                }
+              }}
+              title={item.Title}
+              titleStyle={{ textAlign: "left" }}
+              // subtitleStyle = {{textAlign : "left"}}
+              // subtitle={item.Title}
+            />
+            <Divider style={{ backgroundColor: "black" }} />
+          </View>
+        );
+
+      }
     }
-  }
-}
-
-
+  };
 
   render() {
     console.log("the data inside the render : ", this.state.chat);
