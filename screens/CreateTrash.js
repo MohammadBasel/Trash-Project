@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View, Text, TouchableOpacity, TextInput, Picker, Alert } from 'react-native';
+import { ScrollView, StyleSheet, View, Text, TouchableOpacity, TextInput, Picker, Alert, Platform } from 'react-native';
 import { Header, ListItem, Divider, Badge, Avatar, Card, Button, Icon, CheckBox } from "react-native-elements"
 import { ExpoLinksView } from '@expo/samples';
 import db from "../db.js"
@@ -100,8 +100,7 @@ export default class CreateTrash extends React.Component {
     render() {
       console.log("zone", this.state.zones)
         return (
-            <ScrollView style={styles.container}>
-              <View style={{alignItems: 'center', justifyContent: "center", borderWidth: 0.5}}>
+              <View style={{alignItems: 'center', justifyContent: "center"}}>
                <View style= {{flexDirection: "row"}}>
                <TouchableOpacity style={styles.buttonContainer} onPress={() => {this.onCreatebuttonChange()}}>
                     <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>Create Trash</Text> 
@@ -114,7 +113,7 @@ export default class CreateTrash extends React.Component {
                   <View>
                     <Picker
                         selectedValue={this.state.zone}
-                        style={{height: hp("5%"), width: wp("50%")}}
+                        style={{height: hp("5%"), width: wp("50%"), marginBottom: Platform.OS === "ios" ? hp("8%"): hp("1%")}}
                         selectedValue={this.state.zone}
                         onValueChange={(itemValue, itemIndex) =>
                             this.setState({zone: itemValue})
@@ -125,18 +124,20 @@ export default class CreateTrash extends React.Component {
                             ))
                             }
                         </Picker>
-                        <TouchableOpacity style={styles.buttonContainer}  onPress={() => {this.getZone()}}>
-                            <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>Trash Select</Text> 
+                        <View style={{alignItems: "center"}}>
+                        <TouchableOpacity style={styles.buttonContainer1}  onPress={() => {this.getZone()}}>
+                            <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>Zone Select</Text> 
                         </TouchableOpacity>
+                        </View>
                        
                 </View>
                 <View>
                     {this.state.button == true && (
-                        <View>
+                        <View style={{alignItems: "center"}}>
                             <Text style={{fontWeight: 'bold', fontSize: 20}}>Enter the Trash:</Text>
                             <Picker
                                 selectedValue={this.state.trash}
-                                style={{height: hp("5%"), width: wp("50%")}}
+                                style={{height: hp("5%"), width: wp("50%"), marginBottom: Platform.OS === "ios" ? hp("8%"): hp("1%")}}
                                 selectedValue={this.state.trash}
                                 onValueChange={(itemValue, itemIndex) =>
                                 this.setState({trash: itemValue})
@@ -147,14 +148,13 @@ export default class CreateTrash extends React.Component {
                                 )) 
                                 }
                             </Picker>
-                            <Button
-                                onPress={() => {this.getTrash()}}
-                                title="Trash Selected"
-                                color="blue"
-                            />
+                            <TouchableOpacity style={styles.buttonContainer1}  onPress={() => {this.getTrash()}}>
+                            <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>Trash Select</Text> 
+                        </TouchableOpacity>
                             
                         </View>
                     )}
+                    <View style={{alignItems: "center"}}>
                     <Text style={{fontWeight: 'bold', fontSize: 20}}>Enter the Latitude:</Text>
                   <TextInput
                     style={{ paddingTop: 20 }}
@@ -183,12 +183,12 @@ export default class CreateTrash extends React.Component {
                    <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>SUBMIT</Text> 
                  </TouchableOpacity>
                   )}
+                  </View>
                   
                   
                 </View>
               </View>
 
-            </ScrollView>
         );
     }
   }
@@ -201,15 +201,27 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
       // marginTop:hp(3),
-      height:hp("5%"),
+      height:hp("6%"),
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
       // marginBottom:hp(3),
-      width:wp("15%"),
+      width:wp("20%"),
       borderRadius:10,
       backgroundColor: "#7a66ff",
       padding: wp("3%")
     },
+    buttonContainer1: {
+        // marginTop:hp(3),
+        height:hp("6%"),
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        // marginBottom:hp(3),
+        width:wp("20%"),
+        borderRadius:10,
+        backgroundColor: "#7a66ff",
+        padding: wp("3%")
+      },
 });
 

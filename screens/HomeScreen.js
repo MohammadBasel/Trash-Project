@@ -60,7 +60,7 @@ export default class HomeScreen extends React.Component {
 
 async componentDidMount() {
  await this.getData()  
-//  await this.createCalandar()
+ await this.createCalandar()
 }
 
 getData = async () => {
@@ -81,13 +81,13 @@ getData = async () => {
       await  db.collection("Shift")
       .onSnapshot(querySnapshot => {
         querySnapshot.forEach(doc => {
-          shifts.push({ id: doc.id, ...doc.data() })
+          shifts.push({ id: doc.id,  ...doc.data()})
         })
         this.setState({shifts})
       })
       // await this.setState({users, zone, shifts})
       console.log("shifts sasdsadsa", shifts)
-    // await this.createCalandar(shifts)
+    await this.createCalandar(shifts)
     console.log("shifts calendar", shifts)
 }
 
@@ -183,9 +183,9 @@ toggleSwitch1 = (value) => {
       .update({ Emergency: true });
   Alert.alert("The Emergency Call is made")
 }
-createCalandar = async (shifts) =>{
+createCalandar = async () =>{
     let header = [...this.state.tableHead]
-    // let shifts = shifts
+    let shifts = [...this.state.shifts]
     console.log("shifts", shifts)
     let tableData = [...this.state.tableData]
     for (let i = 0; i < header.length; i++){
@@ -251,7 +251,6 @@ createCalandar = async (shifts) =>{
               onPress={this.pickAvatar}
               style={styles.avatarview}
             >
-              {console.log("AVATAR", this.state.users)}
 
               <Image
                 style={styles.avatar}
@@ -291,13 +290,13 @@ createCalandar = async (shifts) =>{
                   )
                 )}
               </View> 
-              <View>
+              {/* <View>
               <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
                 <Row data={this.state.tableHead} style={styles.head} textStyle={styles.text}/>
                 <Rows data={this.state.tableData} textStyle={styles.text}/>
               </Table>
 
-              </View>
+              </View> */}
               <View />
               <View style={styles.bodyContent}>
                 <Switch
@@ -306,7 +305,7 @@ createCalandar = async (shifts) =>{
                 />
                 {this.state.switch1Value == true && (
                   <TouchableOpacity
-                    style={styles.buttonContainer}
+                    style={styles.buttonContainer1}
                     onPress={() => {
                       this.emergency();
                     }}
@@ -400,6 +399,17 @@ const styles = StyleSheet.create({
     textAlign: "left"
   },
   buttonContainer: {
+    marginTop: 10,
+    height: 45,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+    width: 150,
+    borderRadius: 30,
+    backgroundColor: "#7a66ff"
+  },
+  buttonContainer1: {
     marginTop: 10,
     height: 45,
     flexDirection: "row",

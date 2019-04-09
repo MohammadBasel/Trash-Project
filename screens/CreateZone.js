@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View, Text, TouchableOpacity, TextInput, Picker, Alert } from 'react-native';
+import { ScrollView, StyleSheet, View, Text, TouchableOpacity, TextInput, Picker, Alert, Platform } from 'react-native';
 import { Header, ListItem, Divider, Badge, Avatar, Card, Button, Icon, CheckBox } from "react-native-elements"
 import { ExpoLinksView } from '@expo/samples';
 import db from "../db.js"
@@ -180,7 +180,7 @@ export default class CreateZone extends React.Component {
       console.log("zone", this.state.coordinates)
         return (
             <ScrollView style={styles.container}>
-              <View style={{alignItems: 'center', justifyContent: "center", borderWidth: 0.5}}>
+              <View style={{alignItems: 'center', justifyContent: "center"}}>
               <View style= {{flexDirection: "row"}}>
               <TouchableOpacity style={styles.buttonContainer} onPress={() => {this.onCreatebuttonChange()}}>
                     <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>Create Zone</Text> 
@@ -213,7 +213,7 @@ export default class CreateZone extends React.Component {
                   <View>
                     <Picker
                     selectedValue={this.state.zone}
-                    style={{height: hp("5%"), width: wp("50%")}}
+                    style={{height: hp("5%"), width: wp("50%"), marginBottom: Platform.OS === "ios" ? hp("8%"): hp("1%")}}
                     selectedValue={this.state.zone}
                     onValueChange={(itemValue, itemIndex) =>
                       this.setState({zone: itemValue})
@@ -224,9 +224,11 @@ export default class CreateZone extends React.Component {
                       ))
                       }
                   </Picker>
-                  <TouchableOpacity style={styles.buttonContainer} onPress={() => {this.getZone()}}>
+                  <View style={{alignItems: "center"}}>
+                  <TouchableOpacity style={styles.buttonContainer1} onPress={() => {this.getZone()}}>
                   <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>Zone Select</Text> 
                 </TouchableOpacity>
+                </View>
                   
               </View>
                 )}
@@ -304,12 +306,24 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
       // marginTop:hp(3),
-      height:hp("5%"),
+      height:hp("6%"),
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
       // marginBottom:hp(3),
-      width:wp("15%"),
+      width:wp("20%"),
+      borderRadius:10,
+      backgroundColor: "#7a66ff",
+      padding: wp("3%")
+    },
+    buttonContainer1: {
+      // marginTop:hp(3),
+      height:hp("6%"),
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      // marginBottom:hp(3),
+      width:wp("20%"),
       borderRadius:10,
       backgroundColor: "#7a66ff",
       padding: wp("3%")

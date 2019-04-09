@@ -139,12 +139,12 @@ export default class CreateShift extends React.Component {
       console.log("shift user render", this.state.shiftUsers.length)
         return (
             <ScrollView style={styles.container}>
-              <View style={{alignItems: 'center', justifyContent: "center", borderWidth: 0.5}}>
+              <View style={{alignItems: 'center', justifyContent: "center"}}>
                   <Text style={{fontWeight: 'bold', fontSize: 20}}>Enter the Shift:</Text>
                   <View>
                       <Picker
                       selectedValue={this.state.shiftId}
-                      style={{height: hp("5%"), width: wp("50%")}}
+                      style={{height: hp("5%"), width: wp("50%"), marginBottom: Platform.OS === "ios" ? hp("8%"): hp("1%")}}
                       selectedValue={this.state.shiftId}
                       onValueChange={(itemValue, itemIndex) =>
                         this.setState({shiftId: itemValue})
@@ -155,9 +155,11 @@ export default class CreateShift extends React.Component {
                     ))
                     }
                 </Picker>
-                <TouchableOpacity style={styles.buttonContainer}  onPress={() => {this.getShift()}}>
+                <View style={{alignItems: "center"}}>
+                <TouchableOpacity style={styles.buttonContainer1}  onPress={() => {this.getShift()}}>
                   <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>Shift Select</Text> 
                 </TouchableOpacity>
+                </View>
               </View>
                 <Text style={{ color: "red" }}>{this.state.erroremail}</Text>
                 <Text style={{fontWeight: 'bold', fontSize: 20}}>Enter the Start Time:</Text>
@@ -208,12 +210,24 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
       // marginTop:hp(3),
-      height:hp("5%"),
+      height:hp("6%"),
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
       // marginBottom:hp(3),
       width:wp("15%"),
+      borderRadius:10,
+      backgroundColor: "#7a66ff",
+      padding: wp("3%")
+    },
+    buttonContainer1: {
+      // marginTop:hp(3),
+      height:hp("6%"),
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      // marginBottom:hp(3),
+      width:wp("20%"),
       borderRadius:10,
       backgroundColor: "#7a66ff",
       padding: wp("3%")

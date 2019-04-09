@@ -105,40 +105,7 @@ export default class ChatScreen extends React.Component {
     console.log("group Title : ", groupTitle)
 
     if (check == true) {
-      return (
-        <View>
-          <ListItem
-            onPress={() =>
-              this.props.navigation.navigate("ChatList", {
-                data: item.id,
-                Members: item.Members,
-                title: item.Title
-              })
-            }
-            leftAvatar={{
-              source: {
-                uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(
-                  item.Sender_Id
-                )}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`,
-                activeOpacity: 0.9
-              }
-              leftAvatar={{
-                source: {
-                  uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(
-                    item.Title
-                  )}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`,
-                  activeOpacity: 0.9
-                }
-              }}
-              title={item.Title}
-              titleStyle={{ textAlign: "left" }}
-              // subtitleStyle = {{textAlign : "left"}}
-              // subtitle={item.Title}
-            />
-            <Divider style={{ backgroundColor: "black" }} />
-          </View>
-        );
-      } else {
+      if(length == true){
         return (
           <View>
             <ListItem
@@ -168,9 +135,10 @@ export default class ChatScreen extends React.Component {
             <Divider style={{ backgroundColor: "black" }} />
           </View>
         );
-      }else{
-
+        
       
+        
+      }else{
       return (
         <View>
           <ListItem
