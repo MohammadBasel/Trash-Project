@@ -531,7 +531,7 @@ export default class MapScreen extends React.Component {
     const Desc = "Trash bin was emptied";
     const Time = new Date();
     const Trash_Id = this.state.selectedBin.id;
-    const Truck_Id = truckId;
+    const Truck_Id = turck;
     const User_Id = this.state.user.id;
     const Zone_Id = this.state.zone.zoneObj.id;
 

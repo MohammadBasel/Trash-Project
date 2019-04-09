@@ -207,6 +207,12 @@ export default class CreateZone extends React.Component {
                       onChangeText={zone => this.setState({ longitude })}
                       value={this.state.longitude}
                     />
+                    
+                    <View style={{alignItems: "center"}}>
+                  <TouchableOpacity style={styles.buttonContainer1} onPress={() => {this.addCoordinate()}}>
+                  <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>Add Coordinate</Text> 
+                </TouchableOpacity>
+                </View>
                   </View>
                 ):
                 (
