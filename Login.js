@@ -107,18 +107,21 @@ export default class Login extends React.Component {
           source={this.image}
           style={{ width: width, height: height }}
         >
-          <KeyboardAvoidingView style={styles.container} behavior="padding">
-            {this.state.Online === false ? (
-              <View style={styles.contentContainer}>
-                <View style={styles.welcomeContainer}>
-                  <Image
-                    style={{ width: width * 0.35, height: height * 0.28 }}
-                    source={{
-                      uri:
-                        "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/logo.png?alt=media&token=3a5446d6-2998-46b5-8cef-7f1c1afda0d3"
-                    }}
-                  />
-                  <Text>{"  "}</Text>
+        <KeyboardAvoidingView style={styles.container} behavior="padding" >
+        {this.state.Online === false ? (
+          <View style={styles.contentContainer}>
+            <View style={styles.welcomeContainer}>
+            {/* <View style={{paddingTop : "50%"}}> */}
+              <Image
+                style={{ width: wp(40), height: hp(21) }}
+                source={{
+                  uri:
+                    "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/logo.png?alt=media&token=3a5446d6-2998-46b5-8cef-7f1c1afda0d3"
+                }}
+              />
+
+              <Text>{"  "}</Text>
+
                   <Input
                     leftIcon={
                       <AntDesign name="user" size={20} color="#567D46" />
@@ -166,7 +169,8 @@ export default class Login extends React.Component {
                     </Text>
                   </TouchableOpacity>
                 </View>
-              </View>
+                </View>
+
             ) : (
               <AppNavigator />
             )}
