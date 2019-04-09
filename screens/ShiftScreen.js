@@ -107,6 +107,7 @@ export default class ShiftScreen extends React.Component {
     }
   };
   saveChange = async () => {
+    this.setState({ switch: false });
     let tempNew = [];
     let tempOld = [];
     for (i = 0; i < this.state.changed.length; i++) {
@@ -117,7 +118,7 @@ export default class ShiftScreen extends React.Component {
       tempOld = this.state.changed[i].oldid.Users;
 
       tempOld.splice(tempOld.indexOf(this.state.changed[i].user_id), 1);
-      console.log("tempOld", tempOld);
+      console.log("tempOld", tempOld.indexOf(this.state.changed[i].user_id));
       await db
         .collection("Shift")
         .doc(this.state.changed[i].newid.id)
@@ -129,6 +130,8 @@ export default class ShiftScreen extends React.Component {
         .update({ Users: tempOld });
       //console.log("TEMPORARY ARRAY", temp);
     }
+
+    this.setState({ changed: [] });
   };
   undo = async () => {
     changed = [...this.state.changed];
@@ -136,6 +139,7 @@ export default class ShiftScreen extends React.Component {
     await this.setState({ changed });
     console.log("Changed", this.state.changed);
   };
+  fontSize = 13;
   render() {
     return (
       <View style={styles.container}>
@@ -158,79 +162,144 @@ export default class ShiftScreen extends React.Component {
               <Button
                 onPress={this.saveChange}
                 title="Save changes"
-                titleStyle={{ color: "white" }}
+                titleStyle={{
+                  color: "white",
+                  fontSize: this.fontSize / fontScale
+                }}
                 containerStyle={{ width: 100 }}
                 type="clear"
               />
             )
           }
         />
+        <ScrollView>
+          {/* <Switch onValueChange={this.turnOn} value={this.state.switch} /> */}
+          {this.state.switch && this.state.changed.length != 0 && (
+            <View>
+              <View>
+                <TouchableOpacity
+                  onPress={this.undo}
+                  style={{
+                    backgroundColor: "#7a66ff",
+                    opacity: 1,
+                    borderRadius: 10,
+                    border: "1px solid #7a66ff",
+                    //  padding: "15%",
+                    width: width * 0.2,
+                    height: height * 0.06,
+                    alignItems: "center",
+                    justifyContent: "center"
+                    // position: "absolute",
+                    // top: height * 0.87,
+                    // left: width * 0.4
+                  }}
+                >
+                  <Text>Undo Last Change</Text>
+                </TouchableOpacity>
+              </View>
 
-        <Switch onValueChange={this.turnOn} value={this.state.switch} />
-        {this.state.switch && this.state.changed.length != 0 && (
-          <View>
-            <Button onPress={this.undo} title="Undo Last Change" />
-            <Text style={{ fontWeight: "bold" }}>Changes to be Made</Text>
-
-            {this.state.changed.map(change => (
-              <View
+              <Text
                 style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between"
+                  fontWeight: "bold",
+                  alignItems: "center",
+                  justifyContent: "center"
                 }}
               >
-                <Text style={{ fontWeight: "bold" }}> User:{"  "}</Text>
-                <Text>
-                  {" "}
-                  {change.user_id}
-                  {"  "}
+                Changes to be Made
+              </Text>
+
+              {this.state.changed.map(change => (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between"
+                  }}
+                >
+                  <Text style={{ fontWeight: "bold" }}> User:{"  "}</Text>
+                  <Text>
+                    {" "}
+                    {change.user_id}
+                    {"  "}
+                  </Text>
+
+                  <Text style={{ fontWeight: "bold" }}> Day:{"  "}</Text>
+                  <Text> {change.newid.Day}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+          {this.state.users.map(user => (
+            <Card>
+              <View
+                style={{
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  width: width * 0.7
+                }}
+              >
+                <Text
+                  style={{
+                    fontWeight: "bold",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 18
+                  }}
+                >
+                  {user.id}
                 </Text>
 
-                <Text style={{ fontWeight: "bold" }}> Day:{"  "}</Text>
-                <Text> {change.newid.Day}</Text>
-              </View>
-            ))}
-          </View>
-        )}
-        {this.state.users.map(user => (
-          <ScrollView>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between"
-              }}
-            >
-              <Text style={{ padding: 10 }}>{user.id}</Text>
-
-              {this.state.shift.map(
-                shif =>
-                  shif.Users.includes(user.id) && (
-                    <View
-                      style={
-                        {
-                          // flexDirection: "row",
-                          // justifyContent: "space-between"
-                        }
-                      }
-                    >
+                {this.state.shift.map(
+                  shif =>
+                    shif.Users.includes(user.id) && (
                       <TouchableOpacity
                         onPress={() => this.change(shif.id, user.id)}
                         disabled={!this.state.switch}
                       >
-                        <Text>{shif.Day}</Text>
-                        <Text>{shif.End_Time}</Text>
-                        <Text>
-                          {shif.Start_Time}
-                          {"\n"}
-                        </Text>
+                        <View
+                          style={{
+                            // width: width * 0.8
+                            flexDirection: "row",
+                            justifyContent: "space-between"
+                          }}
+                        >
+                          <Text style={{ width: width * 0.2, fontSize: 15 }}>
+                            {shif.Day}
+                          </Text>
+                          <Text style={{ fontSize: 15 }}>{shif.End_Time}</Text>
+                          <Text style={{ fontSize: 15 }}>
+                            {shif.Start_Time}
+                          </Text>
+                          <Text>{"\n"}</Text>
+                        </View>
                       </TouchableOpacity>
-                    </View>
-                  )
-              )}
-              <View />
-            </View>
-          </ScrollView>
-        ))}
+                    )
+                )}
+                <View />
+              </View>
+            </Card>
+          ))}
+        </ScrollView>
+        <View>
+          <TouchableOpacity
+            onPress={this.turnOn}
+            style={{
+              backgroundColor: "#7a66ff",
+              opacity: 1,
+              borderRadius: 10,
+              border: "1px solid #7a66ff",
+              //  padding: "15%",
+              width: width * 0.2,
+              height: height * 0.06,
+              alignItems: "center",
+              justifyContent: "center"
+              // position: "absolute",
+              // top: height * 0.87,
+              // left: width * 0.4
+            }}
+          >
+            <Text>{!this.state.switch ? "Start Edit" : "Stop Edit"}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
