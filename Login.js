@@ -129,6 +129,7 @@ export default class Login extends React.Component {
                     onChangeText={email => this.setState({ email })}
                     placeholderTextColor="#567D46"
                   />
+
                   <Text>{""}</Text>
                   <Input
                     leftIcon={
@@ -141,6 +142,7 @@ export default class Login extends React.Component {
                     secureTextEntry={true}
                     placeholderTextColor="#567D46"
                   />
+
                   <Text>{""}</Text>
                   <Text
                     style={{

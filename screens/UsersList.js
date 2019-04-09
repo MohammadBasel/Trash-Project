@@ -103,31 +103,35 @@ export default class UsersList extends React.Component {
       if (oldmembers[i] == this.state.members) {
         check = true;
       }
-      
     }
     return check;
-
-  }
-
+  };
 
   addChat = async () => {
+    const { goBack } = this.props.navigation;
     console.log("the check is : ", this.check());
     check = false;
-    oldmembers = [];
+    oldmembersOut = []
     await db.collection(`Chat`).onSnapshot(querySnapshot => {
+      oldmembers = []
       querySnapshot.forEach(doc => {
-        oldmembers.push(doc.data().members);
-
+        
+        oldmembers.push(doc.data().Members);
+        
         console.log("the zone is : ", zoneId);
       });
+      oldmembersOut = oldmembers
+      console.log("the members in addChat oldmembersOut : ", oldmembersOut);
     });
-
-    for (let i = 0; i < oldmembers.length; i++) {
-      console.log("the memebers in old is : ", oldmembers[i]);
-      if (oldmembers[i] == this.state.members) {
+    console.log("the memebers in old is before for loop : ", oldmembers[i]);
+    for (let i = 0; i < oldmembersOut.length; i++) {
+      console.log("the memebers in old is : ", oldmembersOut[i]);
+      if (oldmembersOut[i] == this.state.members) {
         check = true;
       }
     }
+    console.log()
+    console.log("the check in the  userslist after it's done : ",check)
     if (check === false) {
       const { navigation } = this.props;
       let title = "";
@@ -157,12 +161,12 @@ export default class UsersList extends React.Component {
       });
 
       this.props.navigation.navigate("Chat");
-    };
+    }
   };
-  avatarURL = (email) => {
-    console.log("the email : ", email)
-    return  email.replace("@","%40")
-  }
+  avatarURL = email => {
+    console.log("the email : ", email);
+    return email.replace("@", "%40");
+  };
 
   renderUsers = ({ item }) => {
     const match = this.searchForMatch(item.id);
@@ -173,7 +177,8 @@ export default class UsersList extends React.Component {
             // onPress= { this.addChat(item.id,item.Name)}
             leftAvatar={{
               source: {
-                uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(item.Sender_Id)}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`,
+                uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(item.id)}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`,
+
                 activeOpacity: 0.9
               }
             }}

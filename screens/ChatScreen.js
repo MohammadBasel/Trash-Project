@@ -44,8 +44,8 @@ export default class ChatScreen extends React.Component {
 
   async componentDidMount() {
     console.log("the email logged in is ", firebase.auth().currentUser.email);
-    chat = [];
     await db.collection(`Chat`).onSnapshot(querySnapshot => {
+      chat = [];
       querySnapshot.forEach(doc => {
         chat.push({ id: doc.id, ...doc.data() });
       });
@@ -67,6 +67,11 @@ export default class ChatScreen extends React.Component {
     console.log("i'm getting inside");
     var rand = Math.floor(1 + Math.random() * (100 - 1));
     check = false;
+    console.log("the item : ", item);
+    console.log("i'm getting inside");
+    var rand = Math.floor(1 + Math.random() * (100 - 1));
+    check = false;
+    length = false;
 
     for (i = 0; item.Members !== undefined && i < item.Members.length; i++) {
       console.log("the memeers ", item.Members[i]);
@@ -77,6 +82,9 @@ export default class ChatScreen extends React.Component {
     for (i = 0; i < item.Members.length; i++) {
       console.log("the memeers ", item.Members[i]);
       if (item.Members[i] === firebase.auth().currentUser.email) {
+        if (item.Members.length > 2) {
+          length = true;
+        }
         check = true;
       }
     }
@@ -99,15 +107,52 @@ export default class ChatScreen extends React.Component {
                 )}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`,
                 activeOpacity: 0.9
               }
-            }}
-            title={item.Title}
-            titleStyle={{ textAlign: "left" }}
-            // subtitleStyle = {{textAlign : "left"}}
-            // subtitle={item.Title}
-          />
-          <Divider style={{ backgroundColor: "black" }} />
-        </View>
-      );
+              leftAvatar={{
+                source: {
+                  uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(
+                    item.Title
+                  )}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`,
+                  activeOpacity: 0.9
+                }
+              }}
+              title={item.Title}
+              titleStyle={{ textAlign: "left" }}
+              // subtitleStyle = {{textAlign : "left"}}
+              // subtitle={item.Title}
+            />
+            <Divider style={{ backgroundColor: "black" }} />
+          </View>
+        );
+      } else {
+        return (
+          <View>
+            <ListItem
+              {...console.log("the sender id :", item.Sender_Id)}
+              onPress={() =>
+                this.props.navigation.navigate("ChatList", {
+                  data: item.id,
+                  Members: item.Members,
+                  title: item.Title
+                })
+              }
+              leftAvatar={{
+                source: {
+                  uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(
+                    item.Title
+                  )}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`,
+
+                  activeOpacity: 0.9
+                }
+              }}
+              title={item.Title}
+              titleStyle={{ textAlign: "left" }}
+              // subtitleStyle = {{textAlign : "left"}}
+              // subtitle={item.Title}
+            />
+            <Divider style={{ backgroundColor: "black" }} />
+          </View>
+        );
+      }
     }
   };
 

@@ -56,6 +56,7 @@ export default class Employee extends React.Component {
         this.getTruckData(this.state.zone);
       });
       this.setState({ zones });
+      zones = [];
     });
     db.collection("Logging").onSnapshot(querySnapshot => {
       logs = [];
@@ -65,6 +66,7 @@ export default class Employee extends React.Component {
       });
       this.setState({ logs });
       this.setState({ filteredItems: logs });
+      logs = [];
       console.log("Current logs: ", this.state.logs.length);
     });
 
@@ -78,7 +80,7 @@ export default class Employee extends React.Component {
         trash.push({ id: doc.id, ...doc.data() });
       });
       this.setState({ trash });
-
+      trash = [];
       //console.log("Current zones: ", this.state.trash.length);
     });
   };
@@ -90,7 +92,7 @@ export default class Employee extends React.Component {
         trucks.push({ id: doc.id, ...doc.data() });
       });
       this.setState({ trucks });
-
+      truck = [];
       //console.log("Current zones: ", this.state.trash.length);
     });
   };
@@ -307,8 +309,8 @@ export default class Employee extends React.Component {
   };
   render() {
     //console.log("TRUCKS", this.state.trucks);
-    console.log("StartDate", this.state.startdate.date);
-    console.log("EndDate", this.state.enddate.date);
+    console.log("Trucks", this.state.trucks);
+
     return (
       <View style={styles.container}>
         <Header
@@ -330,65 +332,67 @@ export default class Employee extends React.Component {
           {"\n"}
           {"\n"}
         </Text>
-        <DatePicker
-          style={{ width: 200 }}
-          date={this.state.startdate.date}
-          mode="date"
-          placeholder="select start date"
-          format="YYYY-MM-DD"
-          minDate="2016-05-01"
-          maxDate="2030-06-01"
-          confirmBtnText="Confirm"
-          cancelBtnText="Cancel"
-          customStyles={{
-            dateIcon: {
-              position: "absolute",
-              left: 0,
-              top: 4,
-              marginLeft: 0
-            },
-            dateInput: {
-              marginLeft: 36
-            }
-            // ... You can check the source to find the other keys.
-          }}
-          onDateChange={date => {
-            this.handleStartDate({ date });
-          }}
-        />
+        <View style={{ height: height * 0.1 }}>
+          <DatePicker
+            style={{ width: 200 }}
+            date={this.state.startdate.date}
+            mode="date"
+            placeholder="select start date"
+            format="YYYY-MM-DD"
+            minDate="2016-05-01"
+            maxDate="2030-06-01"
+            confirmBtnText="Confirm"
+            cancelBtnText="Cancel"
+            customStyles={{
+              dateIcon: {
+                position: "absolute",
+                left: 0,
+                top: 4,
+                marginLeft: 0
+              },
+              dateInput: {
+                marginLeft: 36
+              }
+              // ... You can check the source to find the other keys.
+            }}
+            onDateChange={date => {
+              this.handleStartDate({ date });
+            }}
+          />
 
-        <DatePicker
-          style={{ width: 200 }}
-          date={this.state.enddate.date}
-          mode="date"
-          placeholder="select end date"
-          format="YYYY-MM-DD"
-          minDate="2016-05-01"
-          maxDate="2030-06-01"
-          confirmBtnText="Confirm"
-          cancelBtnText="Cancel"
-          customStyles={{
-            dateIcon: {
-              position: "absolute",
-              left: 0,
-              top: 4,
-              marginLeft: 0
-            },
-            dateInput: {
-              marginLeft: 36
-            }
-            // ... You can check the source to find the other keys.
-          }}
-          onDateChange={date => {
-            this.handleEndDate({ date });
-          }}
-        />
+          <DatePicker
+            style={{ width: 200 }}
+            date={this.state.enddate.date}
+            mode="date"
+            placeholder="select end date"
+            format="YYYY-MM-DD"
+            minDate="2016-05-01"
+            maxDate="2030-06-01"
+            confirmBtnText="Confirm"
+            cancelBtnText="Cancel"
+            customStyles={{
+              dateIcon: {
+                position: "absolute",
+                left: 0,
+                top: 4,
+                marginLeft: 0
+              },
+              dateInput: {
+                marginLeft: 36
+              }
+              // ... You can check the source to find the other keys.
+            }}
+            onDateChange={date => {
+              this.handleEndDate({ date });
+            }}
+          />
+        </View>
         <Text>
           {"\n"}
           {"\n"}
         </Text>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <View>
+          <View style={{ height: height * 0.2 }}>
             <Text>Choose a Trash</Text>
             <Picker
               selectedValue={this.state.trashid}
@@ -403,7 +407,7 @@ export default class Employee extends React.Component {
               ))}
             </Picker>
           </View>
-          <View>
+          <View style={{ height: height * 0.2 }}>
             <Text>Choose a Truck</Text>
             <Picker
               selectedValue={this.state.truckid}
@@ -413,29 +417,44 @@ export default class Employee extends React.Component {
               }
             >
               <Picker.Item label="All" value="0" />
-              {this.state.trucks.map(truck => (
-                <Picker.Item label={truck.id} value={truck.id} />
+              {this.state.trucks.map(tru => (
+                <Picker.Item label={tru.id} value={tru.id} />
               ))}
             </Picker>
           </View>
         </View>
-
-        {this.state.filteredItems.map(log => (
-          <Card title={log.Desc} width={width * 0.95}>
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
-            >
-              <Text style={{ fontWeight: "bold" }}>Trash ID:</Text>
-              <Text>{log.Trash_Id.substring(33)}</Text>
-            </View>
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
-            >
-              <Text style={{ fontWeight: "bold" }}>Truck ID:</Text>
-              <Text>{log.Truck_Id.substring(33)}</Text>
-            </View>
-          </Card>
-        ))}
+        <ScrollView>
+          <View style={{ height: height * 0.65 }}>
+            {this.state.filteredItems.length === 0 ? (
+              <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+                Sorry, Logs for this condition not available
+              </Text>
+            ) : (
+              this.state.filteredItems.map(log => (
+                <Card title={log.Desc} width={width * 0.95}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between"
+                    }}
+                  >
+                    <Text style={{ fontWeight: "bold" }}>Trash ID:</Text>
+                    <Text>{log.Trash_Id.substring(32)}</Text>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between"
+                    }}
+                  >
+                    <Text style={{ fontWeight: "bold" }}>Truck ID:</Text>
+                    <Text>{log.Truck_Id.substring(32)}</Text>
+                  </View>
+                </Card>
+              ))
+            )}
+          </View>
+        </ScrollView>
       </View>
     );
   }

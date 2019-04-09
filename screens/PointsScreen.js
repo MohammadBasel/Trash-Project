@@ -29,7 +29,7 @@ import {
 } from "react-native-elements";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import SwitchToggle from "react-native-switch-toggle";
-const { width, height } = Dimensions.get("window");
+const { width, height, fontScale } = Dimensions.get("window");
 
 export default class PointsScreen extends React.Component {
   static navigationOptions = {
@@ -74,6 +74,7 @@ export default class PointsScreen extends React.Component {
     else this.setState({ switch: false });
   };
   avatarURL = email => {
+    console.log("EMAIL", email);
     return email.replace("@", "%40");
   };
   list = item => {
@@ -92,9 +93,9 @@ export default class PointsScreen extends React.Component {
                 size="small"
                 rounded
                 source={{
-                  uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/${this.avatarURL(
+                  uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(
                     item.id
-                  )}%2Favatar.png?alt=media`
+                  )}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`
                 }}
               />
             }
@@ -139,6 +140,7 @@ export default class PointsScreen extends React.Component {
         .doc(this.state.users[i].id)
         .update({ Points: this.state.users[i].Points });
     }
+    this.setState({ switch: false });
     // );
   };
   getValue = (value, id) => {
@@ -153,7 +155,7 @@ export default class PointsScreen extends React.Component {
       this.setState({ users: changes });
     }
   };
-
+  fontSize = 13;
   render() {
     console.log("USERS", this.state.users);
     return (
@@ -178,14 +180,17 @@ export default class PointsScreen extends React.Component {
                 onPress={this.saveChange}
                 title="Save changes"
                 type="clear"
-                titleStyle={{ color: "white" }}
+                titleStyle={{
+                  color: "white",
+                  fontSize: this.fontSize / fontScale
+                }}
                 containerStyle={{ width: 100 }}
               />
             )
           }
         />
 
-        <Switch onValueChange={this.turnOn} value={this.state.switch} />
+        {/* <Switch onValueChange={this.turnOn} value={this.state.switch} /> */}
         <FlatList
           data={this.state.users}
           keyExtractor={item => item.id}
@@ -195,6 +200,25 @@ export default class PointsScreen extends React.Component {
             //console.log("items", item);
           }
         />
+        <TouchableOpacity
+          onPress={this.turnOn}
+          style={{
+            backgroundColor: "#7a66ff",
+            opacity: 1,
+            borderRadius: 10,
+            border: "1px solid #7a66ff",
+            //  padding: "15%",
+            width: width * 0.2,
+            height: height * 0.06,
+            alignItems: "center",
+            justifyContent: "center"
+            // position: "absolute",
+            // top: height * 0.87,
+            // left: width * 0.4
+          }}
+        >
+          <Text>{!this.state.switch ? "Start Edit" : "Stop Edit"}</Text>
+        </TouchableOpacity>
       </View>
     );
   }
