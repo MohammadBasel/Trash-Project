@@ -103,6 +103,7 @@ export default class ChatScreen extends React.Component {
     }
     console.log("group Title : ", groupTitle);
 
+
     if (check === true) {
       if (length === true) {
         return (
@@ -162,6 +163,7 @@ export default class ChatScreen extends React.Component {
             <Divider style={{ backgroundColor: "black" }} />
           </View>
         );
+
       }
     }
   };

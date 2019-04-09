@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View, Text, TouchableOpacity, TextInput, Picker, Alert } from 'react-native';
+import { ScrollView, StyleSheet, View, Text, TouchableOpacity, TextInput, Picker, Alert,Platform } from 'react-native';
 import { Header, ListItem, Divider, Badge, Avatar, Card, Button, Icon } from "react-native-elements"
 import { ExpoLinksView } from '@expo/samples';
 import db from "../db.js"
@@ -129,7 +129,6 @@ export default class CreateUser extends React.Component {
     }
     render() {
         return (
-            <ScrollView style={styles.container}>
               <View style={{alignItems: 'center', justifyContent: "center", alignItems: "center"}}>
               <View style= {{flexDirection: "row", justifyContent: 'space-between', flexWrap: "wrap", alignItems: "center"}}>
 
@@ -151,10 +150,11 @@ export default class CreateUser extends React.Component {
                 />
                 ):
                 (
+                  
                   <View>
                     <Picker
                     selectedValue={this.state.user}
-                    style={{height: hp("5%"), width: wp("50%")}}
+                    style={{height: hp("5%"), width: wp("50%"), marginBottom: Platform.OS === "ios" ? hp("8%"): hp("1%")}}
                     selectedValue={this.state.email}
                     onValueChange={(itemValue, itemIndex) =>
                       this.setState({email: itemValue})
@@ -165,11 +165,12 @@ export default class CreateUser extends React.Component {
                       ))
                       }
                   </Picker>
-                  <Button
-                    onPress={() => {this.getUser()}}
-                    title="User Selected"
-                    color="blue"
-                  />
+                  <View style={{alignItems: "center"}}>
+                  <TouchableOpacity style={styles.buttonContainer1} onPress={() => {this.getUser()}}>
+                  <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>User Select</Text> 
+                </TouchableOpacity>
+                </View>
+                   
               </View>
                 )}
                 <Text style={{ color: "red" }}>{this.state.erroremail}</Text>
@@ -202,37 +203,73 @@ export default class CreateUser extends React.Component {
                   }>
                   <Picker.Item label="Employee" value="Employee" />
                   <Picker.Item label="Supervisor" value="Supervisor" />
-                  <Picker.Item label="Maintenance" value="Maintenance" />
+                  <Picker.Item label="Maintainer" value="Maintainer" />
                 </Picker>
-                <Text style={{fontWeight: 'bold', fontSize: 20}}>Choose the Role:</Text>
-                <Picker
-                  selectedValue={this.state.zone}
-                  style={{height: hp("5%"), width: wp("50%")}}
-                  selectedValue={this.state.zone}
-                  onValueChange={(itemValue, itemIndex) =>
-                    this.setState({zone: itemValue})
-                  }>
-                    <Picker.Item label="Select" value="" />
-                    {this.state.zones.map((zone, i) => (
-                        <Picker.Item label={zone.id} value={zone.id}/>
-                    ))
-                    }
-                </Picker>
-                <Text style={{ color: "red" }}>{this.state.error}</Text>
-                {this.state.button == false ? (
-                  <TouchableOpacity style={styles.buttonContainer}  onPress={() => {this.createUser()}}>
-                    <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>SUBMIT</Text> 
-                  </TouchableOpacity>
-                    
-                ) : (
-                  <TouchableOpacity style={styles.buttonContainer}  onPress={() => {this.updateUser()}}>
-                    <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>SUBMIT</Text> 
-                  </TouchableOpacity>
+                {Platform.OS === "ios" ? (
+                  <View style={{paddingTop: hp("10%")}}>
+                      <Text style={{fontWeight: 'bold', fontSize: 20}}>Choose the Role:</Text>
+                      <Picker
+                        selectedValue={this.state.zone}
+                        style={{height: hp("10%"), width: wp("50%")}}
+                        selectedValue={this.state.zone}
+                        onValueChange={(itemValue, itemIndex) =>
+                          this.setState({zone: itemValue})
+                        }>
+                          <Picker.Item label="Select" value="" />
+                          {this.state.zones.map((zone, i) => (
+                              <Picker.Item label={zone.id} value={zone.id}/>
+                          ))
+                          }
+                      </Picker>
+                    <Text style={{ color: "red" }}>{this.state.error}</Text>
+                    <View style={{paddingTop: hp("10%")}}>
+                    {this.state.button == false ? (
+                      <TouchableOpacity style={styles.buttonContainer}  onPress={() => {this.createUser()}}>
+                        <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>SUBMIT</Text> 
+                      </TouchableOpacity>
+                        
+                    ) : (
+                      <TouchableOpacity style={styles.buttonContainer}  onPress={() => {this.updateUser()}}>
+                        <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>SUBMIT</Text> 
+                      </TouchableOpacity>
+                      
+                    )}
+                    </View>
+                  </View>
+                ) : 
+                (
+                  <View>
+                      <Text style={{fontWeight: 'bold', fontSize: 20}}>Choose the Role:</Text>
+                      <Picker
+                        selectedValue={this.state.zone}
+                        style={{height: hp("5%"), width: wp("50%")}}
+                        selectedValue={this.state.zone}
+                        onValueChange={(itemValue, itemIndex) =>
+                          this.setState({zone: itemValue})
+                        }>
+                          <Picker.Item label="Select" value="" />
+                          {this.state.zones.map((zone, i) => (
+                              <Picker.Item label={zone.id} value={zone.id}/>
+                          ))
+                          }
+                      </Picker>
+                    <Text style={{ color: "red" }}>{this.state.error}</Text>
+                    {this.state.button == false ? (
+                      <TouchableOpacity style={styles.buttonContainer}  onPress={() => {this.createUser()}}>
+                        <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>SUBMIT</Text> 
+                      </TouchableOpacity>
+                        
+                    ) : (
+                      <TouchableOpacity style={styles.buttonContainer}  onPress={() => {this.updateUser()}}>
+                        <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>SUBMIT</Text> 
+                      </TouchableOpacity>
+                      
+                    )}
+                  </View>
                 )}
+               
                  
               </View>
-
-            </ScrollView>
         );
     }
 }
@@ -245,12 +282,24 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
       // marginTop:hp(3),
-      height:hp("5%"),
+      height:hp("6%"),
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
       // marginBottom:hp(3),
-      width:wp("15%"),
+      width:wp("20%"),
+      borderRadius:10,
+      backgroundColor: "#7a66ff",
+      padding: wp("3%")
+    },
+    buttonContainer1: {
+      // marginTop:hp(3),
+      height:hp("6%"),
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      // marginBottom:hp(3),
+      width:wp("20%"),
       borderRadius:10,
       backgroundColor: "#7a66ff",
       padding: wp("3%")
