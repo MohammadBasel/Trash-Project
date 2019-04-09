@@ -48,7 +48,6 @@ export default class Login extends React.Component {
   };
   image = require("./assets/images/park.jpg");
   count = 6;
-
   async componentDidMount() {
     // firebase.auth().onAuthStateChanged = (user) => {
     //   console.log("login page", user)
@@ -106,20 +105,19 @@ export default class Login extends React.Component {
       <View style={styles.container}>
         <ImageBackground
           source={this.image}
-          style={{ width: wp("100%"), height: hp("100%") }}
+          style={{ width: width, height: height }}
         >
           <KeyboardAvoidingView style={styles.container} behavior="padding">
             {this.state.Online === false ? (
               <View style={styles.contentContainer}>
                 <View style={styles.welcomeContainer}>
                   <Image
-                    style={{ width: wp(40), height: hp(21) }}
+                    style={{ width: width * 0.35, height: height * 0.28 }}
                     source={{
                       uri:
                         "https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/logo.png?alt=media&token=3a5446d6-2998-46b5-8cef-7f1c1afda0d3"
                     }}
                   />
-
                   <Text>{"  "}</Text>
                   <Input
                     leftIcon={

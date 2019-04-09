@@ -62,6 +62,7 @@ export default class MapScreen extends React.Component {
     zone: null,
     route: null,
     forcast: null,
+    zones: [],
     bins: [],
     trucks: [],
     coordsArr: [{ latitude: 25.381649, longitude: 51.479143 }],
@@ -91,7 +92,7 @@ export default class MapScreen extends React.Component {
 
   async componentDidMount() {
     //this.getDirections();
-    //this.getWhether();
+    this.getWhether();
     setInterval(this.tempUpdater, 30000);
     await Permissions.askAsync(Permissions.LOCATION);
     const email = firebase.auth().currentUser.email;
@@ -121,33 +122,59 @@ export default class MapScreen extends React.Component {
     const zoneId = result.data().Zone;
 
     const user = { id: result.id, ...result.data() };
-    await db
-      .collection("Zone")
-      .doc(zoneId)
-      .onSnapshot(querySnapshot => {
-        const id = querySnapshot.id;
-        const coordsArr = this.convertToObjects(
-          querySnapshot.data().Coordinate
-        );
-        const zone = { id, ...querySnapshot.data() };
-        this.setState({ zone, coordsArr, user });
+    if (user.Role === "Maintainer") {
+      await db.collection("Zone").onSnapshot(querySnapshot => {
+        let zones = [];
+        let bins = [];
+        querySnapshot.forEach(async doc => {
+          let coordsArr = this.convertToObjects(doc.data().Coordinate);
+          const zoneObj = { id: doc.id, ...doc.data() };
+
+          zones.push({ zoneObj, coordsArr });
+          await db
+            .collection(`Zone/${doc.id}/Trash`)
+            .onSnapshot(querySnapshot => {
+              querySnapshot.forEach(doc => {
+                bins.push({ id: doc.id, ...doc.data() });
+              });
+            });
+          this.setState({ bins });
+        });
+        const zone = zones.find(zad => zad.zoneObj.id === zoneId);
+        console.log("Zone is: ", zone);
+        this.setState({ zones, zone, user });
+        bins = [];
+      });
+    } else {
+      await db
+        .collection("Zone")
+        .doc(zoneId)
+        .onSnapshot(querySnapshot => {
+          const id = querySnapshot.id;
+          const coordsArr = this.convertToObjects(
+            querySnapshot.data().Coordinate
+          );
+          const zoneObj = { id, ...querySnapshot.data() };
+          const zone = { zoneObj, coordsArr };
+          this.setState({ zone, user });
+        });
+
+      db.collection(`Zone/${zoneId}/Trash`).onSnapshot(querySnapshot => {
+        let bins = [];
+        querySnapshot.forEach(doc => {
+          bins.push({ id: doc.id, ...doc.data() });
+        });
+        this.setState({ bins });
       });
 
-    db.collection(`Zone/${zoneId}/Trash`).onSnapshot(querySnapshot => {
-      let bins = [];
-      querySnapshot.forEach(doc => {
-        bins.push({ id: doc.id, ...doc.data() });
+      db.collection(`Zone/${zoneId}/Truck`).onSnapshot(querySnapshot => {
+        let trucks = [];
+        querySnapshot.forEach(doc => {
+          trucks.push({ id: doc.id, ...doc.data() });
+        });
+        this.setState({ trucks });
       });
-      this.setState({ bins });
-    });
-
-    db.collection(`Zone/${zoneId}/Truck`).onSnapshot(querySnapshot => {
-      let trucks = [];
-      querySnapshot.forEach(doc => {
-        trucks.push({ id: doc.id, ...doc.data() });
-      });
-      this.setState({ trucks });
-    });
+    }
   }
 
   tempUpdater = async () => {
@@ -319,7 +346,6 @@ export default class MapScreen extends React.Component {
   };
 
   cancelReservation = async () => {
-    console.log("Insided cancel function");
     let truckId = null;
     for (let i = 0; i < this.state.trucks.length; i++) {
       let user = this.state.trucks[i].Crew.find(c => c === this.state.user.id);
@@ -345,12 +371,28 @@ export default class MapScreen extends React.Component {
         .doc(reservation.id)
         .update({ Status: "Cancelled" });
       await db
-        .collection(`Zone/${this.state.zone.id}/Trash`)
+        .collection(`Zone/${this.state.zone.zoneObj.id}/Trash`)
         .doc(this.state.selectedBin.id)
         .update({ Status: "Active" });
       clearImmediate(this.timer);
       this.timer = null;
       this.setState({ countDown: 30 });
+
+      const Desc = "Trash bin reservation has been cancelled";
+      const Time = new Date();
+      const Trash_Id = this.state.selectedBin.id;
+      const Truck_Id = truckId;
+      const User_Id = this.state.user.id;
+      const Zone_Id = this.state.zone.zoneObj.id;
+
+      db.collection("Logging").add({
+        Desc,
+        Time,
+        Trash_Id,
+        Truck_Id,
+        User_Id,
+        Zone_Id
+      });
     } else {
       alert(
         "You cannot cancel this reservation because you did not created it!"
@@ -378,6 +420,21 @@ export default class MapScreen extends React.Component {
         break;
       }
     }
+    const Desc = "Trash bin has been reserved";
+    const Time = new Date();
+    const Trash_Id = this.state.selectedBin.id;
+    const Truck_Id = truckId;
+    const User_Id = this.state.user.id;
+    const Zone_Id = this.state.zone.zoneObj.id;
+
+    db.collection("Logging").add({
+      Desc,
+      Time,
+      Trash_Id,
+      Truck_Id,
+      User_Id,
+      Zone_Id
+    });
     //console.log("Truck Id is: ", truckId);
     const result = await db
       .collection(`Reserve_Bin`)
@@ -388,7 +445,7 @@ export default class MapScreen extends React.Component {
     //console.log("result is: ", result.size);
 
     if (result.size <= 0) {
-      db.collection(`Zone/${this.state.zone.id}/Trash`)
+      db.collection(`Zone/${this.state.zone.zoneObj.id}/Trash`)
         .doc(this.state.selectedBin.id)
         .update({ Status: "Reserved" });
 
@@ -415,9 +472,24 @@ export default class MapScreen extends React.Component {
         break;
       }
     }
+    const Desc = "Team points was deducted from";
+    const Time = new Date();
+    const Trash_Id = this.state.selectedBin.id;
+    const Truck_Id = truckId;
+    const User_Id = this.state.user.id;
+    const Zone_Id = this.state.zone.zoneObj.id;
+
+    db.collection("Logging").add({
+      Desc,
+      Time,
+      Trash_Id,
+      Truck_Id,
+      User_Id,
+      Zone_Id
+    });
 
     await db
-      .collection(`Zone/${this.state.zone.id}/Trash`)
+      .collection(`Zone/${this.state.zone.zoneObj.id}/Trash`)
       .doc(this.state.selectedBin.id)
       .update({ Status: "Active" });
 
@@ -454,8 +526,24 @@ export default class MapScreen extends React.Component {
       }
     }
 
+    const Desc = "Trash bin was emptied";
+    const Time = new Date();
+    const Trash_Id = this.state.selectedBin.id;
+    const Truck_Id = truckId;
+    const User_Id = this.state.user.id;
+    const Zone_Id = this.state.zone.zoneObj.id;
+
+    db.collection("Logging").add({
+      Desc,
+      Time,
+      Trash_Id,
+      Truck_Id,
+      User_Id,
+      Zone_Id
+    });
+
     await db
-      .collection(`Zone/${this.state.zone.id}/Trash`)
+      .collection(`Zone/${this.state.zone.zoneObj.id}/Trash`)
       .doc(this.state.selectedBin.id)
       .update({ Status: "Active", Level: 0 });
 
@@ -537,30 +625,6 @@ export default class MapScreen extends React.Component {
           justifyContent: "center"
         }}
       >
-        {/* <Overlay
-          isVisible={this.state.dialogIsVisiable}
-          windowBackgroundColor="rgba(255, 255, 255, .5)"
-          overlayBackgroundColor="red"
-          width="auto"
-          height="auto"
-          onBackdropPress={() => this.setState({ dialogIsVisiable: false })}
-        >
-          <Text>Hello from Overlay!</Text>
-          {this.state.directions.map((trashBin, i) => {
-            <Text
-              style={{ fontWeight: "bold", color: "#7a66ff" }}
-              onPress={() =>
-                this.setState({
-                  selectedBin: trashBin,
-                  dialogIsVisiable: false
-                })
-              }
-            >
-              {console.log("I am inside the text teg: ", trashBin)}
-              {trashBin.id}
-            </Text>;
-          })}
-        </Overlay> */}
         <View>
           <Dialog
             hasOverlay
@@ -589,8 +653,6 @@ export default class MapScreen extends React.Component {
                     })
                   }
                 >
-                  {/* {alert("I am inside the text teg: " + trashBin.id)}
-                  {console.log("I am inside the text teg: ", trashBin.id)} */}
                   {trashBin.id}
                 </Text>
               ))}
@@ -639,7 +701,7 @@ export default class MapScreen extends React.Component {
           {this.state.forcast !== null && (
             <Card
               containerStyle={{
-                backgroundColor: "rgba(56, 172, 236, 1)",
+                backgroundColor: "rgba(56, 172, 236, 1.0)",
                 borderWidth: 0,
                 margin: 0,
                 width: width
@@ -745,11 +807,23 @@ export default class MapScreen extends React.Component {
             ]}
             region={this.state.region}
           >
-            <MapView.Polygon
-              coordinates={this.state.coordsArr}
-              strokeColor="green"
-              strokeWidth={2}
-            />
+            {this.state.user !== null && this.state.user.Role === "Maintainer"
+              ? this.state.zones.map((z, i) => (
+                  <MapView.Polygon
+                    coordinates={z.coordsArr}
+                    strokeColor="green"
+                    strokeWidth={2}
+                  />
+                ))
+              : this.state.user !== null &&
+                this.state.user.Zone === this.state.zone.zoneObj.id && (
+                  <MapView.Polygon
+                    coordinates={this.state.zone.coordsArr}
+                    strokeColor="green"
+                    strokeWidth={2}
+                  />
+                )}
+
             {this.state.bins.map((bin, i) => (
               <MapView.Marker
                 key={i}
@@ -900,7 +974,7 @@ export default class MapScreen extends React.Component {
                 destination={this.state.route[1]}
                 apikey={GOOGLE_API_KEY}
                 strokeWidth={3}
-                strokeColor="#7a66ff"
+                strokeColor="#173fc4"
                 onReady={this.onReady}
                 onError={this.onError}
               />
@@ -914,7 +988,8 @@ export default class MapScreen extends React.Component {
               this.state.selectedBin === null ||
               this.state.selectedBin.Status === "Damaged" ||
               this.state.selectedBin.Status === "Under Maintenance" ||
-              this.state.selectedBin.Status === "Disabled"
+              this.state.selectedBin.Status === "Disabled" ||
+              this.state.user.Role === "Maintainer"
                 ? true
                 : false
             }
@@ -946,7 +1021,8 @@ export default class MapScreen extends React.Component {
               this.state.selectedBin === null ||
               this.state.selectedBin.Status === "Damaged" ||
               this.state.selectedBin.Status === "Under Maintenance" ||
-              this.state.selectedBin.Status === "Disabled"
+              this.state.selectedBin.Status === "Disabled" ||
+              this.state.user.Role === "Maintainer"
                 ? true
                 : false
             }
@@ -978,7 +1054,8 @@ export default class MapScreen extends React.Component {
               this.state.selectedBin === null ||
               this.state.selectedBin.Status === "Damaged" ||
               this.state.selectedBin.Status === "Under Maintenance" ||
-              this.state.selectedBin.Status === "Disabled"
+              this.state.selectedBin.Status === "Disabled" ||
+              this.state.user.Role === "Maintainer"
                 ? true
                 : false
             }

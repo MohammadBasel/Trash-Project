@@ -67,7 +67,6 @@ export default class ChatScreen extends React.Component {
     console.log("i'm getting inside");
     var rand = Math.floor(1 + Math.random() * (100 - 1));
     check = false;
-
     console.log("the item : ", item);
     console.log("i'm getting inside");
     var rand = Math.floor(1 + Math.random() * (100 - 1));
@@ -80,7 +79,6 @@ export default class ChatScreen extends React.Component {
         check = true;
       }
     }
-
     for (i = 0; i < item.Members.length; i++) {
       console.log("the memeers ", item.Members[i]);
       if (item.Members[i] === firebase.auth().currentUser.email) {
@@ -92,17 +90,22 @@ export default class ChatScreen extends React.Component {
     }
 
     if (check == true) {
-      if (length == true) {
-        return (
-          <View>
-            <ListItem
-              {...console.log("the sender id :", item.Sender_Id)}
-              onPress={() =>
-                this.props.navigation.navigate("ChatList", {
-                  data: item.id,
-                  Members: item.Members,
-                  title: item.Title
-                })
+      return (
+        <View>
+          <ListItem
+            onPress={() =>
+              this.props.navigation.navigate("ChatList", {
+                data: item.id,
+                Members: item.Members,
+                title: item.Title
+              })
+            }
+            leftAvatar={{
+              source: {
+                uri: `https://firebasestorage.googleapis.com/v0/b/trashapp-77bcd.appspot.com/o/avatar%2F${this.avatarURL(
+                  item.Sender_Id
+                )}?alt=media&token=1c79507b-72ea-4d02-9250-72889191c26f`,
+                activeOpacity: 0.9
               }
               leftAvatar={{
                 source: {
