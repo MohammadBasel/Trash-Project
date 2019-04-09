@@ -44,6 +44,7 @@ export default class TrashStatus extends React.Component {
         this.getTrashData(this.state.zone);
       });
       this.setState({ zones });
+      zones = [];
     });
   }
   getTrashData = id => {
@@ -53,7 +54,7 @@ export default class TrashStatus extends React.Component {
         trash.push({ id: doc.id, ...doc.data() });
       });
       this.setState({ trash });
-
+      trash = [];
       //console.log("Current zones: ", this.state.trash.length);
     });
   };
