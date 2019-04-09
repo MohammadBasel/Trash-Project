@@ -30,6 +30,8 @@ import ChatList from "../screens/ChatList";
 import UsersList from "../screens/UsersList";
 import MyUsersList from "../screens/MyUsersList";
 
+import {Entypo, Ionicons, MaterialIcons, FontAwesome, MaterialCommunityIcons} from "@expo/vector-icons";
+
 import firebase, { firestore } from 'firebase';
 
 role = ""
@@ -50,7 +52,22 @@ role = ""
 
 
 const HomeStack = createStackNavigator({
-  Home: HomeScreen
+  Home: HomeScreen,
+  Maintenance: MaintenanceScreen,
+  Trash: Trash,
+  Battery: Battery,
+  Admin: AdminDashboard,
+  CreateUser: CreateUser,
+  CreateShift: CreateShift,
+  CreateZone: CreateZone,
+  CreateTrash: CreateTrash,
+  CreateTruck: CreateTruck,
+  Dashboard: DashboardScreen,
+  TrashStatus: TrashStatus,
+  Employee: Employee,
+  Log: LogScreen,
+  ShiftScreen: ShiftScreen,
+  PointsScreen: PointsScreen
 });
 
 HomeStack.navigationOptions = {
@@ -58,11 +75,7 @@ HomeStack.navigationOptions = {
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
-      name={
-        Platform.OS === "ios"
-          ? `ios-information-circle${focused ? "" : "-outline"}`
-          : "md-information-circle"
-      }
+      name={Platform.OS === "ios" ? "ios-home" : "md-home"}
     />
   )
 };
@@ -95,7 +108,7 @@ MapStack.navigationOptions = {
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
-      name={Platform.OS === "ios" ? "ios-options" : "md-options"}
+      name={Platform.OS === "ios" ? "ios-map" : "md-map"}
     />
   )
 };
@@ -165,20 +178,9 @@ if(user != null){
 
 
 console.log("Role is: ", this.role)
-if(this.role === "Employee"){
   nav =  createBottomTabNavigator({
     HomeStack,
     MapStack,
     ChatStack
-  });
-}else{
-  nav = createBottomTabNavigator({
-  HomeStack,
-  MapStack,
-  MaintenanceStack,
-  AdminStack,
-  DashboardStack,
-  ChatStack
-});
-}
+})
 export default nav

@@ -165,11 +165,10 @@ export default class CreateUser extends React.Component {
                       ))
                       }
                   </Picker>
-                  <Button
-                    onPress={() => {this.getUser()}}
-                    title="User Selected"
-                    color="blue"
-                  />
+                  <TouchableOpacity style={styles.buttonContainer} onPress={() => {this.getUser()}}>
+                  <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>User Select</Text> 
+                </TouchableOpacity>
+                   
               </View>
                 )}
                 <Text style={{ color: "red" }}>{this.state.erroremail}</Text>
@@ -202,7 +201,7 @@ export default class CreateUser extends React.Component {
                   }>
                   <Picker.Item label="Employee" value="Employee" />
                   <Picker.Item label="Supervisor" value="Supervisor" />
-                  <Picker.Item label="Maintenance" value="Maintenance" />
+                  <Picker.Item label="Maintainer" value="Maintainer" />
                 </Picker>
                 <Text style={{fontWeight: 'bold', fontSize: 20}}>Choose the Role:</Text>
                 <Picker

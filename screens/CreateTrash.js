@@ -104,10 +104,10 @@ export default class CreateTrash extends React.Component {
               <View style={{alignItems: 'center', justifyContent: "center", borderWidth: 0.5}}>
                <View style= {{flexDirection: "row"}}>
                <TouchableOpacity style={styles.buttonContainer} onPress={() => {this.onCreatebuttonChange()}}>
-                    <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>Create User</Text> 
+                    <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>Create Trash</Text> 
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.buttonContainer} onPress={() => {this.onUpdatebuttonChange()}}>
-                    <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%") }}>Update User</Text> 
+                    <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%") }}>Update Trash</Text> 
                   </TouchableOpacity>
                 </View>
                 <Text style={{fontWeight: 'bold', fontSize: 20}}>Enter the Zone:</Text>
@@ -125,11 +125,10 @@ export default class CreateTrash extends React.Component {
                             ))
                             }
                         </Picker>
-                        <Button
-                        onPress={() => {this.getZone()}}
-                        title="Zone Selected"
-                        color="blue"
-                        />
+                        <TouchableOpacity style={styles.buttonContainer}  onPress={() => {this.getZone()}}>
+                            <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>Trash Select</Text> 
+                        </TouchableOpacity>
+                       
                 </View>
                 <View>
                     {this.state.button == true && (
@@ -175,18 +174,16 @@ export default class CreateTrash extends React.Component {
                   />
                   <Text style={{ color: "red" }}>{this.state.errorlong}</Text>
                   {this.state.button == false ? (
-                    <Button
-                    onPress={() => {this.Createsubmit()}}
-                    title="SUBMIT"
-                    color="blue"
-                  />
-                  ):(
-                    <Button
-                    onPress={() => {this.Updatesubmit()}}
-                    title="SUBMIT"
-                    color="blue"
-                  />
+                   <TouchableOpacity style={styles.buttonContainer}  onPress={() => {this.Createsubmit()}}>
+                   <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>SUBMIT</Text> 
+                 </TouchableOpacity>
+                   
+               ) : (
+                 <TouchableOpacity style={styles.buttonContainer}  onPress={() => {this.Updatesubmit()}}>
+                   <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>SUBMIT</Text> 
+                 </TouchableOpacity>
                   )}
+                  
                   
                 </View>
               </View>

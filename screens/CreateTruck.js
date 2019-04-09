@@ -145,10 +145,10 @@ export default class CreateTrash extends React.Component {
               <View style={{alignItems: 'center', justifyContent: "center", borderWidth: 0.5}}>
                <View style= {{flexDirection: "row"}}>
                   <TouchableOpacity style={styles.buttonContainer} onPress={() => {this.onCreatebuttonChange()}}>
-                    <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>Create User</Text> 
+                    <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>Create Truck</Text> 
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.buttonContainer} onPress={() => {this.onUpdatebuttonChange()}}>
-                    <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%") }}>Update User</Text> 
+                    <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%") }}>Update Truck</Text> 
                   </TouchableOpacity>
                 </View>
                 <Text style={{fontWeight: 'bold', fontSize: 20}}>Enter the Zone:</Text>
@@ -189,11 +189,10 @@ export default class CreateTrash extends React.Component {
                                 )) 
                                 }
                             </Picker>
-                            <Button
-                                onPress={() => {this.getTruck()}}
-                                title="Truck Selected"
-                                color="blue"
-                            />
+                            <TouchableOpacity style={styles.buttonContainer}  onPress={() => {this.getTruck()}}>
+                              <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>Truck Select</Text> 
+                            </TouchableOpacity>
+                            
                             
                         </View>
                     )}
@@ -210,17 +209,14 @@ export default class CreateTrash extends React.Component {
                       )}
                     </View>
                   {this.state.button == false ? (
-                    <Button
-                    onPress={() => {this.Createsubmit()}}
-                    title="SUBMIT"
-                    color="blue"
-                  />
-                  ):(
-                    <Button
-                    onPress={() => {this.Updatesubmit()}}
-                    title="SUBMIT"
-                    color="blue"
-                  />
+                   <TouchableOpacity style={styles.buttonContainer}  onPress={() => {this.Createsubmit()}}>
+                   <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>SUBMIT</Text> 
+                 </TouchableOpacity>
+                   
+                  ) : (
+                 <TouchableOpacity style={styles.buttonContainer}  onPress={() => {this.Updatesubmit()}}>
+                   <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>SUBMIT</Text> 
+                 </TouchableOpacity>
                   )}
                   
                 </View>

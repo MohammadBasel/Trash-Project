@@ -91,8 +91,8 @@ export default class MapScreen extends React.Component {
 
   async componentDidMount() {
     //this.getDirections();
-    //this.getWhether();
-    setInterval(this.tempUpdater, 30000);
+    this.getWhether();
+    //setInterval(this.tempUpdater, 30000);
     await Permissions.askAsync(Permissions.LOCATION);
     const email = firebase.auth().currentUser.email;
     await navigator.geolocation.watchPosition(

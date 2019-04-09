@@ -46,21 +46,21 @@ export default class HomeScreen extends React.Component {
     // user: "asma@asma.com",
     switch1Value: false,
     isDialogVisible: false,
-    tableHead: ['Shifts', 'Sunday', 'Monday', 'Tuesday', 'Wednesday','Thursday', 'Friday', 'Saturday'],
+    tableHead: ['Shifts/Days', 'Sunday', 'Monday', 'Tuesday', 'Wednesday','Thursday'],
     tableData: [['Morning Shift'],['Evening Shift']]
   }
   users = {}
 
 async componentDidMount() {
  await this.getData()  
- await this.createCalandar()
+//  await this.createCalandar()
 }
 
 getData = async () => {
   users = {}
   let zone = ""
-  shifts = []
-  db.collection("Users")
+  let shifts = []
+  await db.collection("Users")
       .onSnapshot(querySnapshot => {
         querySnapshot.forEach(doc => {
           if(this.state.user == doc.id){
@@ -70,13 +70,18 @@ getData = async () => {
           this.setState({users, zone})
         })
       })
-      db.collection("Shift")
+      console.log("user sasdsadsa", users)
+      await  db.collection("Shift")
       .onSnapshot(querySnapshot => {
         querySnapshot.forEach(doc => {
-            shifts = { id: doc.id, ...doc.data() }
-          this.setState({shifts})
+          shifts.push({ id: doc.id, ...doc.data() })
         })
+        this.setState({shifts})
       })
+      // await this.setState({users, zone, shifts})
+      console.log("shifts sasdsadsa", shifts)
+    // await this.createCalandar(shifts)
+    console.log("shifts calendar", shifts)
 }
 
 
@@ -152,22 +157,29 @@ emergency = () => {
 
   Alert.alert("The Emergency Call is made")
 }
-createCalandar = async () =>{
+createCalandar = async (shifts) =>{
     let header = [...this.state.tableHead]
-    let shifts = [...this.state.shifts]
+    // let shifts = shifts
+    console.log("shifts", shifts)
     let tableData = [...this.state.tableData]
     for (let i = 0; i < header.length; i++){
+      console.log("shift header", header[i])
       for(let j = 0; j < shifts.length; j++){
-        if(header[i] == shifts[j].Day){
+        console.log("shift day",shifts[j].Day)
+        if(header[i] === shifts[j].Day){
           if(shifts[j].Start_Time.includes("am")){
+            console.log("shift am", shifts[j].Start_Time.includes("am"))
             if(shifts[j].Users.contains(this.state.user)){
               let time = shifts[j].Start_Time + " - " + shifts[j].End_Time
+              console.log("shift ON", time)
               tableData[0].push(time)
             }else{
               let time = "Off Shift"
+              console.log("shift OFF")
               tableData[0].push(time)
             }
           }else if (shifts[j].Start_Time.includes("pm")){
+            console.log("shift pm", shifts[j].Start_Time.includes("pm"))
             if(shifts[j].Users.contains(this.state.user)){
               let time = shifts[j].Start_Time + " - " + shifts[j].End_Time
               tableData[1].push(time)
@@ -185,13 +197,14 @@ createCalandar = async () =>{
 
   render() {
     // console.log("user auth", firebase.auth().currentUser)
+    console.log("render shifts" ,this.state.shifts)
     return (
       <ScrollView style={styles.container}>
        <Header
+          containerStyle={{ backgroundColor: "#7a66ff" }}
           placement="left"
           centerComponent={{ text:this.state.users.Name, style: { color: '#fff' } }}
           rightComponent={<Text style={{color: "white"}} onPress={() => {this.logout()}}>Log out</Text>}
-
       />
       {this.state.zone == "" ? (<View style={{paddingTop: "50%",paddingLeft: "50%", alignItems: "center" ,justifyContent: "center", width: "50%", heigth: "50%" }}><Image source={require('../assets/images/loading.gif')} /></View>) : 
         (
@@ -212,11 +225,30 @@ createCalandar = async () =>{
                 <Text style={styles.info}>Phone: {this.state.users.Phone}</Text>
                 <Text style={styles.info}>Role: {this.state.users.Role}</Text>
                 <Text style={styles.info}>Points earn: {this.state.users.Points}</Text>
+                {this.state.users.Role === "Admin" ? (
+                  <TouchableOpacity style={styles.buttonContainer}  onPress={()=>{this.props.navigation.navigate("Admin")}}>
+                    <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>Admin DashBoard</Text> 
+                  </TouchableOpacity>
+                ):(
+                  this.state.users.Role === "Supervisor" ? (
+                    <TouchableOpacity style={styles.buttonContainer}  onPress={()=>{this.props.navigation.navigate("Dashboard")}}>
+                      <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>Supervisor DashBoard</Text> 
+                    </TouchableOpacity>
+                  ):(
+                    this.state.users.Role === "Maintainer" ? (
+                      <TouchableOpacity style={styles.buttonContainer}  onPress={()=>{this.props.navigation.navigate("Maintenance")}}>
+                      <Text style={{color: "white",fontWeight: "bold", fontSize: wp("2%"), alignItems: "center" }}>Maintainer DashBoard</Text> 
+                    </TouchableOpacity>
+                    ):(
+                      null
+                    )
+                  )
+                )}
               </View> 
               <View>
               <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
-                <Row data={state.tableHead} style={styles.head} textStyle={styles.text}/>
-                <Rows data={state.tableData} textStyle={styles.text}/>
+                <Row data={this.state.tableHead} style={styles.head} textStyle={styles.text}/>
+                <Rows data={this.state.tableData} textStyle={styles.text}/>
               </Table>
 
               </View>
